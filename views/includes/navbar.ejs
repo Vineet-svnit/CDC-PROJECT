@@ -1,0 +1,21 @@
+<nav class="navbar bg-body-tertiary sticky-top pt-2 pb-0">
+    <div class="container-fluid ">
+        <ul class="nav nav-tabs ">
+            <li class="nav-item">
+            <a class="nav-link navTab p-4 <%= currentPath === '/' ? 'active' : '' %>" href="/">HOMEPAGE</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link navTab p-4 <%= currentPath === '/history' ? 'active' : '' %>" href="/history">HISTORY</a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link navTab p-4 <%= currentPath === '/announcement' ? 'active' : '' %>" href="/announcement">ANNOUNCEMENT</a>
+            </li>
+        </ul>
+        <button class="navbar-toggler mb-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
+            aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <%- include("./sidebar.ejs") %>
+    </div>
+</nav>

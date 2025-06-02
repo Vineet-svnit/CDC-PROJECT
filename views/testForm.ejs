@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/style.css" />
+    <title>Test Form</title>
+</head>
+<body>
+
+    <div class="card col-md-4 mt-5 mx-auto">
+        <div class="card-header">
+            <h3>Create Test</h3>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="/createtest" class="needs-validation" novalidate>
+                <div class="mb-3">
+                    <label for="testName" class="form-label">Test Name</label>
+                    <input name="testName" placeholder="Enter name of the test" type="text" id="testName" class="form-control" required/>
+                </div>
+                <div class="mb-3">
+                    <label for="date" class="form-label">Test Date</label>
+                    <input name="date" placeholder="Enter date of test" type="date" id="date" class="form-control" required/>
+                </div>
+                <div class="mb-3">
+                    <label for="time" class="form-label">Test Timing</label>
+                    <input name="time" placeholder="Enter time for the test" type="time" id="time" class="form-control" required/>
+                </div>
+                <div class="mb-3">
+                    <label for="duration" class="form-label">Test Duration (in minutes)</label>
+                    <input name="duration" placeholder="Enter duration" type="number" id="duration" class="form-control" required/>
+                </div>
+                <div class="mb-3">
+                    <label for="numberOfQues" class="form-label">Total number of Questions</label>
+                    <input name="numberOfQues" placeholder="Enter number of Questions" type="number" id="numberOfQues" class="form-control" required/>
+                </div>
+                <div class="mb-3">
+                    <label for="totalMarks" class="form-label">Total marks</label>
+                    <input name="totalMarks" placeholder="Enter number of Questions" type="number" id="totalMarks" class="form-control" required/>
+                </div>
+                <button class="btn btn-dark">Submit</button>
+            </form>
+        </div>
+    </div>
+    
+    <script src="/js/script.js"></script>
+</body>
+</html>
