@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="/css/announcement.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    <title>Dashboard</title>
+</head>
+
+<body>
+    <div class="dashboard">
+        <div class="main-content">
+            <div class="header">
+                <h1>Dashboard</h1>
+                <div class="user-info">
+                    <span>Admin User</span>
+                    <div class="user-avatar">AU</div>
+                </div>
+            </div>
+
+            <div class="cards">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Total Students</h3>
+                        <div class="card-icon blue">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                    <div class="card-value">1,248</div>
+                    <div class="card-description">+12% from last month</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Active Tests</h3>
+                        <div class="card-icon green">
+                            <i class="fas fa-edit"></i>
+                        </div>
+                    </div>
+                    <div class="card-value">15</div>
+                    <div class="card-description">3 ending today</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Average Score</h3>
+                        <div class="card-icon red">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                    </div>
+                    <div class="card-value">78.5%</div>
+                    <div class="card-description">+2.3% from last test</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Total Students</h3>
+                        <div class="card-icon blue">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                    <div class="card-value">1,248</div>
+                    <div class="card-description">+12% from last month</div>
+                </div>
+
+            </div>
+
+
+            <div class="sections">
+                <div class="section">
+                    <div class="section-header">
+                        <h2 class="section-title">Announcements</h2>
+                        <form method="GET" action="/announcement/new">
+                        <button class="btn btn-primary" id="newAnnouncementBtn">
+                            <i class="fas fa-plus"></i> New Announcement
+                        </button>
+                        </form>
+                    </div>
+                    <ul class="announcement-list">
+                        <% for(announcement of allAnnouncements){ %>
+                            <li class="announcement-item">
+                                <div class="announcement-box position-relative">
+                                    <div class="announcement-title">
+                                        <%= announcement.title %>
+                                    </div>
+                                    <div class="announcement-date">
+                                        Date: <%= announcement.date %>
+                                    </div>
+                                    <div class="announcement-body">
+                                        <%- announcement.body %>
+                                    </div>
+                                    <div class="announcement-footer">
+                                        Issued By: <%= announcement.issued_by %>
+                                    </div>
+
+                                    <div class="position-absolute bottom-0 end-0 p-3 d-flex gap-3">
+                                        <form action="/announcement/<%= announcement._id %>" method="GET">
+                                            <button type="submit" class="btn btn-warning btn-sm">Edit</button>
+                                        </form>
+                                        <form action="/announcement/<%= announcement._id %>?_method=DELETE" method="POST">
+                                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                        </form>
+                                    </div>
+                            </li>
+                            <% } %>
+                    </ul>
+                </div>
+
+                <div class="section">
+                    <div class="section-header">
+                        <h2 class="section-title">Create New Test</h2>
+                        <button class="btn btn-primary" id="newAnnouncementBtn">
+                            <i class="fas fa-plus"></i> New Test
+                        </button>
+                    </div>
+                    <form id="createTestForm">
+                        <div class="form-group">
+                            <label for="testTitle" class="form-label">Test Title</label>
+                            <input type="text" id="testTitle" class="form-control" placeholder="Enter test title">
+                        </div>
+                        <div class="form-group">
+                            <label for="testCourse" class="form-label">Course</label>
+                            <select id="testCourse" class="form-control">
+                                <option value="">Select Course</option>
+                                <option value="cs101">Computer Science 101</option>
+                                <option value="math201">Mathematics 201</option>
+                                <option value="phy301">Physics 301</option>
+                                <option value="eng401">Engineering 401</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="testDate" class="form-label">Test Date</label>
+                            <input type="datetime-local" id="testDate" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="testDuration" class="form-label">Duration (minutes)</label>
+                            <input type="number" id="testDuration" class="form-control" placeholder="60">
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Create Test
+                            </button>
+                            <button type="button" class="btn btn-danger">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="section" style="margin-top: 20px;">
+                <div class="section-header">
+                    <h2 class="section-title">Recent Student Performance</h2>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-download"></i> Export Data
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="student-table">
+                        <thead>
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Course</th>
+                                <th>Last Test</th>
+                                <th>Score</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>S1001</td>
+                                <td>John Smith</td>
+                                <td>CS 101</td>
+                                <td>Midterm Exam</td>
+                                <td>85%</td>
+                                <td><span class="badge badge-success">Passed</span></td>
+                            </tr>
+                            <tr>
+                                <td>S1002</td>
+                                <td>Emily Johnson</td>
+                                <td>Math 201</td>
+                                <td>Chapter 5 Quiz</td>
+                                <td>92%</td>
+                                <td><span class="badge badge-success">Passed</span></td>
+                            </tr>
+                            <tr>
+                                <td>S1003</td>
+                                <td>Michael Brown</td>
+                                <td>Physics 301</td>
+                                <td>Weekly Test 3</td>
+                                <td>68%</td>
+                                <td><span class="badge badge-warning">Borderline</span></td>
+                            </tr>
+                            <tr>
+                                <td>S1004</td>
+                                <td>Sarah Davis</td>
+                                <td>Engineering 401</td>
+                                <td>Final Exam</td>
+                                <td>45%</td>
+                                <td><span class="badge badge-danger">Failed</span></td>
+                            </tr>
+                            <tr>
+                                <td>S1005</td>
+                                <td>Robert Wilson</td>
+                                <td>CS 101</td>
+                                <td>Midterm Exam</td>
+                                <td>78%</td>
+                                <td><span class="badge badge-success">Passed</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

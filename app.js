@@ -7,6 +7,7 @@ const ejsMate=require("ejs-mate");
 const flash=require("connect-flash");
 const session=require("express-session");
 const cookieParser = require('cookie-parser')
+const methodOverride=require("method-override");
 
 //node-schedule can schedule the task, but cant iteract with the front-end by itself. So we use socket.io
 const schedule = require("node-schedule");
@@ -29,6 +30,7 @@ app.use('/bootstrap', express.static(path.join(__dirname, 'node_modules/bootstra
 app.use(express.urlencoded({extended:true}));
 app.use(express.json());
 app.use(express.static(path.join(__dirname,"/public"))); 
+app.use(methodOverride("_method"));
 
 const sessionOptions={
     secret:"mysupersecret",
@@ -87,7 +89,7 @@ const scheduledJobs = new Set(); // store globally, outside route
 
 app.get("/", async (req, res) => {
     let allTests = await Test.find({});
-
+    allTests.reverse();
     allTests.forEach((test) => {
         if (!scheduledJobs.has(test._id.toString())) {
             const runAt = new Date(test.startTime);
@@ -110,6 +112,7 @@ app.get("/history",(req,res)=>{
 
 app.get("/announcement",async (req,res)=>{
     let allAnnouncements=await Announcement.find({});
+    allAnnouncements.reverse();
     res.render("customer/announcement.ejs",{ currentPath: req.path,allAnnouncements });
 });
 
@@ -172,7 +175,38 @@ app.post("/announcement/new",async (req,res)=>{
     let now=new Date();
     let date=now.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
     newAnnouncement=new Announcement({...announcement,date});
-    await newAnnouncement.save()
+    await newAnnouncement.save();
+    res.redirect("/dashboard");
+})
+
+//Delete Announcement
+app.delete("/announcement/:id",async (req,res)=>{
+    let {id}=req.params;
+    await Announcement.findByIdAndDelete(id);
+    res.redirect("/dashboard");
+});
+
+//Show Announcement Edit Form
+app.get("/announcement/:id",async (req,res)=>{
+    let {id}=req.params;
+    let announcement=await Announcement.findById(id);
+    res.render("announcementEditForm.ejs",{id,announcement});
+});
+
+//Update Announcement
+app.put("/announcement/:id",async (req,res)=>{
+    let {id}=req.params;
+    let announcement=await Announcement.findById(id);
+    await Announcement.findByIdAndUpdate(id,{...req.body})
+    res.redirect("/dashboard");
+});
+
+app.get("/dashboard",async (req,res)=>{
+    let allAnnouncements=await Announcement.find({});
+    allAnnouncements.reverse();
+    let allTests = await Test.find({});
+    allTests.reverse();
+    res.render("dashboard.ejs",{allAnnouncements,allTests});
 })
 
 app.listen(8080,()=>{
