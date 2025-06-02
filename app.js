@@ -20,6 +20,7 @@ server.listen(8080);
 
 //Require Schemas
 const Test=require("./models/test.js");
+const Announcement=require("./models/announcement.js");
 
 const mongoURL='mongodb://127.0.0.1:27017/CDCproject';
 
@@ -107,8 +108,9 @@ app.get("/history",(req,res)=>{
     res.render("customer/history.ejs",{ currentPath: req.path });
 });
 
-app.get("/announcement",(req,res)=>{
-    res.render("customer/announcement.ejs",{ currentPath: req.path });
+app.get("/announcement",async (req,res)=>{
+    let allAnnouncements=await Announcement.find({});
+    res.render("customer/announcement.ejs",{ currentPath: req.path,allAnnouncements });
 });
 
 //Show test
@@ -155,12 +157,23 @@ app.post("/createtest",async (req,res)=>{
 //Create Ques Route
 app.post("/createtest/:id",async (req,res)=>{
     const {id}=req.params;
-    console.log(id);
-    console.log(req.body);
     await Test.findByIdAndUpdate(id,{questions:req.body.questions});
     res.send("Test created successfully")
 })
 
+//Show Announcement
+app.get("/announcement/new",(req,res)=>{
+    res.render("announcementForm.ejs");
+});
+
+//Create Announcement
+app.post("/announcement/new",async (req,res)=>{
+    let announcement=req.body;
+    let now=new Date();
+    let date=now.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+    newAnnouncement=new Announcement({...announcement,date});
+    await newAnnouncement.save()
+})
 
 app.listen(8080,()=>{
     console.log("Server is listening at http://localhost:8080");

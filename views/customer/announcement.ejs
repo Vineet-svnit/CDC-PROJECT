@@ -1,3 +1,20 @@
 <% layout("/layouts/boilerplate") %>
 
-<h1>This is Announcement page</h1>
+<div class="offset-3">
+<% for(announcement of allAnnouncements){ %>
+  <div class="announcement-box mt-4">
+    <div class="announcement-title">
+        <%= announcement.title %>
+    </div>
+    <div class="announcement-date">
+      Date: <%= announcement.date %>
+    </div>
+    <div class="announcement-body">
+        <%- announcement.body %>
+    </div>
+    <div class="announcement-footer">
+      Issued By: <%= announcement.issued_by %>
+    </div>
+  </div>
+<% } %>
+</div>
