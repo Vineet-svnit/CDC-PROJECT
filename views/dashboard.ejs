@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="/css/announcement.css" />
     <link rel="stylesheet" href="/css/dashboard.css" />
     <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
@@ -23,7 +24,7 @@
             </div>
 
             <div class="cards">
-                <div class="card">
+                <div class="dashboard-card">
                     <div class="card-header">
                         <h3 class="card-title">Total Students</h3>
                         <div class="card-icon blue">
@@ -34,7 +35,7 @@
                     <div class="card-description">+12% from last month</div>
                 </div>
 
-                <div class="card">
+                <div class="dashboard-card">
                     <div class="card-header">
                         <h3 class="card-title">Active Tests</h3>
                         <div class="card-icon green">
@@ -45,7 +46,7 @@
                     <div class="card-description">3 ending today</div>
                 </div>
 
-                <div class="card">
+                <div class="dashboard-card">
                     <div class="card-header">
                         <h3 class="card-title">Average Score</h3>
                         <div class="card-icon red">
@@ -56,7 +57,7 @@
                     <div class="card-description">+2.3% from last test</div>
                 </div>
 
-                <div class="card">
+                <div class="dashboard-card">
                     <div class="card-header">
                         <h3 class="card-title">Total Students</h3>
                         <div class="card-icon blue">
@@ -113,42 +114,46 @@
                 <div class="section">
                     <div class="section-header">
                         <h2 class="section-title">Create New Test</h2>
+                        <form method="GET" action="/test/new">
                         <button class="btn btn-primary" id="newAnnouncementBtn">
                             <i class="fas fa-plus"></i> New Test
                         </button>
+                        </form>
                     </div>
-                    <form id="createTestForm">
-                        <div class="form-group">
-                            <label for="testTitle" class="form-label">Test Title</label>
-                            <input type="text" id="testTitle" class="form-control" placeholder="Enter test title">
-                        </div>
-                        <div class="form-group">
-                            <label for="testCourse" class="form-label">Course</label>
-                            <select id="testCourse" class="form-control">
-                                <option value="">Select Course</option>
-                                <option value="cs101">Computer Science 101</option>
-                                <option value="math201">Mathematics 201</option>
-                                <option value="phy301">Physics 301</option>
-                                <option value="eng401">Engineering 401</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="testDate" class="form-label">Test Date</label>
-                            <input type="datetime-local" id="testDate" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label for="testDuration" class="form-label">Duration (minutes)</label>
-                            <input type="number" id="testDuration" class="form-control" placeholder="60">
-                        </div>
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Create Test
-                            </button>
-                            <button type="button" class="btn btn-danger">
-                                <i class="fas fa-times"></i> Cancel
-                            </button>
-                        </div>
-                    </form>
+                    <ul class="announcement-list">
+                        <% for(test of allTests){ %>
+
+                        <%
+                            const dateObj = new Date(test.startTime);
+                            const date = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+                            const time = dateObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase();
+                        %>
+                            
+                            <li class="announcement-item">
+                                <div class="position-relative">
+                                    <div class="card p-0">
+                                        <div class="card-header">
+                                            <%= test.testName %>
+                                        </div>
+                                        <div class="card-body">
+                                            <p class="card-text"><b>Scheduled date :&MediumSpace;</b><%= date %></p>
+                                            <p class="card-text"><b>Scheduled time :&MediumSpace;</b><%= time %></p>
+                                            <p class="card-text"><b>Total questions :&MediumSpace;</b><%= test.numberOfQues %></p>
+                                            <p class="card-text"><b>Total marks :&MediumSpace;</b><%= test.totalMarks %></p>
+                                        </div>
+                                    </div>
+                                    <div class="position-absolute bottom-0 end-0 p-3 d-flex gap-3">
+                                        <form action="/test/<%= test._id %>" method="GET">
+                                            <button type="submit" class="btn btn-warning btn-sm">Edit</button>
+                                        </form>
+                                        <form action="/test/<%= test._id %>?_method=DELETE" method="POST">
+                                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                        </form>
+                                    </div>
+                            </li>
+                        <% } %>
+                    </ul>
+                    </div>
                 </div>
             </div>
 

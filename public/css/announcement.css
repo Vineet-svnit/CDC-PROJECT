@@ -39,3 +39,8 @@
 .announcement-box:hover{
     transform: scale(1.05);
 }
+
+body.dark-mode {
+  background-color: #121212;
+  color: #ffffff;
+}

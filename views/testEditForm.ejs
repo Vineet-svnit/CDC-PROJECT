@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/style.css" />
+    <title>Test Form</title>
+</head>
+<body>
+    <form method="POST" action="/test/<%= test._id %>?_method=PUT" class="needs-validation" novalidate>
+
+        <!-- Test form -->
+        <div class="card col-md-4 mt-5 mb-3 mx-auto">
+            <div class="card-header">
+                <h3>Edit Test</h3>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="testName" class="form-label">Test Name</label>
+                    <input name="testName" value="<%= test.testName %>" placeholder="Enter name of the test" type="text"
+                        id="testName" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label for="date" class="form-label">Test Date</label>
+                    <input name="date" value="<%= test.startTime.toISOString().slice(0, 10) %>"
+                        placeholder="Enter date of test" type="date" id="date" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label for="time" class="form-label">Test Timing</label>
+                    <input name="time" value="<%= test.startTime.toISOString().slice(11, 16) %>"
+                        placeholder="Enter time for the test" type="time" id="time" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label for="duration" class="form-label">Test Duration (in minutes)</label>
+                    <input name="duration" value="<%= test.duration %>" placeholder="Enter duration" type="number"
+                        id="duration" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label for="numberOfQues" class="form-label">Total number of Questions</label>
+                    <input name="numberOfQues" value="<%= test.numberOfQues %>" placeholder="Enter number of Questions"
+                        type="number" id="numberOfQues" class="form-control" required readonly />
+                </div>
+                <div class="mb-3">
+                    <label for="totalMarks" class="form-label">Total marks</label>
+                    <input name="totalMarks" value="<%= test.totalMarks %>" placeholder="Enter number of Questions"
+                        type="number" id="totalMarks" class="form-control" required />
+                </div>
+            </div>
+        </div>
+        <!-- Test Questions -->
+        <% for(let i=0;i<test.numberOfQues;i++){ %>
+            <div class="row">
+                <div class="col-6 mycard mx-auto mt-3 mb-3 position-relative">
+                    <div class="position-absolute top-10 start-10 translate-middle bg-primary serialNumber">
+                        <%= i+1 %>
+                    </div>
+                    <div class="row offset-1">
+                        <div class="mb-3 col">
+                            <label for="question" class="form-label">Question</label>
+                            <input name="questions[<%= i %>][question]" value="<%= test.questions[i].question %>"
+                                placeholder="Enter question" type="text" id="question" class="form-control" />
+                        </div>
+                        OR
+                        <div class="mb-3 col">
+                            <label for="questionImage" class="form-label">Question Image</label>
+                            <input name="questions[<%= i %>][questionImage]"
+                                 type="file" id="questionImage"
+                                class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="_type" class="form-label">Type of Question</label>
+                        <select class="form-select form-control" name="questions[<%= i %>][_type]" id="_type"
+                            required>
+                            <option selected disabled value="">Choose...</option>
+                            <option value="SCQ" <% if("SCQ"==test.questions[i]._type){ %>selected<% } %>>Single Correct
+                            </option>
+                            <option value="MCQ" <% if("MCQ"==test.questions[i]._type){ %>selected<% } %>>Multiple
+                                    Correct</option>
+                            <option value="FIB" <% if("FIB"==test.questions[i]._type){ %>selected<% } %>>Fill in the
+                                    blanks</option>
+                        </select>
+                    </div>
+                    <p><b>If Single/Multiple Correct</b></p>
+                    <!-- 1 -->
+                    <div class="row">
+                        <div class="mb-3 col">
+                            <label for="option1" class="form-label">Enter option 1</label>
+                            <input name="questions[<%= i %>][option1]" value="<%= test.questions[i].option1 %>"
+                                placeholder="Enter option 1" type="text" id="option1" class="form-control" />
+                        </div>
+                        OR
+                        <div class="mb-3 col">
+                            <label for="image1" class="form-label">Option 1 Image</label>
+                            <input name="questions[<%= i %>][image1]" 
+                                type="file" id="image1" class="form-control" />
+                        </div>
+                    </div>
+                    <!-- 2 -->
+                    <div class="row">
+                        <div class="mb-3 col">
+                            <label for="option2" class="form-label">Enter option 2</label>
+                            <input name="questions[<%= i %>][option2]" value="<%= test.questions[i].option2 %>"
+                                placeholder="Enter option 2" type="text" id="option2" class="form-control" />
+                        </div>
+                        OR
+                        <div class="mb-3 col">
+                            <label for="image2" class="form-label">Option 2 Image</label>
+                            <input name="questions[<%= i %>][image2]" 
+                                type="file" id="image2" class="form-control" />
+                        </div>
+                    </div>
+                    <!-- 3 -->
+                    <div class="row">
+                        <div class="mb-3 col">
+                            <label for="option3" class="form-label">Enter option 3</label>
+                            <input name="questions[<%= i %>][option3]" value="<%= test.questions[i].option3 %>"
+                                placeholder="Enter option 1" type="text" id="option3" class="form-control" />
+                        </div>
+                        OR
+                        <div class="mb-3 col">
+                            <label for="image3" class="form-label">Option 3 Image</label>
+                            <input name="questions[<%= i %>][image3]" 
+                                type="file" id="image3" class="form-control" />
+                        </div>
+                    </div>
+                    <!-- 4 -->
+                    <div class="row">
+                        <div class="mb-3 col">
+                            <label for="option4" class="form-label">Enter option 4</label>
+                            <input name="questions[<%= i %>][option4]" value="<%= test.questions[i].option4 %>"
+                                placeholder="Enter option 1" type="text" id="option4" class="form-control" />
+                        </div>
+                        OR
+                        <div class="mb-3 col">
+                            <label for="image4" class="form-label">Option 4 Image</label>
+                            <input name="questions[<%= i %>][image4]" 
+                                type="file" id="image4" class="form-control" />
+                        </div>
+                    </div>
+
+                    <!-- Answer -->
+                    <div class="mb-3">
+                        <label for="answer" class="form-label">Enter Answer ("ABC" for Single/Multiple Correct OR a
+                            sentence/number for Fill in the blanks)</label>
+                        <input name="questions[<%= i %>][answer]" value="<%= test.questions[i].answer %>"
+                            placeholder="Enter answer" type="text" id="answer" class="form-control" required />
+                    </div>
+                </div>
+            </div>
+            <% } %>
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-success">Update Test</button>
+                </div>
+    </form>
+    <script src="/js/script.js"></script>
+</body>
+</html>

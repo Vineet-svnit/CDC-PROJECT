@@ -28,3 +28,7 @@
     border-bottom: 1px solid lightgrey;
 }
 
+body.dark-mode {
+  background-color: #121212;
+  color: #ffffff;
+}

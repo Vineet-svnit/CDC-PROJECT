@@ -26,3 +26,40 @@ setTimeout(() => {
     setTimeout(() => flash.remove(), 500); // remove after fade-out
   }
 }, 3000); // 3 seconds
+
+
+// theme change
+function setCookie(name, value) {
+  document.cookie = `${name}=${value}; path=/;`;
+}
+
+function getCookie(name) {
+  const cookies = document.cookie.split(';');
+  for (let cookie of cookies) {
+    let [k, v] = cookie.trim().split('=');
+    if (k === name) return v;
+  }
+  return null;
+}
+
+window.onload = () => {
+  const cookieTheme = getCookie('theme') || "";
+  document.body.classList.add(cookieTheme);
+};
+
+// --- Toggle theme and update cookie ---
+let button = document.getElementById("theme-toggle");
+let icon = document.getElementById("theme-icon");
+
+button.addEventListener("click",async () => {
+
+  document.body.classList.toggle("dark-mode");
+
+  if (document.body.classList.contains("dark-mode")) {
+    icon.classList.replace("fa-sun", "fa-moon");
+    setCookie("theme","");
+  } else {
+    icon.classList.replace("fa-moon", "fa-sun");
+    setCookie("theme","dark-mode");
+  }
+});

@@ -102,18 +102,17 @@ app.get("/", async (req, res) => {
             scheduledJobs.add(test._id.toString()); // mark as scheduled
         }
     });
-
-    res.render("customer/home.ejs", { currentPath: req.path, allTests });
+    res.render("user/home.ejs", { currentPath: req.path, allTests });
 });
 
 app.get("/history",(req,res)=>{
-    res.render("customer/history.ejs",{ currentPath: req.path });
+    res.render("user/history.ejs",{ currentPath: req.path });
 });
 
 app.get("/announcement",async (req,res)=>{
     let allAnnouncements=await Announcement.find({});
     allAnnouncements.reverse();
-    res.render("customer/announcement.ejs",{ currentPath: req.path,allAnnouncements });
+    res.render("user/announcement.ejs",{ currentPath: req.path,allAnnouncements });
 });
 
 //Show test
@@ -128,13 +127,13 @@ app.get("/submission",(req,res)=>{
     res.send("This is submission page");
 });
 
-//Show Route
-app.get("/createtest",(req,res)=>{
+//Show Test Form 
+app.get("/test/new",(req,res)=>{
     res.render("testForm.ejs");
 });
 
 // Create Test Route
-app.post("/createtest",async (req,res)=>{
+app.post("/test/questions/new",async (req,res)=>{
     let {testName,date,time,duration,numberOfQues,totalMarks}=req.body;
 
     // Combine into ISO string
@@ -158,13 +157,46 @@ app.post("/createtest",async (req,res)=>{
 });
 
 //Create Ques Route
-app.post("/createtest/:id",async (req,res)=>{
+app.post("/test/questions/:id",async (req,res)=>{
     const {id}=req.params;
     await Test.findByIdAndUpdate(id,{questions:req.body.questions});
-    res.send("Test created successfully")
+    res.redirect("/dashboard");
 })
 
-//Show Announcement
+//Delete Test
+app.delete("/test/:id",async (req,res)=>{
+    let {id}=req.params;
+    await Test.findByIdAndDelete(id);
+    res.redirect("/dashboard");
+});
+
+//Show Test Edit Form
+app.get("/test/:id",async (req,res)=>{
+    let {id}=req.params;
+    let test=await Test.findById(id);
+    res.render("testEditForm.ejs",{id,test});
+});
+
+//Update Test
+app.put("/test/:id",async (req,res)=>{
+    let {id}=req.params;
+    let {date,time,duration}=req.body;
+
+    // Combine into ISO string
+    const isoString = `${date}T${time}:00`;
+
+    // Convert to Date object (for MongoDB)
+    const startTime = new Date(isoString);
+    const endTime = new Date(isoString);
+    endTime.setMinutes(endTime.getMinutes()+Number(duration));
+
+    await Test.findByIdAndUpdate(id,{...req.body,startTime,endTime});
+    res.redirect("/dashboard");
+});
+
+// _____________________________________________________________________
+
+//Show Announcement Form
 app.get("/announcement/new",(req,res)=>{
     res.render("announcementForm.ejs");
 });
@@ -208,6 +240,18 @@ app.get("/dashboard",async (req,res)=>{
     allTests.reverse();
     res.render("dashboard.ejs",{allAnnouncements,allTests});
 })
+
+//Error Handler
+// app.use((err,req,res,next)=>{
+//     let {status=500,message="Sorry! Some error occurred."}=err;
+//     res.status(status).render("error.ejs",err);
+// });
+//.......
+
+// Page not found error as middleware
+app.use((req,res)=>{
+    res.status(404).send("Page not found")
+});
 
 app.listen(8080,()=>{
     console.log("Server is listening at http://localhost:8080");
