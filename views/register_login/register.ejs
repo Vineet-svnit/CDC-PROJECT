@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></head>
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/register_login.css">
+    <title>Register</title>
+</head>
+<body>
+    <div class="circle orange"></div>
+    <div class="circle blue"></div>
+    <div id="container">
+        <h1>Register Here</h1>
+        <form method="" action="" class="needs-validation" novalidate>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" name="admission_number" placeholder="Admission number" id="admission_number" required>
+                <label for="admission_number">Admission number</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="email" class="form-control" name="institute_email" placeholder="Institute email" id="institute_email" required>
+                <label for="institute_email">Institute email</label>
+            </div>
+            <div class="form-floating mb-3 password-wrapper">
+                <input type="password" class="form-control" name="password" placeholder="Password" id="password" required>
+                <label for="password">Password</label><button id="btn" type="button"><i class="fa fa-eye-slash"></i></button>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" name="full_name" placeholder="Full name" id="full_name" required>
+                <label for="full_name">Full name</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="number" class="form-control" name="phone_number" placeholder="Phone number" id="phone_number" required>
+                <label for="phone_number">Phone number</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="number" class="form-control" name="year" placeholder="Year" id="year" required>
+                <label for="year">Year</label>
+            </div>
+            <select class="form-select form-select-lg mb-3" aria-label="Large select example" required>
+                <option selected>Select branch</option>
+                <option value="ai">Artificial Intelligence</option>
+                <option value="che">Chemical Engineering</option>
+                <option value="chm">Chemistry</option>
+                <option value="ce">Civil Engineering</option>
+                <option value="cse">Computer Science and Engineering</option>
+                <option value="ee">Electrical Engineering</option>
+                <option value="ece">Electronics Engineering</option>
+                <option value="hss">Humanities and Social Sciences</option>
+                <option value="ms">Management Studies</option>
+                <option value="math">Mathematics</option>
+                <option value="me">Mechanical Engineering</option>
+                <option value="phy">Physics</option>
+            </select>
+            <button class="btn btn-dark mb-3" id="register">Register</button>       
+            <p>Already have an account? &MediumSpace;<a href="http://localhost:8080/login">Log in</a></p>
+        </form>
+    </div>
+    <script src="/js/script.js"></script>
+    <script src="/js/register_login.js"></script>
+</body>
+</html>

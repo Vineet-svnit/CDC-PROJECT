@@ -87,6 +87,14 @@ async function main() {
 
 const scheduledJobs = new Set(); // store globally, outside route
 
+app.get("/register",(req,res)=>{
+    res.render("register_login/register.ejs");
+});
+
+app.get("/login",(req,res)=>{
+    res.render("register_login/login.ejs");
+});
+
 app.get("/", async (req, res) => {
     let allTests = await Test.find({});
     allTests.reverse();

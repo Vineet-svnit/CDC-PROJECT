@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></head>
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/register_login.css">
+    <title>Login</title>
+</head>
+<body>
+    <div class="circle orange"></div>
+    <div class="circle blue"></div>
+    <div id="container">
+        <h1>Login Here</h1>
+        <form method="" action="" class="needs-validation" novalidate>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" name="admission_number" placeholder="Admission number" id="admission_number" required>
+                <label for="admission_number">Admission number</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="password" class="form-control" name="password" placeholder="Password" id="password" required>
+                <label for="password">Password</label><button id="btn" type="button"><i class="fa fa-eye-slash"></i></button>
+            </div>
+            <button class="btn btn-dark mb-3" id="register">Login</button>       
+            <p><a href="http://localhost:8080/register">Click here</a> to Register </p>
+        </form>
+        
+    </div>
+    <script src="/js/script.js"></script>
+    <script src="/js/register_login.js"></script>
+</body>
+</html>

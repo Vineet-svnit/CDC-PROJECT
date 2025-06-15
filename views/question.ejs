@@ -11,9 +11,34 @@
     <div>
         <h2>Time Remaining: <span id="timer"></span></h2>
     </div>
-    <form id="testForm" method="GET" action="/submission">
-        <!-- your form fields -->
-    </form>
+
+    <div class="item1">
+        <div class="main">
+            <div id="instruction">### INSTRUCTION ###</div><hr><br>
+            <div id="quesNum"></div>
+            <div class="ques"></div><br>
+            <div class="ans">
+                <input type="radio" name="options" id="opt1">
+                <label for="opt1"></label><br>
+                <input type="radio" name="options" id="opt2">
+                <label for="opt2"></label><br>
+                <input type="radio" name="options" id="opt3">
+                <label for="opt3"></label><br>
+                <input type="radio" name="options" id="opt4">
+                <label for="opt4"></label><br>
+            </div>
+            <div class="num input">
+                <input type="text" id="num">
+            </div><br><br>
+            <button id="prev">PREVIOUS</button>
+            <button id="clear">CLEAR</button>
+            <button id="next">NEXT</button>
+        </div>
+        <form  method="GET" action="/submission/<%= card_id %>/<%= id %>">
+            <button id="submit">SUBMIT</button>
+        </form>
+    </div>
+
     <script>
         const startTime = new Date("<%= test.startTime.toISOString() %>");
         const endTime = new Date("<%= test.endTime.toISOString() %>");
