@@ -1,12 +1,25 @@
-<% if (failure && failure.length > 0) { %>
+<% if (error && error.length > 0) { %>
   <div class="toast-container position-fixed bottom-0 end-0 p-3" id="flash_message">
-    <div id="liveToast" class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+    <div id="liveToast" class="toast show bg-danger" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="toast-header danger">
-        <strong class="me-auto">Alert</strong>
+        <strong class="me-auto">Error</strong>
         <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
       </div>
-      <div class="toast-body">
-        <%= failure[0] %>
+      <div class="toast-body bg-light text-dark">
+        <%= error[0] %>
+      </div>
+    </div>
+  </div>
+<% } %>
+<% if (success && success.length > 0) { %>
+  <div class="toast-container position-fixed bottom-0 end-0 p-3" id="flash_message">
+    <div id="liveToast" class="toast show bg-success" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header success">
+        <strong class="me-auto">Success</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body bg-light text-dark">
+        <%= success[0] %>
       </div>
     </div>
   </div>

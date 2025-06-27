@@ -9,17 +9,18 @@
     <title>Login</title>
 </head>
 <body>
+    <%- include("../includes/flash.ejs") %>
     <div class="circle orange"></div>
     <div class="circle blue"></div>
     <div id="container">
         <h1>Login Here</h1>
-        <form method="" action="" class="needs-validation" novalidate>
+        <form method="post" action="/login" class="needs-validation" novalidate>
             <div class="form-floating mb-3">
-                <input type="text" class="form-control" name="admission_number" placeholder="Admission number" id="admission_number" required>
-                <label for="admission_number">Admission number</label>
+                <input type="text" class="form-control" name="username" placeholder="Enter Admission Number" id="username" required>
+                <label for="username">Admission number</label>
             </div>
             <div class="form-floating mb-3">
-                <input type="password" class="form-control" name="password" placeholder="Password" id="password" required>
+                <input type="password" class="form-control" name="password" placeholder="Enter Password" id="password" required>
                 <label for="password">Password</label><button id="btn" type="button"><i class="fa fa-eye-slash"></i></button>
             </div>
             <button class="btn btn-dark mb-3" id="register">Login</button>       
@@ -27,6 +28,7 @@
         </form>
         
     </div>
+    <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="/js/script.js"></script>
     <script src="/js/register_login.js"></script>
 </body>
