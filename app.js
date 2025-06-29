@@ -58,6 +58,7 @@ passport.deserializeUser(User.deserializeUser());
 
 app.use((req, res, next) => {
     res.locals.currentUser = req.user;
+    res.locals.currentPath = req.path;
     res.locals.error = req.flash("error");
     res.locals.success = req.flash("success");
     next();
@@ -175,17 +176,17 @@ app.get("/", isLoggedIn, async (req, res) => {
             scheduledJobs.add(test._id.toString()); // mark as scheduled
         }
     });
-    res.render("user/home.ejs", { currentPath: req.path, allTests });
+    res.render("user/home.ejs", { allTests });
 });
 
 app.get("/history", isLoggedIn, (req, res) => {
-    res.render("user/history.ejs", { currentPath: req.path });
+    res.render("user/history.ejs");
 });
 
 app.get("/announcement", isLoggedIn, async (req, res) => {
     let allAnnouncements = await Announcement.find({});
     allAnnouncements.reverse();
-    res.render("user/announcement.ejs", { currentPath: req.path, allAnnouncements });
+    res.render("user/announcement.ejs", { allAnnouncements });
 });
 
 //Show test 
@@ -244,7 +245,7 @@ app.delete("/test/:id", isLoggedIn, async (req, res) => {
 });
 
 //Show Test Edit Form
-app.get("/test/:id", isLoggedIn, async (req, res) => {
+app.get("/test/:id", isLoggedIn, async (req, res, next) => {
     let { id } = req.params;
     let test = await Test.findById(id);
     res.render("testEditForm.ejs", { id, test });
@@ -319,7 +320,8 @@ app.use((err,req,res,next)=>{
     let {status=500,message="Sorry! Some error occurred."}=err;
     err.status = status;
     err.message = message;
-    res.status(status).render("error", err);
+    res.status(status).render("error", {err});
+    // res.send('Problem')
 });
 //.......
 
