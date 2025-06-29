@@ -319,7 +319,7 @@ app.use((err,req,res,next)=>{
     let {status=500,message="Sorry! Some error occurred."}=err;
     err.status = status;
     err.message = message;
-    res.status(status).render("error", err);
+    res.status(status).render("error", {err});
 });
 //.......
 
