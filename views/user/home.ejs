@@ -16,9 +16,10 @@
                 <div class="card-body">
                     <p class="card-text"><b>Scheduled date :&MediumSpace;</b><%= date %></p>
                     <p class="card-text"><b>Scheduled time :&MediumSpace;</b><%= time %></p>
+                    <p class="card-text"><b>Duration :&MediumSpace;</b><%= test.duration %></p>
                     <p class="card-text"><b>Total questions :&MediumSpace;</b><%= test.numberOfQues %></p>
                     <p class="card-text"><b>Total marks :&MediumSpace;</b><%= test.totalMarks %></p>
-                    <a href="http://localhost:8080/tests/<%= test._id %>" class="btn btn-primary" id="<%= test._id %>">START TEST</a>
+                    <a href="http://localhost:8080/tests/<%= test._id %>/<%= user._id %>" class="btn btn-primary" id="<%= test._id %>">START TEST</a>
                 </div>
             </div>
         </div>

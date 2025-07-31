@@ -5,11 +5,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link href="/css/question.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
-    <div>
-        <h2>Time Remaining: <span id="timer"></span></h2>
+
+    <div class="container">
+
+        <div class="item1">
+            <div class="main">
+                <div id="instruction"></div>
+                <hr><br>
+                <div id="quesNum"></div>
+                <div class="ques"></div><br>
+                <div class="options">
+                </div>
+                <button id="mark">MARK FOR REVIEW</button>
+                <button id="prev">PREVIOUS</button>
+                <button id="clear">CLEAR</button>
+                <button id="next">NEXT</button>
+            </div>
+            <button id="exit">EXIT TEST</button>
+            <button id="submit">SUBMIT</button>
+        </div>
+        <div class="item2">
+            <span id="timer"></span>
+            <button id="theme-toggle">
+                <i id="theme-icon" class="fa-solid fa-sun"></i>
+            </button>
+            <p>ATTEMPTED</p>
+            <div class="at">0</div>
+            <p>UNATTEMPTED</p>
+            <div class="unat">
+                <%= test.questions.length %>
+            </div>
+            <p>MARKED FOR REVIEW</p>
+            <div class="mark">0</div>
+            <div id="pallete"></div>
+        </div>
     </div>
 
     <script>
@@ -39,7 +73,51 @@
 
         setInterval(updateTimer, 1000);
         updateTimer(); // Initial call
+
+
+        const questions =<%- JSON.stringify(test.questions) %>;
+        console.log(questions);
     </script>
+    <script>
+        const testId = "<%= test._id %>";
+        const userId = "<%= user_id %>";
+        
+        document.querySelector("#submit").addEventListener("click", async (e) => {
+            console.log(submissions);
+            await axios.post(`http://localhost:8080/submission/${testId}/${userId}`, { submissions });
+            window.location.href = "/submission";
+        });
+        </script>
+        <script src="/js/question.js"></script>
+    <!-- Enforce full screen -->
+    <!-- Detect tab switching -->
+    <script>
+        let violations = 0;
+        let maxViolations = 3;
+
+        document.addEventListener("visibilitychange",async () => {
+            await axios.post(`http://localhost:8080/submission/${testId}/${userId}`, { submissions });
+            window.location.href = "/submission";
+        });
+
+        window.addEventListener("blur",async () => {
+            await axios.post(`http://localhost:8080/submission/${testId}/${userId}`, { submissions });
+            window.location.href = "/submission";
+        });
+    </script>
+    <!-- <script>
+        document.addEventListener("contextmenu", e => e.preventDefault());
+        document.onkeydown = function (e) {
+            if (
+                e.keyCode == 123 || // F12
+                (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) || // Ctrl+Shift+I/J
+                (e.ctrlKey && e.keyCode == 85) // Ctrl+U
+            ) {
+                return false;
+            }
+        };
+    </script> -->
+
 </body>
 
 </html>

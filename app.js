@@ -10,6 +10,7 @@ const cookieParser = require('cookie-parser')
 const methodOverride = require("method-override");
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
+const axios = require('axios');
 
 //node-schedule can schedule the task, but cant iteract with the front-end by itself. So we use socket.io
 const schedule = require("node-schedule");
@@ -84,7 +85,7 @@ const checkValidity = async (req, res, next) => {
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
-app.engine("ejs", ejsMate); 
+app.engine("ejs", ejsMate);
 
 main()
     .then(() => {
@@ -101,7 +102,7 @@ async function main() {
 const scheduledJobs = new Set(); // store globally, outside route
 
 const isLoggedIn = (req, res, next) => {
-    if(!req.isAuthenticated()) {
+    if (!req.isAuthenticated()) {
         req.session.returnTo = req.originalUrl;
         req.flash('error', 'Please Login First!');
         return res.redirect('/login');
@@ -110,7 +111,7 @@ const isLoggedIn = (req, res, next) => {
 }
 
 const storeReturnTo = (req, res, next) => {
-    if(req.session.returnTo) {
+    if (req.session.returnTo) {
         res.locals.returnTo = req.session.returnTo;
     }
     next();
@@ -125,8 +126,8 @@ app.get("/login", (req, res) => {
 });
 
 app.get('/logout', (req, res, next) => {
-    req.logout(function(err) {
-        if(err) {
+    req.logout(function (err) {
+        if (err) {
             return next(err);
         }
         req.flash('success', 'Logged out Successfully!');
@@ -139,13 +140,13 @@ app.post('/register', async (req, res) => {
         // console.log(req.body);
         const { username, password, email, name, phone, branch, year } = req.body;
         const user = new User({ username, email, name, phone, branch, year });
-        const registeredUser = await User.register( user, password );
+        const registeredUser = await User.register(user, password);
         req.login(registeredUser, err => {
-            if(err) return next(err);
+            if (err) return next(err);
             req.flash('success', 'User registered successfully');
             res.redirect('/');
         })
-    } catch(e) {
+    } catch (e) {
         if (e) {
             req.flash('error', e.message || 'Registration Failed!!');
             // console.log(e);
@@ -154,12 +155,16 @@ app.post('/register', async (req, res) => {
     }
 })
 
-app.post('/login', storeReturnTo, passport.authenticate('local', { failureFlash: true, failureRedirect: '/login' }), async (req, res) => {
+app.post('/login', storeReturnTo, passport.authenticate('local', {
+    failureFlash: true,
+    failureRedirect: '/login'
+}), async (req, res) => {
     const { name } = req.user;
-    req.flash('success', `Welcome Back ${ name }`);
+    req.flash('success', `Welcome Back ${name}`);
     const redirectUrl = res.locals.returnTo || '/';
+    // Then redirect the browser
     res.redirect(redirectUrl);
-})
+});
 
 app.get("/", isLoggedIn, async (req, res) => {
     let allTests = await Test.find({});
@@ -176,7 +181,7 @@ app.get("/", isLoggedIn, async (req, res) => {
             scheduledJobs.add(test._id.toString()); // mark as scheduled
         }
     });
-    res.render("user/home.ejs", { allTests });
+    res.render("user/home.ejs", { allTests, user: req.user });
 });
 
 app.get("/history", isLoggedIn, (req, res) => {
@@ -190,10 +195,10 @@ app.get("/announcement", isLoggedIn, async (req, res) => {
 });
 
 //Show test 
-app.get("/tests/:id", isLoggedIn, checkValidity, async (req, res) => {
-    let { id } = req.params;
+app.get("/tests/:id/:user_id", isLoggedIn, checkValidity, async (req, res) => {
+    let { id, user_id } = req.params;
     let test = await Test.findById(id);
-    res.render("question.ejs", { test });
+    res.render("question.ejs", { test, user_id });
 });
 
 //Show submission page
@@ -201,6 +206,37 @@ app.get("/submission", isLoggedIn, (req, res) => {
     res.send("This is submission page");
 });
 
+app.post("/submission/:id/:user_id", async (req, res) => {
+    try {
+        const { submissions } = req.body; // Array from frontend
+        const { id, user_id } = req.params;
+        console.log(submissions);
+        // 1. Transform submissions into the correct schema format
+        const formattedSubmissions = submissions.map(sub => ({
+            answer: sub.answer || "",
+            isMarked: sub.isMarked || false
+        }));
+
+        // 2. Find the user first (to avoid overwriting existing submissions)
+        const user = await User.findById(user_id);
+
+        if (!user) {
+            return res.status(404).send("User not found");
+        }
+        user.submissions.push({
+            test_id: id,
+            submittedAns: formattedSubmissions
+        });        // 3. Check if the user already submitted this test
+
+        // 4. Save the updated user
+        await user.save();
+
+        res.redirect("/submission");
+    } catch (err) {
+        console.error("Submission error:", err);
+        res.status(500).send("Internal Server Error");
+    }
+});
 //Show Test Form 
 app.get("/test/new", isLoggedIn, (req, res) => {
     res.render("testForm.ejs");
@@ -316,11 +352,11 @@ app.get("/dashboard", isLoggedIn, async (req, res) => {
 })
 
 // Error Handler
-app.use((err,req,res,next)=>{
-    let {status=500,message="Sorry! Some error occurred."}=err;
+app.use((err, req, res, next) => {
+    let { status = 500, message = "Sorry! Some error occurred." } = err;
     err.status = status;
     err.message = message;
-    res.status(status).render("error", {err});
+    res.status(status).render("error", { err });
 });
 //.......
 

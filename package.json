@@ -10,6 +10,7 @@
   "license": "ISC",
   "description": "CDC Project",
   "dependencies": {
+    "axios": "^1.11.0",
     "bootstrap": "^5.3.6",
     "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.7",

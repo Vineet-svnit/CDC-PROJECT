@@ -26,7 +26,27 @@ const userSchema = new Schema({
     year: {
         type: String,
         required: true
-    }
+    },
+    submissions:[
+        {
+            test_id:{
+                type:Schema.Types.ObjectId,
+                ref:"Test"
+            },
+            submittedAns:[
+                {
+                    answer:{
+                        type:String,
+                        default:""
+                    },
+                    isMarked:{
+                        type:Boolean,
+                        default:false
+                    }
+                }
+            ]
+        }
+    ]
 }, { timestamps: true });
 
 userSchema.plugin(passportLocalMongoose);

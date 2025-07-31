@@ -37,7 +37,7 @@ const testSchema=new Schema({
             _type:{
                 type:String,
                 required:true,
-                enum:["SCQ","MCQ","FIB"]
+                enum:["SCQ","MCQ"]
             },
             image1:{
                 type:String,
