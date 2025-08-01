@@ -7,7 +7,7 @@ body {
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    overflow: hidden;
+    overflow-x: hidden;
     position: relative;
 }
 
@@ -85,7 +85,7 @@ label {
 }
 
 /* Password eye button */
-#btn {
+/* #btn {
     position: absolute;
     right: 45px;
     top: 45%;
@@ -94,7 +94,7 @@ label {
     border: none;
     color: #fff;
     cursor: pointer;
-}
+} */
 
 /* Register Button */
 #register {

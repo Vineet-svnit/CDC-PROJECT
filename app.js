@@ -20,11 +20,12 @@ const socketIo = require("socket.io");
 const http = require("http");
 const server = http.createServer(app); // Use HTTP server
 const io = socketIo(server); // Initialize socket.io with the server
-server.listen(8080);
+// server.listen(8080);
 
 //Require Schemas
 const User = require('./models/user.js');
 const Test = require("./models/test.js");
+const Admin = require('./models/admin.js'); 
 const Announcement = require("./models/announcement.js");
 
 const mongoURL = 'mongodb://127.0.0.1:27017/CDCproject';
@@ -62,6 +63,7 @@ app.use((req, res, next) => {
     res.locals.currentPath = req.path;
     res.locals.error = req.flash("error");
     res.locals.success = req.flash("success");
+    req.isAdmin = req.session.isAdmin || false;
     next();
 });
 
@@ -110,6 +112,13 @@ const isLoggedIn = (req, res, next) => {
     next();
 }
 
+const isAdmin = (req, res, next) =>{
+    if(req.isAdmin)
+        return next();
+    req.flash('error', 'You are not authorized');
+    res.redirect('/');
+}
+
 const storeReturnTo = (req, res, next) => {
     if (req.session.returnTo) {
         res.locals.returnTo = req.session.returnTo;
@@ -125,6 +134,10 @@ app.get("/login", (req, res) => {
     res.render("register_login/login.ejs");
 });
 
+app.get("/admin/login", (req, res) => {
+    res.render('register_login/AdminLogin');
+})
+
 app.get('/logout', (req, res, next) => {
     req.logout(function (err) {
         if (err) {
@@ -132,6 +145,16 @@ app.get('/logout', (req, res, next) => {
         }
         req.flash('success', 'Logged out Successfully!');
         res.redirect('/login');
+    })
+})
+
+app.get('/admin/logout', (req, res, next) => {
+    req.session.destroy((err) => {
+        if(err) {
+            console.log('Error logging admin out', err);
+            return res.redirect('/dashboard');
+        }
+        res.redirect('/admin/login');
     })
 })
 
@@ -166,6 +189,23 @@ app.post('/login', storeReturnTo, passport.authenticate('local', {
     res.redirect(redirectUrl);
 });
 
+app.post('/admin/login', async (req, res) => {
+    const { adminUsername, password } = req.body;
+    const admin = await Admin.findOne({ adminUsername });
+    if (!admin) {
+        req.flash("error", "Invalid credentials");
+        return res.redirect("/admin/login");
+    }
+    const isValid = await admin.validatePassword(password);
+    if (!isValid) {
+        req.flash("error", "Invalid credentials");
+        return res.redirect("/admin/login");
+    }
+    req.session.isAdmin = admin._id;
+    res.redirect('/dashboard'); 
+})
+
+
 app.get("/", isLoggedIn, async (req, res) => {
     let allTests = await Test.find({});
     allTests.reverse();
@@ -184,8 +224,13 @@ app.get("/", isLoggedIn, async (req, res) => {
     res.render("user/home.ejs", { allTests, user: req.user });
 });
 
-app.get("/history", isLoggedIn, (req, res) => {
-    res.render("user/history.ejs");
+app.get("/history", isLoggedIn, async (req, res) => {
+    const userId = req.user._id;
+    const user = await User.findById(userId).populate('submissions.test_id');
+    const submissions = user.submissions;
+    submissions.reverse();
+    console.log(submissions[0]);
+    res.render('history', { submissions });
 });
 
 app.get("/announcement", isLoggedIn, async (req, res) => {
@@ -202,49 +247,94 @@ app.get("/tests/:id/:user_id", isLoggedIn, checkValidity, async (req, res) => {
 });
 
 //Show submission page
-app.get("/submission", isLoggedIn, (req, res) => {
-    res.send("This is submission page");
-});
 
-app.post("/submission/:id/:user_id", async (req, res) => {
-    try {
-        const { submissions } = req.body; // Array from frontend
-        const { id, user_id } = req.params;
-        console.log(submissions);
-        // 1. Transform submissions into the correct schema format
-        const formattedSubmissions = submissions.map(sub => ({
-            answer: sub.answer || "",
-            isMarked: sub.isMarked || false
-        }));
+app.get("/submission/:id", isLoggedIn, async (req, res) => {
+    console.log('called get');
+    const testId = req.params.id;
+    const test = await Test.findById(testId);
+    const user = await User.findById(req.user._id);
+    const submission = user.submissions.find(s => s.test_id.equals(testId));
+    console.log(submission);
+    res.render("submission", { test, submission });
+})
 
-        // 2. Find the user first (to avoid overwriting existing submissions)
-        const user = await User.findById(user_id);
+app.post("/submission/:id", isLoggedIn, async (req, res) => {
+    console.log('called post');
+    const { submissions } = req.body; // Array from frontend
+    const testId = req.params.id;
+    const id = req.user._id;
+    console.log(submissions);
+    // 1. Transform submissions into the correct schema format
+    const formattedSubmissions = submissions.map(sub => ({
+        answer: sub.answer || "",
+        isMarked: sub.isMarked || false
+    }));
 
-        if (!user) {
-            return res.status(404).send("User not found");
-        }
-        user.submissions.push({
-            test_id: id,
-            submittedAns: formattedSubmissions
-        });        // 3. Check if the user already submitted this test
+    // 2. Find the user first (to avoid overwriting existing submissions)
+    const user = await User.findById(id);
 
-        // 4. Save the updated user
-        await user.save();
-
-        res.redirect("/submission");
-    } catch (err) {
-        console.error("Submission error:", err);
-        res.status(500).send("Internal Server Error");
+    if (!user) {
+        return res.status(404).send("User not found");
     }
+    user.submissions.push({
+        test_id: testId,
+        submittedAns: formattedSubmissions
+    });        // 3. Check if the user already submitted this test
+
+    // 4. Save the updated user
+    await user.save();
+
+    const submission = user.submissions.find(s => s.test_id.equals(testId));
+    if (!submission)
+        return res.status(404).send("Submission not found");
+    const test = await Test.findOne({ _id: testId });
+    const answers = submission.submittedAns;
+    const questions = test.questions;
+    let score = 0;
+    for (let i = 0; i < questions.length; i++) {
+        if (questions[i]._type === "SCQ") {
+            if (questions[i].answer === answers[i].answer) {
+                score += 3;
+                answers[i].score = 3;
+            }
+        }
+        else if (questions[i]._type === "MCQ" && answers[i].answer.length > 0) {
+            const correctAns = questions[i].answer;
+            const givenAns = answers[i].answer;
+            let count = 0;
+            let falseAns = false;
+            for (const a of givenAns) {
+                if (correctAns.indexOf(a) === -1) {
+                    score -= 2;
+                    answers[i].score = -2;
+                    falseAns = true;
+                    break;
+                }
+                else count++;
+            }
+            if (!falseAns && count === correctAns.length) {
+                score += 4;
+                answers[i].score = 4;
+            }
+            else if (!falseAns) {
+                score += count;
+                answers[i].score = count;
+            }
+        }
+    }
+    submission.score = score;
+    await user.save();
+    res.redirect(`/submission/${testId}`);
 });
+
 //Show Test Form 
-app.get("/test/new", isLoggedIn, (req, res) => {
+app.get("/test/new", isAdmin, (req, res) => {
     res.render("testForm.ejs");
 });
 
-// Create Test Route
-app.post("/test/questions/new", isLoggedIn, async (req, res) => {
-    let { testName, date, time, duration, numberOfQues, totalMarks } = req.body;
+// Create Test Routea
+app.post("/test/questions/new", isAdmin, async (req, res) => {
+    let { testName, date, time, duration, numberOfQues } = req.body;
 
     // Combine into ISO string
     const isoString = `${date}T${time}:00`;
@@ -255,7 +345,7 @@ app.post("/test/questions/new", isLoggedIn, async (req, res) => {
     endTime.setMinutes(endTime.getMinutes() + Number(duration));
 
     const newTest = new Test({
-        testName, startTime, endTime, duration, numberOfQues, totalMarks
+        testName, startTime, endTime, duration, numberOfQues,
     });
 
     await newTest.save()
@@ -267,28 +357,39 @@ app.post("/test/questions/new", isLoggedIn, async (req, res) => {
 });
 
 //Create Ques Route
-app.post("/test/questions/:id", isLoggedIn, async (req, res) => {
+app.post("/test/questions/:id", isAdmin, async (req, res) => {
     const { id } = req.params;
-    await Test.findByIdAndUpdate(id, { questions: req.body.questions });
+    const questions = req.body.questions;
+    const test = await Test.findById(id);
+    test.questions = questions;
+    let totalMarks = 0;
+    for (const question of questions) {
+        if (question._type === 'SCQ')
+            totalMarks += 3;
+        else if (question._type === 'MCQ')
+            totalMarks += 4;
+    }
+    test.totalMarks = totalMarks;
+    await test.save();
     res.redirect("/dashboard");
 })
 
 //Delete Test
-app.delete("/test/:id", isLoggedIn, async (req, res) => {
+app.delete("/test/:id", isAdmin, async (req, res) => {
     let { id } = req.params;
     await Test.findByIdAndDelete(id);
     res.redirect("/dashboard");
 });
 
 //Show Test Edit Form
-app.get("/test/:id", isLoggedIn, async (req, res, next) => {
+app.get("/test/:id", isAdmin, async (req, res, next) => {
     let { id } = req.params;
     let test = await Test.findById(id);
     res.render("testEditForm.ejs", { id, test });
 });
 
 //Update Test
-app.put("/test/:id", isLoggedIn, async (req, res) => {
+app.put("/test/:id", isAdmin, async (req, res) => {
     let { id } = req.params;
     let { date, time, duration } = req.body;
 
@@ -300,19 +401,29 @@ app.put("/test/:id", isLoggedIn, async (req, res) => {
     const endTime = new Date(isoString);
     endTime.setMinutes(endTime.getMinutes() + Number(duration));
 
-    await Test.findByIdAndUpdate(id, { ...req.body, startTime, endTime });
+    const test = await Test.findByIdAndUpdate(id, { ...req.body, startTime, endTime }, { new: true });
+    const questions = test.questions;
+    let totalMarks = 0;
+    for (const question of questions) {
+        if (question._type === 'SCQ')
+            totalMarks += 3;
+        else if (question._type === 'MCQ')
+            totalMarks += 4;
+    }
+    test.totalMarks = totalMarks;
+    await test.save();
     res.redirect("/dashboard");
 });
 
 // _____________________________________________________________________
 
 //Show Announcement Form
-app.get("/announcement/new", isLoggedIn, (req, res) => {
+app.get("/announcement/new", isAdmin, (req, res) => {
     res.render("announcementForm.ejs");
 });
 
 //Create Announcement
-app.post("/announcement/new", isLoggedIn, async (req, res) => {
+app.post("/announcement/new", isAdmin, async (req, res) => {
     let announcement = req.body;
     let now = new Date();
     let date = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -322,28 +433,28 @@ app.post("/announcement/new", isLoggedIn, async (req, res) => {
 })
 
 //Delete Announcement
-app.delete("/announcement/:id", isLoggedIn, async (req, res) => {
+app.delete("/announcement/:id", isAdmin, async (req, res) => {
     let { id } = req.params;
     await Announcement.findByIdAndDelete(id);
     res.redirect("/dashboard");
 });
 
 //Show Announcement Edit Form
-app.get("/announcement/:id", isLoggedIn, async (req, res) => {
+app.get("/announcement/:id", isAdmin, async (req, res) => {
     let { id } = req.params;
     let announcement = await Announcement.findById(id);
     res.render("announcementEditForm.ejs", { id, announcement });
 });
 
 //Update Announcement
-app.put("/announcement/:id", isLoggedIn, async (req, res) => {
+app.put("/announcement/:id", isAdmin, async (req, res) => {
     let { id } = req.params;
     let announcement = await Announcement.findById(id);
     await Announcement.findByIdAndUpdate(id, { ...req.body })
     res.redirect("/dashboard");
 });
 
-app.get("/dashboard", isLoggedIn, async (req, res) => {
+app.get("/dashboard", isAdmin, async (req, res) => {
     let allAnnouncements = await Announcement.find({});
     allAnnouncements.reverse();
     let allTests = await Test.find({});
@@ -365,6 +476,9 @@ app.use((req, res) => {
     res.status(404).send("Page not found")
 });
 
-app.listen(8080, () => {
-    console.log("Server is listening at http://localhost:8080");
+// app.listen(8080, () => {
+//     console.log("Server is listening at http://localhost:8080");
+// });
+server.listen(8080, () => {
+    console.log("Server (with socket.io) is listening at http://localhost:8080");
 });

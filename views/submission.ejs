@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title><%= test.testName %> - Submission Result</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: auto;
+            padding: 2rem;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #003366;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 2rem;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 12px;
+            vertical-align: top;
+            text-align: left;
+        }
+
+        th {
+            background-color: #e0e0e0;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f4f4f4;
+        }
+
+        .options {
+            margin: 0;
+            padding-left: 1.2rem;
+        }
+
+        .option-label {
+            font-weight: bold;
+        }
+
+        img {
+            margin-top: 5px;
+        }
+
+        .summary {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: #eaf2f8;
+            border-left: 5px solid #3498db;
+        }
+
+        .summary p {
+            margin: 0.5rem 0;
+        }
+
+        .correct {
+            background-color: #d4edda;
+        }
+
+        .wrong {
+            background-color: #f8d7da;
+        }
+
+        .marked {
+            border: 2px solid #007bff;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 8px 16px;
+            margin-top: 1rem;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1><%= test.testName %> - Submission Result</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Question & Options</th>
+                <th>Correct Answer(s)</th>
+                <th>Your Answer(s)</th>
+                <th>Score</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% 
+            const questions = test.questions;
+            const answers = submission.submittedAns;
+            let attemptedCount = 0;
+
+            for(let i = 0; i < questions.length; i++) { 
+                const q = questions[i];
+                const ans = answers[i] || {};
+                const userAnswer = ans.answer || "";
+                const score = ans.score != null ? ans.score : 0;
+                const isMarked = ans.isMarked;
+                const attempted = userAnswer.trim().length > 0;
+
+                if (attempted) attemptedCount++;
+
+                function optionText(label, text, img) {
+                    return `<li><span class="option-label">${label}.</span> ${text || ''} ${img ? `<br><img src="${img}" alt="option ${label}" style="max-width:150px; max-height:100px;">` : ''}</li>`;
+                }
+
+                const opts = [
+                    optionText('A', q.option1, q.image1),
+                    optionText('B', q.option2, q.image2),
+                    optionText('C', q.option3, q.image3),
+                    optionText('D', q.option4, q.image4)
+                ].join('');
+
+                let rowClass = "";
+                if (isMarked) {
+                    rowClass += " marked";
+                }
+                if (attempted && score > 0) {
+                    rowClass += " correct";
+                } else if (attempted && score <= 0) {
+                    rowClass += " wrong";
+                }
+            %>
+            <tr class="<%= rowClass.trim() %>">
+                <td><%= i + 1 %></td>
+                <td>
+                    <p><%= q.question %></p>
+                    <% if(q.questionImage) { %>
+                        <img src="<%= q.questionImage %>" alt="Question Image" style="max-width:300px; max-height:200px;"><br>
+                    <% } %>
+                    <ul class="options"><%- opts %></ul>
+                </td>
+                <td><%= q.answer %></td>
+                <td><%= userAnswer %></td>
+                <td><%= score %></td>
+            </tr>
+            <% } %>
+        </tbody>
+    </table>
+
+    <div class="summary">
+        <p><strong>Total Questions:</strong> <%= questions.length %></p>
+        <p><strong>Attempted Questions:</strong> <%= attemptedCount %></p>
+        <p><strong>Total Score:</strong> <%= submission.score %></p>
+        <p><strong>Max Possible Score:</strong> <%= test.totalMarks || 'N/A' %></p>
+        <p><strong>Accuracy:</strong> 
+            <%= attemptedCount > 0 && test.totalMarks 
+                ? ((submission.score / test.totalMarks) * 100).toFixed(2) + '%' 
+                : 'N/A' 
+            %>
+        </p>
+    </div>
+
+</body>
+</html>

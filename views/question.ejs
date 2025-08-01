@@ -81,29 +81,40 @@
     <script>
         const testId = "<%= test._id %>";
         const userId = "<%= user_id %>";
-        
+        let legalSubmission = false;
+
+        document.querySelector("#submit").addEventListener("mousedown", () => {
+            legalSubmission = true;
+        })
+
         document.querySelector("#submit").addEventListener("click", async (e) => {
-            console.log(submissions);
-            await axios.post(`http://localhost:8080/submission/${testId}/${userId}`, { submissions });
-            window.location.href = "/submission";
+            await axios.post(`http://localhost:8080/submission/${testId}`, { submissions });
+            legalSubmission = true;
+            window.location.href = `/submission/${testId}`;
+
         });
-        </script>
-        <script src="/js/question.js"></script>
+        
+        document.addEventListener("visibilitychange", async () => {
+                if (document.visibilityState === 'hidden' && !legalSubmission) {
+                    await axios.post(`http://localhost:8080/submission/${testId}`, { submissions });
+                    window.location.href = `/submission/${testId}`;
+                }
+            });
+    </script>
+    <script src="/js/question.js"></script>
+
     <!-- Enforce full screen -->
     <!-- Detect tab switching -->
     <script>
-        let violations = 0;
-        let maxViolations = 3;
 
-        document.addEventListener("visibilitychange",async () => {
-            await axios.post(`http://localhost:8080/submission/${testId}/${userId}`, { submissions });
-            window.location.href = "/submission";
-        });
 
-        window.addEventListener("blur",async () => {
-            await axios.post(`http://localhost:8080/submission/${testId}/${userId}`, { submissions });
-            window.location.href = "/submission";
-        });
+
+        // window.addEventListener("blur", async () => {
+        //     if(!legalSubmit) {
+        //         await axios.post(`http://localhost:8080/submission/${testId}`, { submissions });
+        //         window.location.href = `/submission/${testId}`;
+        //     }
+        // });
     </script>
     <!-- <script>
         document.addEventListener("contextmenu", e => e.preventDefault());

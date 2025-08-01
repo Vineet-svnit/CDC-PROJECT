@@ -37,16 +37,16 @@
                     <input name="duration" value="<%= test.duration %>" placeholder="Enter duration" type="number"
                         id="duration" class="form-control" required />
                 </div>
-                <div class="mb-3">
+                <!-- <div class="mb-3">
                     <label for="numberOfQues" class="form-label">Total number of Questions</label>
-                    <input name="numberOfQues" value="<%= test.numberOfQues %>" placeholder="Enter number of Questions"
+                    <input name="numberOfQues" value="< %= test.numberOfQues %>" placeholder="Enter number of Questions"
                         type="number" id="numberOfQues" class="form-control" required readonly />
-                </div>
-                <div class="mb-3">
+                </div> -->
+                <!-- <div class="mb-3">
                     <label for="totalMarks" class="form-label">Total marks</label>
-                    <input name="totalMarks" value="<%= test.totalMarks %>" placeholder="Enter number of Questions"
+                    <input name="totalMarks" value="< %= test.totalMarks %>" placeholder="Enter number of Questions"
                         type="number" id="totalMarks" class="form-control" required />
-                </div>
+                </div> -->
             </div>
         </div>
         <!-- Test Questions -->
@@ -80,8 +80,8 @@
                             </option>
                             <option value="MCQ" <% if("MCQ"==test.questions[i]._type){ %>selected<% } %>>Multiple
                                     Correct</option>
-                            <option value="FIB" <% if("FIB"==test.questions[i]._type){ %>selected<% } %>>Fill in the
-                                    blanks</option>
+                            <!-- <option value="FIB" < % if("FIB"==test.questions[i]._type){ %>selected< % } %>>Fill in the
+                                    blanks</option> -->
                         </select>
                     </div>
                     <p><b>If Single/Multiple Correct</b></p>
