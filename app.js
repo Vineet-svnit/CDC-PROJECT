@@ -1,4 +1,6 @@
 //Require Packages
+const dotenv=require("dotenv");
+dotenv.config();
 const express = require("express");
 const app = express();
 const path = require("path");
@@ -11,6 +13,7 @@ const methodOverride = require("method-override");
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const axios = require('axios');
+const {connectDB}=require("./config/db.js")
 
 //node-schedule can schedule the task, but cant iteract with the front-end by itself. So we use socket.io
 const schedule = require("node-schedule");
@@ -20,6 +23,7 @@ const socketIo = require("socket.io");
 const http = require("http");
 const server = http.createServer(app); // Use HTTP server
 const io = socketIo(server); // Initialize socket.io with the server
+const PORT = process.env.PORT || 5000;
 // server.listen(8080);
 
 //Require Schemas
@@ -28,7 +32,7 @@ const Test = require("./models/test.js");
 const Admin = require('./models/admin.js'); 
 const Announcement = require("./models/announcement.js");
 
-const mongoURL = 'mongodb://127.0.0.1:27017/CDCproject';
+// const mongoURL = 'mongodb://127.0.0.1:27017/CDCproject';
 
 //Middlewares
 app.use('/bootstrap', express.static(path.join(__dirname, 'node_modules/bootstrap/dist')));//to use bootstrap
@@ -89,17 +93,18 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.engine("ejs", ejsMate);
 
-main()
-    .then(() => {
-        console.log("Connected to DB");
-    })
-    .catch((err) => {
-        console.log(err);
-    });
+//local host
+// main()
+//     .then(() => {
+//         console.log("Connected to DB");
+//     })
+//     .catch((err) => {
+//         console.log(err);
+//     });
 
-async function main() {
-    await mongoose.connect(mongoURL);
-}
+// async function main() {
+//     await mongoose.connect(mongoURL);
+// }
 
 const scheduledJobs = new Set(); // store globally, outside route
 
@@ -479,6 +484,16 @@ app.use((req, res) => {
 // app.listen(8080, () => {
 //     console.log("Server is listening at http://localhost:8080");
 // });
-server.listen(8080, () => {
-    console.log("Server (with socket.io) is listening at http://localhost:8080");
-});
+// 💡 DB connect and start server
+connectDB()
+  .then(() => {
+    console.log("Database connected successfully");
+    server.listen(PORT, () => {
+      console.log(`🚀 Server is running on port ${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error("Database connection failed:", error);
+  });
+
+
