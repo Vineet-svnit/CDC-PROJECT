@@ -88,7 +88,7 @@
         })
 
         document.querySelector("#submit").addEventListener("click", async (e) => {
-            await axios.post(`http://localhost:8080/submission/${testId}`, { submissions });
+            await axios.post(`/submission/${testId}`, { submissions });
             legalSubmission = true;
             window.location.href = `/submission/${testId}`;
 
@@ -96,7 +96,7 @@
         
         document.addEventListener("visibilitychange", async () => {
                 if (document.visibilityState === 'hidden' && !legalSubmission) {
-                    await axios.post(`http://localhost:8080/submission/${testId}`, { submissions });
+                    await axios.post(`/submission/${testId}`, { submissions });
                     window.location.href = `/submission/${testId}`;
                 }
             });
