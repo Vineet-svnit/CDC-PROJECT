@@ -236,7 +236,7 @@ app.get("/", isLoggedIn, async (req, res) => {
             scheduledJobs.add(test._id.toString()); // mark as scheduled
         }
     });
-    res.render("user/home.ejs", { allTests, user: req.user });
+    res.render("user/home.ejs", { allTests, user: req.user,page:"home" });
 });
 
 app.get("/history", isLoggedIn, async (req, res) => {
@@ -245,13 +245,13 @@ app.get("/history", isLoggedIn, async (req, res) => {
     const submissions = user.submissions;
     submissions.reverse();
     console.log(submissions[0]);
-    res.render('history', { submissions });
+    res.render('history', { submissions,page:"history" });
 });
 
 app.get("/announcement", isLoggedIn, async (req, res) => {
     let allAnnouncements = await Announcement.find({});
     allAnnouncements.reverse();
-    res.render("user/announcement.ejs", { allAnnouncements });
+    res.render("user/announcement.ejs", { allAnnouncements,page:"announcement" });
 });
 
 //Show test 
@@ -270,7 +270,7 @@ app.get("/submission/:id", isLoggedIn, async (req, res) => {
     const user = await User.findById(req.user._id);
     const submission = user.submissions.find(s => s.test_id.equals(testId));
     console.log(submission);
-    res.render("submission", { test, submission });
+    res.render("submission", { test, submission,page:"submission" });
 })
 
 app.post("/submission/:id", isLoggedIn, async (req, res) => {

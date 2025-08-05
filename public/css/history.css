@@ -1,0 +1,78 @@
+        /* body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            color: #333;
+        } */
+
+        .container {
+            max-width: 960px;
+            margin: auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #2c3e50;
+        }
+
+        .card {
+            background: linear-gradient(to right, #ffffff, #f8f9fa);
+            margin-bottom: 20px;
+            border-radius: 10px;
+            padding: 20px 25px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            color: #34495e;
+        }
+
+        .meta p {
+            margin: 5px 0;
+            font-size: 15px;
+        }
+
+        .accuracy-green {
+            color: green;
+            font-weight: bold;
+        }
+
+        .accuracy-orange {
+            color: orange;
+            font-weight: bold;
+        }
+
+        .accuracy-red {
+            color: red;
+            font-weight: bold;
+        }
+
+        .history-btn {
+            display: inline-block;
+            padding: 8px 18px;
+            margin-top: 12px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+        }
+
+        .history-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .no-submissions {
+            text-align: center;
+            color: #999;
+            font-size: 18px;
+            margin-top: 50px;
+        }
