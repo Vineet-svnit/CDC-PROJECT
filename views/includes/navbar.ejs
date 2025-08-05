@@ -1,21 +1,46 @@
 <nav class="navbar bg-body-tertiary sticky-top pt-2 pb-0">
-    <div class="container-fluid ">
-        <ul class="nav nav-tabs ">
+    <div class="container-fluid">
+        <ul class="nav nav-tabs">
             <li class="nav-item">
-            <a class="nav-link navTab p-4 <%= currentPath === '/' ? 'active' : '' %>" href="/">HOMEPAGE</a>
+                <a class="nav-link navTab p-4 <%= currentPath === '/' ? 'active' : '' %>" href="/">HOMEPAGE</a>
             </li>
             <li class="nav-item">
-            <a class="nav-link navTab p-4 <%= currentPath === '/history' ? 'active' : '' %>" href="/history">HISTORY</a>
+                <a class="nav-link navTab p-4 <%= currentPath === '/history' ? 'active' : '' %>" href="/history">HISTORY</a>
             </li>
             <li class="nav-item">
-            <a class="nav-link navTab p-4 <%= currentPath === '/announcement' ? 'active' : '' %>" href="/announcement">ANNOUNCEMENT</a>
+                <a class="nav-link navTab p-4 <%= currentPath === '/announcement' ? 'active' : '' %>" href="/announcement">ANNOUNCEMENT</a>
             </li>
         </ul>
         <a href="/logout" class="btn btn-danger ms-auto m-2">Logout</a>
-        <!-- <button class="navbar-toggler mb-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
-            aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button> -->
-
     </div>
 </nav>
+<style>
+    /* Navbar specific styles */
+    .nav-tabs {
+        border-bottom: none;
+    }
+    
+    .nav-link {
+        color: #555;
+        font-weight: 500;
+        transition: all 0.3s;
+    }
+    
+    .nav-link:hover {
+        color: #1976d2;
+        background-color: rgba(25, 118, 210, 0.1);
+    }
+    
+    .nav-link.active {
+        color: #1976d2;
+        background-color: white;
+        border-color: #e0e0e0 #e0e0e0 white;
+        border-bottom: 3px solid #1976d2;
+    }
+    
+    @media (max-width: 768px) {
+        .nav-link {
+            padding: 10px 15px !important;
+        }
+    }
+</style>
