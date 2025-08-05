@@ -46,7 +46,7 @@ const store = MongoStore.create({
     mongoUrl: process.env.MONGODB_URI,
     touchAfter: 24 * 60 * 60, // tells that if there has been no change in data then don't save until a day atleast to prevent unecessary saves
     crypto: {
-        secret: secret
+        secret: process.env.SECRET
     }
 })
 
