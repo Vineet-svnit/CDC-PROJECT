@@ -14,6 +14,7 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const axios = require('axios');
 const {connectDB}=require("./config/db.js")
+const MongoStore=require("connect-mongo")
 
 //node-schedule can schedule the task, but cant iteract with the front-end by itself. So we use socket.io
 const schedule = require("node-schedule");
@@ -41,7 +42,16 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "/public")));
 app.use(methodOverride("_method"));
 
+const store = MongoStore.create({
+    mongoUrl: process.env.MONGODB_URI,
+    touchAfter: 24 * 60 * 60, // tells that if there has been no change in data then don't save until a day atleast to prevent unecessary saves
+    crypto: {
+        secret: secret
+    }
+})
+
 const sessionOptions = {
+    store,
     secret: process.env.SECRET,
     resave: false,
     saveUninitialized: true,
@@ -481,7 +491,7 @@ app.use((req, res) => {
     res.status(404).send("Page not found")
 });
 
-// app.listen(8080, () => {
+// app.listen(PORT, () => {
 //     console.log("Server is listening at http://localhost:8080");
 // });
 // 💡 DB connect and start server
