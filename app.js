@@ -1,5 +1,5 @@
 //Require Packages
-const dotenv=require("dotenv");
+const dotenv = require("dotenv");
 dotenv.config();
 const express = require("express");
 const app = express();
@@ -13,8 +13,8 @@ const methodOverride = require("method-override");
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const axios = require('axios');
-const {connectDB}=require("./config/db.js")
-const MongoStore=require("connect-mongo")
+const { connectDB } = require("./config/db.js")
+const MongoStore = require("connect-mongo")
 
 //node-schedule can schedule the task, but cant iteract with the front-end by itself. So we use socket.io
 const schedule = require("node-schedule");
@@ -30,7 +30,7 @@ const PORT = process.env.PORT || 5000;
 //Require Schemas
 const User = require('./models/user.js');
 const Test = require("./models/test.js");
-const Admin = require('./models/admin.js'); 
+const Admin = require('./models/admin.js');
 const Announcement = require("./models/announcement.js");
 
 // const mongoURL = 'mongodb://127.0.0.1:27017/CDCproject';
@@ -127,8 +127,8 @@ const isLoggedIn = (req, res, next) => {
     next();
 }
 
-const isAdmin = (req, res, next) =>{
-    if(req.isAdmin)
+const isAdmin = (req, res, next) => {
+    if (req.isAdmin)
         return next();
     req.flash('error', 'You are not authorized');
     res.redirect('/');
@@ -165,7 +165,7 @@ app.get('/logout', (req, res, next) => {
 
 app.get('/admin/logout', (req, res, next) => {
     req.session.destroy((err) => {
-        if(err) {
+        if (err) {
             console.log('Error logging admin out', err);
             return res.redirect('/dashboard');
         }
@@ -217,7 +217,7 @@ app.post('/admin/login', async (req, res) => {
         return res.redirect("/admin/login");
     }
     req.session.isAdmin = admin._id;
-    res.redirect('/dashboard'); 
+    res.redirect('/dashboard');
 })
 
 
@@ -236,7 +236,7 @@ app.get("/", isLoggedIn, async (req, res) => {
             scheduledJobs.add(test._id.toString()); // mark as scheduled
         }
     });
-    res.render("user/home.ejs", { allTests, user: req.user,page:"home" });
+    res.render("user/home.ejs", { allTests, user: req.user, page: "home" });
 });
 
 app.get("/history", isLoggedIn, async (req, res) => {
@@ -245,13 +245,13 @@ app.get("/history", isLoggedIn, async (req, res) => {
     const submissions = user.submissions;
     submissions.reverse();
     console.log(submissions[0]);
-    res.render('history', { submissions,page:"history" });
+    res.render('history', { submissions, page: "history" });
 });
 
 app.get("/announcement", isLoggedIn, async (req, res) => {
     let allAnnouncements = await Announcement.find({});
     allAnnouncements.reverse();
-    res.render("user/announcement.ejs", { allAnnouncements,page:"announcement" });
+    res.render("user/announcement.ejs", { allAnnouncements, page: "announcement" });
 });
 
 //Show test 
@@ -270,11 +270,10 @@ app.get("/submission/:id", isLoggedIn, async (req, res) => {
     const user = await User.findById(req.user._id);
     const submission = user.submissions.find(s => s.test_id.equals(testId));
     console.log(submission);
-    res.render("submission", { test, submission,page:"submission" });
+    res.render("submission", { test, submission, page: "submission" });
 })
 
 app.post("/submission/:id", isLoggedIn, async (req, res) => {
-    console.log('called post');
     const { submissions } = req.body; // Array from frontend
     const testId = req.params.id;
     const id = req.user._id;
@@ -427,6 +426,48 @@ app.put("/test/:id", isAdmin, async (req, res) => {
     }
     test.totalMarks = totalMarks;
     await test.save();
+
+    const users = await User.find();
+    for (const user of users) {
+        const submission = user.submissions.find(s => s.test_id.equals(id));
+        if (submission) {
+            let score = 0;
+            const answers = submission.submittedAns;
+            for (let i = 0; i < questions.length; i++) {
+                if (questions[i]._type === "SCQ") {
+                    if (questions[i].answer === answers[i].answer) {
+                        score += 3;
+                        answers[i].score = 3;
+                    }
+                }
+                else if (questions[i]._type === "MCQ" && answers[i].answer.length > 0) {
+                    const correctAns = questions[i].answer;
+                    const givenAns = answers[i].answer;
+                    let count = 0;
+                    let falseAns = false;
+                    for (const a of givenAns) {
+                        if (correctAns.indexOf(a) === -1) {
+                            score -= 2;
+                            answers[i].score = -2;
+                            falseAns = true;
+                            break;
+                        }
+                        else count++;
+                    }
+                    if (!falseAns && count === correctAns.length) {
+                        score += 4;
+                        answers[i].score = 4;
+                    }
+                    else if (!falseAns) {
+                        score += count;
+                        answers[i].score = count;
+                    }
+                }
+            }
+            submission.score = score;
+            await user.save();
+        }
+    } 
     res.redirect("/dashboard");
 });
 
@@ -496,14 +537,14 @@ app.use((req, res) => {
 // });
 // 💡 DB connect and start server
 connectDB()
-  .then(() => {
-    console.log("Database connected successfully");
-    server.listen(PORT, () => {
-      console.log(`🚀 Server is running on port ${PORT}`);
+    .then(() => {
+        console.log("Database connected successfully");
+        server.listen(PORT, () => {
+            console.log(`🚀 Server is running on port ${PORT}`);
+        });
+    })
+    .catch((error) => {
+        console.error("Database connection failed:", error);
     });
-  })
-  .catch((error) => {
-    console.error("Database connection failed:", error);
-  });
 
 
