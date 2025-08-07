@@ -17,7 +17,7 @@ const userSchema = new Schema({
         type: String,
         required: true,
         match: /^[0-9]{10}$/
-    },   
+    },
     branch: {
         type: String,
         enum: ['ai', 'che', 'chm', 'ce', 'cse', 'ee', 'ece', 'hss', 'ms', 'math', 'me', 'phy'],
@@ -27,23 +27,56 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
-    submissions:[
+    submissions: [
         {
             test_id:{
                 type:Schema.Types.ObjectId,
                 ref:"Test"
             },
-            submittedAns:[
+            questions: [{
+                questionImage: {
+                    type: String,
+                    default: undefined
+                },
+                question: String,
+                _type: {
+                    type: String,
+                    required: true,
+                    enum: ["SCQ", "MCQ"]
+                },
+                image1: {
+                    type: String,
+                    default: undefined
+                },
+                option1: String,
+                image2: {
+                    type: String,
+                    default: undefined
+                },
+                option2: String,
+                image3: {
+                    type: String,
+                    default: undefined
+                },
+                option3: String,
+                image4: {
+                    type: String,
+                    default: undefined
+                },
+                option4: String,
+                answer: String
+            }],
+            submittedAns: [
                 {
-                    answer:{
-                        type:String,
-                        default:""
+                    answer: {
+                        type: String,
+                        default: ""
                     },
-                    isMarked:{
-                        type:Boolean,
-                        default:false
+                    isMarked: {
+                        type: Boolean,
+                        default: false
                     },
-                    score:{
+                    score: {
                         type: Number,
                         default: 0
                     }

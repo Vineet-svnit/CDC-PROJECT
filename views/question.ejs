@@ -4,58 +4,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= test.testName %> - CDC</title>
+    <title>Document</title>
     <link href="/css/question.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
+
     <div class="container">
+
         <div class="item1">
             <div class="main">
-                <div id="instruction">
-                    <% if(questions[0]._type === "SCQ") { %>
-                        <strong>Instructions:</strong> This is a Single Correct Question (SCQ). Select one correct answer.
-                        <strong>Marking Scheme:</strong> +3 for correct answer, -1 for wrong answer.
-                    <% } else { %>
-                        <strong>Instructions:</strong> This is a Multiple Correct Question (MCQ). Select all correct answers.
-                        <strong>Marking Scheme:</strong> +4 for all correct, +1 for partial correct, -1 for wrong answer.
-                    <% } %>
+                <div id="instruction"></div>
+                <hr><br>
+                <div id="quesNum"></div>
+                <div class="ques"></div><br>
+                <div class="options">
                 </div>
-                <hr>
-                <div class="question-container">
-                    <div id="quesNum"></div>
-                    <div class="ques"></div>
-                </div>
-                <div class="options"></div>
-                <div class="button-group">
-                    <button id="mark">MARK FOR REVIEW</button>
-                    <button id="prev">PREVIOUS</button>
-                    <button id="clear">CLEAR</button>
-                    <button id="next">NEXT</button>
-                </div>
+                <button id="mark">MARK FOR REVIEW</button>
+                <button id="prev">PREVIOUS</button>
+                <button id="clear">CLEAR</button>
+                <button id="next">NEXT</button>
             </div>
-            <div class="submit-container">
-                <button id="submit">SUBMIT</button>
-            </div>
+            <button id="exit">EXIT TEST</button>
+            <button id="submit">SUBMIT</button>
         </div>
         <div class="item2">
-            <button id="exit">EXIT TEST</button>
             <span id="timer"></span>
             <button id="theme-toggle">
                 <i id="theme-icon" class="fa-solid fa-sun"></i>
             </button>
-            <div class="stats">
-                <p>ATTEMPTED</p>
-                <div class="at">0</div>
-                <p>UNATTEMPTED</p>
-                <div class="unat">
-                    <%= test.questions.length %>
-                </div>
-                <p>MARKED FOR REVIEW</p>
-                <div class="mark">0</div>
+            <p>ATTEMPTED</p>
+            <div class="at">0</div>
+            <p>UNATTEMPTED</p>
+            <div class="unat">
+                <%= test.questions.length %>
             </div>
+            <p>MARKED FOR REVIEW</p>
+            <div class="mark">0</div>
             <div id="pallete"></div>
         </div>
     </div>
@@ -65,12 +51,13 @@
         const endTime = new Date("<%= test.endTime.toISOString() %>");
 
         function updateTimer() {
-            const now = new Date();
+            const now = new Date(); // Get current time (local)
             const timeLeft = endTime - now;
 
             if (timeLeft <= 0) {
                 alert("Time's up");
-                document.getElementById("submit").click();
+                // Optionally submit the form automatically
+                document.querySelector('#submit').click();
                 return;
             }
 
@@ -85,9 +72,22 @@
         }
 
         setInterval(updateTimer, 1000);
-        updateTimer();
+        updateTimer(); // Initial call
 
-        const questions = <%- JSON.stringify(test.questions) %>;
+
+        let questions =<%- JSON.stringify(test.questions) %>;
+        // console.log(questions);
+        function shuffle(questions) {
+            for (let i = questions.length - 1; i > 0; i--) {
+                // Pick a random index from 0 to i
+                const j = Math.floor(Math.random() * (i + 1));
+                // Swap elements array[i] and array[j]
+                [questions[i], questions[j]] = [questions[j], questions[i]];
+            }
+            return questions;
+        }
+        questions=shuffle(questions);
+        // console.log(questions);
     </script>
     <script>
         const testId = "<%= test._id %>";
@@ -96,21 +96,39 @@
 
         document.querySelector("#submit").addEventListener("mousedown", () => {
             legalSubmission = true;
-        });
+        })
 
         document.querySelector("#submit").addEventListener("click", async (e) => {
-            await axios.post(`/submission/${testId}`, { submissions });
+            await axios.post(`/submission/${testId}`, { submissions, questions });
             legalSubmission = true;
             window.location.href = `/submission/${testId}`;
-        });
-        
-        document.addEventListener("visibilitychange", async () => {
-            if (document.visibilityState === 'hidden' && !legalSubmission) {
-                await axios.post(`/submission/${testId}`, { submissions });
-                window.location.href = `/submission/${testId}`;
-            }
+
         });
 
+        document.addEventListener("visibilitychange", async () => {
+            if (document.visibilityState === 'hidden' && !legalSubmission) {
+                document.querySelector('#submit').click();
+                // await axios.post(`/submission/${testId}`, { submissions });
+                // window.location.href = `/submission/${testId}`;
+            }
+        });
+    </script>
+    <script src="/js/question.js"></script>
+
+    <!-- Enforce full screen -->
+    <!-- Detect tab switching -->
+    <script>
+
+
+
+        // window.addEventListener("blur", async () => {
+        //     if(!legalSubmit) {
+        //         await axios.post(`http://localhost:8080/submission/${testId}`, { submissions });
+        //         window.location.href = `/submission/${testId}`;
+        //     }
+        // });
+    </script>
+    <script>
         document.addEventListener("contextmenu", e => e.preventDefault());
         document.onkeydown = function (e) {
             if (
@@ -122,6 +140,7 @@
             }
         };
     </script>
-    <script src="/js/question.js"></script>
+
 </body>
+
 </html>

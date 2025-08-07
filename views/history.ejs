@@ -1,5 +1,4 @@
 <% layout("/layouts/userBoilerplate") %>
-    <!-- <% var styles = '<link rel="stylesheet" href="/css/history.css">'; %> -->
     <div class="container">
         <h1>Your Test History</h1>
 
@@ -8,6 +7,7 @@
         <% } else { %>
             <% submissions.forEach(sub => { 
                 const test = sub.test_id;
+                // console.log(test);
                 const accuracyNum = test.totalMarks > 0 ? ((sub.score / test.totalMarks) * 100) : 0;
                 const accuracy = accuracyNum.toFixed(2);
                 let accuracyClass = "accuracy-red";
