@@ -108,9 +108,9 @@ th {
     font-weight: bold;
 }
 
-tr:hover {
+/* tr:hover {
     background-color: #f5f5f5;
-}
+} */
 
 .options {
     list-style-type: none;
@@ -123,7 +123,7 @@ tr:hover {
     color: #1976d2;
 }
 
-.correct {
+/* .correct {
     background-color: rgba(25, 118, 210, 0.1);
 }
 
@@ -133,10 +133,27 @@ tr:hover {
 
 .marked {
     border-left: 4px solid #ff9800;
+} */
+
+.correct {
+    background-color: #d4edda; /* Light green */
+    color: #155724;           /* Dark green text */
 }
 
+.wrong {
+    background-color: #f8d7da; /* Light red */
+    color: #721c24;            /* Dark red text */
+}
+
+.marked {
+    /* background-color: #e3f2fd; Light bluish background */
+    border-left: 4px solid #1976d2; /* Blue accent border */
+    /* color: #0d47a1;            Darker blue text */
+}
+
+
 .summary {
-    background-color: #f5f5f5;
+    background-color: #e3f2fd;
     padding: 20px;
     border-radius: 8px;
     margin-top: 20px;

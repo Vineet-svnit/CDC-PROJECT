@@ -33,7 +33,7 @@
                         <option selected disabled value="">Choose...</option>
                         <option value="SCQ">Single Correct</option>
                         <option value="MCQ">Multiple Correct</option>
-                        <option value="FIB">Fill in the blanks</option>
+                        <!-- <option value="FIB">Fill in the blanks</option> -->
                     </select>
                 </div>
                 <p><b>If Single/Multiple Correct</b></p>
@@ -88,7 +88,7 @@
 
                 <!-- Answer -->
                 <div class="mb-3">
-                    <label for="answer" class="form-label">Enter Answer ("ABC" for Single/Multiple Correct OR a sentence/number for Fill in the blanks)</label>
+                    <label for="answer" class="form-label">Enter Answer ("ABC" for Single/Multiple Correct)</label>
                     <input name="questions[<%= i %>][answer]" placeholder="Enter answer" type="text" id="answer" class="form-control" required/>
                 </div>
             </div>

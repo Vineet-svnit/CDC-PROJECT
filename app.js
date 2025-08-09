@@ -292,7 +292,7 @@ app.get("/tests/:id/:user_id", isLoggedIn, checkValidity, checkSubmit, async (re
 app.get("/submission/:id", isLoggedIn, async (req, res) => {
     // console.log('called get');
     const testId = req.params.id;
-    const test = await Test.findById(testId);
+    const test = await Test.findById(testId).populate('questions');
     const user = await User.findById(req.user._id);
     const submission = user.submissions.find(s => s.test_id.equals(testId));
     // console.log(submission);
@@ -300,14 +300,18 @@ app.get("/submission/:id", isLoggedIn, async (req, res) => {
 })
 
 app.post("/submission/:id", isLoggedIn, checkSubmit, async (req, res) => {
-    const { submissions, questions } = req.body; // Array from frontend
+    // const { submissions, questions } = req.body; // Array from frontend
+    const { submissions } = req.body; // Array from frontend
     const testId = req.params.id;
     const id = req.user._id;
     // 1. Transform submissions into the correct schema format
     const formattedSubmissions = submissions.map(sub => ({
         answer: sub.answer || "",
+        question: sub.question,
         isMarked: sub.isMarked || false
     }));
+
+    formattedSubmissions.sort((a, b) => a.question.toString().localeCompare(b.question.toString()));
 
     // 2. Find the user first (to avoid overwriting existing submissions)
     const user = await User.findById(id);
@@ -326,9 +330,9 @@ app.post("/submission/:id", isLoggedIn, checkSubmit, async (req, res) => {
     const submission = user.submissions.find(s => s.test_id.equals(testId));
     if (!submission)
         return res.status(404).send("Submission not found");
-    // const test = await Test.findOne({ _id: testId }).populate("questions");
+    const test = await Test.findOne({ _id: testId }).populate("questions");
     const answers = submission.submittedAns;
-    // const questions = test.questions;
+    const questions = test.questions;
     let score = 0;
     for (let i = 0; i < questions.length; i++) {
         if (questions[i]._type === "SCQ") {
@@ -362,7 +366,7 @@ app.post("/submission/:id", isLoggedIn, checkSubmit, async (req, res) => {
         }
     }
     submission.score = score;
-    submission.questions=questions;
+    submission.questions = questions;
     await user.save();
     res.redirect(`/submission/${testId}`);
 });
@@ -372,7 +376,7 @@ app.get("/test/new", isAdmin, (req, res) => {
     res.render("testForm.ejs");
 });
 
-// Create Test Routea
+// Create Test Route
 app.post("/test/questions/new", isAdmin, async (req, res) => {
     let { testName, date, time, duration, numberOfQues } = req.body;
 
@@ -387,8 +391,10 @@ app.post("/test/questions/new", isAdmin, async (req, res) => {
     const questions = await Question.aggregate([
         { $sample: { size: Number(numberOfQues) } },
     ]);
+    console.log(questions);
+    let randomIds = questions.map((q) => q._id.toString());
 
-    const randomIds=questions.map((q)=>q._id);
+    randomIds.sort((a, b) => a.localeCompare(b));
 
     let totalMarks = 0;
     for (const question of questions) {
@@ -397,6 +403,7 @@ app.post("/test/questions/new", isAdmin, async (req, res) => {
         else if (question._type === 'MCQ')
             totalMarks += 4;
     }
+    console.log('totalmarks', totalMarks);
     const newTest = new Test({
         testName, startTime, endTime, duration, numberOfQues, questions: randomIds
     });
@@ -413,22 +420,22 @@ app.post("/test/questions/new", isAdmin, async (req, res) => {
 });
 
 //Create Ques Route
-app.post("/test/questions/:id", isAdmin, async (req, res) => {
-    const { id } = req.params;
-    const questions = req.body.questions;
-    const test = await Test.findById(id);
-    test.questions = questions;
-    let totalMarks = 0;
-    for (const question of questions) {
-        if (question._type === 'SCQ')
-            totalMarks += 3;
-        else if (question._type === 'MCQ')
-            totalMarks += 4;
-    }
-    test.totalMarks = totalMarks;
-    await test.save();
-    res.redirect("/dashboard");
-})
+// app.post("/test/questions/:id", isAdmin, async (req, res) => {
+//     const { id } = req.params;
+//     const questions = req.body.questions;
+//     const test = await Test.findById(id);
+//     test.questions = questions;
+//     let totalMarks = 0;
+//     for (const question of questions) {
+//         if (question._type === 'SCQ')
+//             totalMarks += 3;
+//         else if (question._type === 'MCQ')
+//             totalMarks += 4;
+//     }
+//     test.totalMarks = totalMarks;
+//     await test.save();
+//     res.redirect("/dashboard");
+// })
 
 //Delete Test
 app.delete("/test/:id", isAdmin, async (req, res) => {
@@ -440,24 +447,33 @@ app.delete("/test/:id", isAdmin, async (req, res) => {
 //Show Test Edit Form
 app.get("/test/:id", isAdmin, async (req, res, next) => {
     let { id } = req.params;
-    let test = await Test.findById(id);
+    let test = await Test.findById(id).populate("questions");
     res.render("testEditForm.ejs", { id, test });
 });
 
 //Update Test
 app.put("/test/:id", isAdmin, async (req, res) => {
     let { id } = req.params;
-    let { date, time, duration } = req.body;
- 
+    let { date, time, duration, testname, questions: changedQuestions } = req.body;
+    console.log(req.body);
+
     // Combine into ISO string
     const isoString = `${date}T${time}:00`;
-  
+
     // Convert to Date object (for MongoDB)
     const startTime = new Date(isoString);
     const endTime = new Date(isoString);
     endTime.setMinutes(endTime.getMinutes() + Number(duration));
 
-    const test = await Test.findByIdAndUpdate(id, { ...req.body, startTime, endTime }, { new: true }).populate("questions").exec();
+    const updatedPromises = changedQuestions.map(q => {
+        const { _id, ...rest } = q;
+        return Question.findByIdAndUpdate(_id, rest, { new: true });
+    })
+
+    await Promise.all(updatedPromises);
+
+    const test = await Test.findByIdAndUpdate(id, { testname, duration, startTime, endTime }, { new: true }).populate("questions").exec();
+    console.log(test.questions);
     const questions = test.questions;
     let totalMarks = 0;
     for (const question of questions) {
@@ -583,7 +599,7 @@ connectDB()
         console.log("Database connected successfully");
         server.listen(PORT, () => {
             console.log(`🚀 Server is running on port ${PORT}`);
-        }); 
+        });
     })
     .catch((error) => {
         console.error("Database connection failed:", error);

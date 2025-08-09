@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const Admin = require('../models/admin');
 
-mongoose.connect('mongodb://127.0.0.1:27017/CDCproject');
+mongoose.connect(process.env.MONGODB_URI);
 
 async function createAdmin() {
   const hash = await bcrypt.hash('pass', 12);

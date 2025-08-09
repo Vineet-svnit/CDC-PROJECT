@@ -99,7 +99,8 @@
         })
 
         document.querySelector("#submit").addEventListener("click", async (e) => {
-            await axios.post(`/submission/${testId}`, { submissions, questions });
+            // await axios.post(`/submission/${testId}`, { submissions, questions });
+            await axios.post(`/submission/${testId}`, { submissions });
             legalSubmission = true;
             window.location.href = `/submission/${testId}`;
 
@@ -127,6 +128,8 @@
         //         window.location.href = `/submission/${testId}`;
         //     }
         // });
+    for(let i = 0; i < questions.length; i++)
+            submissions[i].question = questions[i]._id;
     </script>
     <script>
         document.addEventListener("contextmenu", e => e.preventDefault());
