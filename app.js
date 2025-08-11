@@ -85,7 +85,9 @@ app.use((req, res, next) => {
 const checkValidity = async (req, res, next) => {
     let { id } = req.params;
     let test = await Test.findById(id);
-    let currentTime = new Date();
+    let currentTime = new Date(
+        new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
+    );
     let { startTime, endTime } = test;
     if (currentTime < startTime) {
         console.log(currentTime, startTime, endTime);
