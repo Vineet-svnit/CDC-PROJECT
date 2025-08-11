@@ -75,7 +75,7 @@
         <p><strong>Max Possible Score:</strong> <%= test.totalMarks || 'N/A' %></p>
         <p><strong>Accuracy:</strong> 
             <%= attemptedCount > 0 && test.totalMarks 
-                ? ((submission.score / test.totalMarks) * 100).toFixed(2) + '%' 
+                ? Math.max(((submission.score / test.totalMarks) * 100), 0).toFixed(2) + '%' 
                 : 'N/A' 
             %>
         </p>

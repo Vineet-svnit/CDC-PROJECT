@@ -179,7 +179,8 @@ function count_atm_unatm_mark() {
         if (submissions[i].isMarked) {
             mfr++;
             div.classList.add("mfr");
-        } else if (submissions[i].answer) {
+        } 
+        if (submissions[i].answer) {
             at++;
             div.classList.add("atm");
         } else {

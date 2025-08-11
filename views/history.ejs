@@ -8,7 +8,7 @@
             <% submissions.forEach(sub => { 
                 const test = sub.test_id;
                 // console.log(test);
-                const accuracyNum = test.totalMarks > 0 ? ((sub.score / test.totalMarks) * 100) : 0;
+                const accuracyNum = test.totalMarks > 0 ? Math.max(((sub.score / test.totalMarks) * 100), 0) : 0;
                 const accuracy = accuracyNum.toFixed(2);
                 let accuracyClass = "accuracy-red";
                 if (accuracyNum >= 75) accuracyClass = "accuracy-green";
@@ -18,7 +18,7 @@
                     <h2><%= test.testName %></h2>
                     <div class="meta">
                         <p><strong>Score:</strong> <%= sub.score %></p>
-                        <p><strong>Accuracy:</strong> <span class="<%= accuracyClass %>"><%= accuracy %>%</span></p>
+                        <p><strong>Accuracy:</strong> <span class="<%= accuracyClass %>"><%= accuracy %></span></p>
                         <p><strong>Start Time:</strong> <%= new Date(test.startTime).toLocaleString() %></p>
                     </div>
                     <a class="history-btn" href="/submission/<%= test._id %>">View Submission</a>
