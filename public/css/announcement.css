@@ -87,7 +87,7 @@
     color: #666;
     font-size: 0.9rem;
     font-style: italic;
-    text-align: right;
+    text-align: left;
 }
 
 @media (max-width: 768px) {
