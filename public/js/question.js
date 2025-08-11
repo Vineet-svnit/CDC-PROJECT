@@ -10,6 +10,7 @@ const mark = document.querySelector("#mark");
 const prev = document.querySelector("#prev");
 const clear = document.querySelector("#clear");
 const next = document.querySelector("#next");
+const instructionElement = document.getElementById("instruction");
 
 // Initialize submissions array properly
 let submissions = Array(questions.length).fill().map(() => ({
@@ -66,6 +67,31 @@ function display(index) {
     const q = questions[index];
     const sub = submissions[index];
 
+    //Show instructions
+    instructionElement.innerHTML = "";
+    let instructionHTML = `<h3><u>Instructions</u></h3><ul>`;
+    if (q._type === "SCQ") {
+        instructionElement.innerHTML += `
+                        <li>
+                            <strong>SCQ (Single Correct Question)</strong>: 
+                            <em>Below is a single correct question with <b>4</b> options — select only one.</em><br>
+                            <span style="color:green;">+3 marks</span> for correct, 
+                            <span style="color:gray;">0 marks</span> for wrong or unattempted.
+                        </li>
+                    `;
+    }
+    else if (q._type === "MCQ") {
+        instructionElement.innerHTML += `
+                        <li>
+                            <strong>MCQ (Multiple Correct Question)</strong>: 
+                            <em>Below is a multiple correct question with <b>4</b> options — select all that apply.</em><br>
+                            <span style="color:green;">+4 marks</span> for correct, 
+                            <span style="color:red;">-2 marks</span> for wrong.
+                            <span style="color:gray;">0 marks</span> for unattempted.
+                        </li>
+                    `;
+    }
+    instructionElement.innerHTML += `</ul>`;
     // Show question
     ques.innerHTML = `
         ${q.questionImage ? `<img src="${q.questionImage}" alt="Question">` : ""}
@@ -120,7 +146,7 @@ function display(index) {
 function updateData(optId, index) {
     const q = questions[index];
     const sub = submissions[index];
-    
+
     if (q._type === "SCQ") {
         // Single correct answer (radio buttons)
         const answerLetter = String.fromCharCode(64 + parseInt(optId.replace("opt", "")));
@@ -129,7 +155,7 @@ function updateData(optId, index) {
         // Multiple correct answers (checkboxes)
         const currentAnswers = sub.answer || "";
         const answerLetter = String.fromCharCode(64 + parseInt(optId.replace("opt", "")));
-        
+
         if (currentAnswers.includes(answerLetter)) {
             // Remove if already selected
             sub.answer = currentAnswers.replace(answerLetter, "");
@@ -138,7 +164,7 @@ function updateData(optId, index) {
             sub.answer = currentAnswers + answerLetter;
         }
     }
-    
+
     count_atm_unatm_mark();
 }
 
