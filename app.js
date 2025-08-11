@@ -88,6 +88,7 @@ const checkValidity = async (req, res, next) => {
     let currentTime = new Date();
     let { startTime, endTime } = test;
     if (currentTime < startTime) {
+        console.log(currentTime, startTime, endTime);
         req.flash("error", "The test cannot be started!");
         return res.redirect("/");
     }
@@ -391,7 +392,7 @@ app.post("/test/questions/new", isAdmin, async (req, res) => {
     const questions = await Question.aggregate([
         { $sample: { size: Number(numberOfQues) } },
     ]);
-    console.log(questions);
+    // console.log(questions);
     let randomIds = questions.map((q) => q._id.toString());
 
     randomIds.sort((a, b) => a.localeCompare(b));
@@ -403,7 +404,7 @@ app.post("/test/questions/new", isAdmin, async (req, res) => {
         else if (question._type === 'MCQ')
             totalMarks += 4;
     }
-    console.log('totalmarks', totalMarks);
+    // console.log('totalmarks', totalMarks);
     const newTest = new Test({
         testName, startTime, endTime, duration, numberOfQues, questions: randomIds
     });
@@ -455,7 +456,7 @@ app.get("/test/:id", isAdmin, async (req, res, next) => {
 app.put("/test/:id", isAdmin, async (req, res) => {
     let { id } = req.params;
     let { date, time, duration, testname, questions: changedQuestions } = req.body;
-    console.log(req.body);
+    // console.log(req.body);
 
     // Combine into ISO string
     const isoString = `${date}T${time}:00`;
