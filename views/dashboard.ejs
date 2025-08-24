@@ -75,9 +75,9 @@
                     <div class="section-header">
                         <h2 class="section-title">Announcements</h2>
                         <form method="GET" action="/announcement/new">
-                        <button class="btn btn-primary" id="newAnnouncementBtn">
-                            <i class="fas fa-plus"></i> New Announcement
-                        </button>
+                            <button class="btn btn-primary" id="newAnnouncementBtn">
+                                <i class="fas fa-plus"></i> New Announcement
+                            </button>
                         </form>
                     </div>
                     <ul class="announcement-list">
@@ -101,7 +101,8 @@
                                         <form action="/announcement/<%= announcement._id %>" method="GET">
                                             <button type="submit" class="btn btn-warning btn-sm">Edit</button>
                                         </form>
-                                        <form action="/announcement/<%= announcement._id %>?_method=DELETE" method="POST">
+                                        <form action="/announcement/<%= announcement._id %>?_method=DELETE"
+                                            method="POST">
                                             <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                                         </form>
                                     </div>
@@ -114,113 +115,127 @@
                     <div class="section-header">
                         <h2 class="section-title">Create New Test</h2>
                         <form method="GET" action="/test/new">
-                        <button class="btn btn-primary" id="newAnnouncementBtn">
-                            <i class="fas fa-plus"></i> New Test
-                        </button>
+                            <button class="btn btn-primary" id="newAnnouncementBtn">
+                                <i class="fas fa-plus"></i> New Test
+                            </button>
                         </form>
                     </div>
+                    <div>
+                        <form action="/upload" method="POST" enctype="multipart/form-data">
+                            <input type="file" name="file" accept=".xlsx,.xls" required />
+                            <button type="submit" class="btn btn-primary">Upload Questions</button>
+                        </form>
+                    </div>
+
                     <ul class="announcement-list">
                         <% for(test of allTests){ %>
 
-                        <%
-                            const dateObj = new Date(test.startTime);
-                            const date = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-                            const time = dateObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase();
-                        %>
-                            
-                            <li class="announcement-item">
-                                <div class="position-relative">
-                                    <div class="card p-0">
-                                        <div class="card-header">
-                                            <%= test.testName %>
-                                        </div>
-                                        <div class="card-body">
-                                            <p class="card-text"><b>Scheduled date :&MediumSpace;</b><%= date %></p>
-                                            <p class="card-text"><b>Scheduled time :&MediumSpace;</b><%= time %></p>
-                                            <p class="card-text"><b>Total questions :&MediumSpace;</b><%= test.numberOfQues %></p>
-                                            <p class="card-text"><b>Total marks :&MediumSpace;</b><%= test.totalMarks %></p>
-                                        </div>
-                                    </div>
-                                    <div class="position-absolute bottom-0 end-0 p-3 d-flex gap-3">
-                                        <form action="/test/<%= test._id %>" method="GET">
-                                            <button type="submit" class="btn btn-warning btn-sm">Edit</button>
-                                        </form>
-                                        <form action="/test/<%= test._id %>?_method=DELETE" method="POST">
-                                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                        </form>
-                                    </div>
-                            </li>
-                        <% } %>
-                    </ul>
-                    </div>
-                </div>
-            </div>
+                            <% const dateObj=new Date(test.startTime); const date=dateObj.toLocaleDateString('en-GB', {
+                                day: 'numeric' , month: 'long' , year: 'numeric' }); const
+                                time=dateObj.toLocaleTimeString('en-US', { hour: 'numeric' , minute: '2-digit' , hour12:
+                                true }).toLowerCase(); %>
 
-            <div class="section" style="margin-top: 20px;">
-                <div class="section-header">
-                    <h2 class="section-title">Recent Student Performance</h2>
-                    <button class="btn btn-primary">
-                        <i class="fas fa-download"></i> Export Data
-                    </button>
-                </div>
-                <div class="table-responsive">
-                    <table class="student-table">
-                        <thead>
-                            <tr>
-                                <th>Student ID</th>
-                                <th>Name</th>
-                                <th>Course</th>
-                                <th>Last Test</th>
-                                <th>Score</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>S1001</td>
-                                <td>John Smith</td>
-                                <td>CS 101</td>
-                                <td>Midterm Exam</td>
-                                <td>85%</td>
-                                <td><span class="badge badge-success">Passed</span></td>
-                            </tr>
-                            <tr>
-                                <td>S1002</td>
-                                <td>Emily Johnson</td>
-                                <td>Math 201</td>
-                                <td>Chapter 5 Quiz</td>
-                                <td>92%</td>
-                                <td><span class="badge badge-success">Passed</span></td>
-                            </tr>
-                            <tr>
-                                <td>S1003</td>
-                                <td>Michael Brown</td>
-                                <td>Physics 301</td>
-                                <td>Weekly Test 3</td>
-                                <td>68%</td>
-                                <td><span class="badge badge-warning">Borderline</span></td>
-                            </tr>
-                            <tr>
-                                <td>S1004</td>
-                                <td>Sarah Davis</td>
-                                <td>Engineering 401</td>
-                                <td>Final Exam</td>
-                                <td>45%</td>
-                                <td><span class="badge badge-danger">Failed</span></td>
-                            </tr>
-                            <tr>
-                                <td>S1005</td>
-                                <td>Robert Wilson</td>
-                                <td>CS 101</td>
-                                <td>Midterm Exam</td>
-                                <td>78%</td>
-                                <td><span class="badge badge-success">Passed</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                                <li class="announcement-item">
+                                    <div class="position-relative">
+                                        <div class="card p-0">
+                                            <div class="card-header">
+                                                <%= test.testName %>
+                                            </div>
+                                            <div class="card-body">
+                                                <p class="card-text"><b>Scheduled date :&MediumSpace;</b>
+                                                    <%= date %>
+                                                </p>
+                                                <p class="card-text"><b>Scheduled time :&MediumSpace;</b>
+                                                    <%= time %>
+                                                </p>
+                                                <p class="card-text"><b>Total questions :&MediumSpace;</b>
+                                                    <%= test.numberOfQues %>
+                                                </p>
+                                                <p class="card-text"><b>Total marks :&MediumSpace;</b>
+                                                    <%= test.totalMarks %>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="position-absolute bottom-0 end-0 p-3 d-flex gap-3">
+                                            <form action="/test/<%= test._id %>" method="GET">
+                                                <button type="submit" class="btn btn-warning btn-sm">Edit</button>
+                                            </form>
+                                            <form action="/test/<%= test._id %>?_method=DELETE" method="POST">
+                                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                            </form>
+                                        </div>
+                                </li>
+                                <% } %>
+                    </ul>
                 </div>
             </div>
         </div>
+
+        <div class="section" style="margin-top: 20px;">
+            <div class="section-header">
+                <h2 class="section-title">Recent Student Performance</h2>
+                <button class="btn btn-primary">
+                    <i class="fas fa-download"></i> Export Data
+                </button>
+            </div>
+            <div class="table-responsive">
+                <table class="student-table">
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Name</th>
+                            <th>Course</th>
+                            <th>Last Test</th>
+                            <th>Score</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>S1001</td>
+                            <td>John Smith</td>
+                            <td>CS 101</td>
+                            <td>Midterm Exam</td>
+                            <td>85%</td>
+                            <td><span class="badge badge-success">Passed</span></td>
+                        </tr>
+                        <tr>
+                            <td>S1002</td>
+                            <td>Emily Johnson</td>
+                            <td>Math 201</td>
+                            <td>Chapter 5 Quiz</td>
+                            <td>92%</td>
+                            <td><span class="badge badge-success">Passed</span></td>
+                        </tr>
+                        <tr>
+                            <td>S1003</td>
+                            <td>Michael Brown</td>
+                            <td>Physics 301</td>
+                            <td>Weekly Test 3</td>
+                            <td>68%</td>
+                            <td><span class="badge badge-warning">Borderline</span></td>
+                        </tr>
+                        <tr>
+                            <td>S1004</td>
+                            <td>Sarah Davis</td>
+                            <td>Engineering 401</td>
+                            <td>Final Exam</td>
+                            <td>45%</td>
+                            <td><span class="badge badge-danger">Failed</span></td>
+                        </tr>
+                        <tr>
+                            <td>S1005</td>
+                            <td>Robert Wilson</td>
+                            <td>CS 101</td>
+                            <td>Midterm Exam</td>
+                            <td>78%</td>
+                            <td><span class="badge badge-success">Passed</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
     </div>
 </body>
 

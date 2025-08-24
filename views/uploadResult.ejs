@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Upload Result</title>
+</head>
+<body>
+  <h1>Upload Summary</h1>
+
+  <p><strong>Inserted:</strong> <%= inserted %></p>
+
+  <% if (errors.length > 0) { %>
+    <h3>Errors:</h3>
+    <ul>
+      <% errors.forEach(function(err) { %>
+        <li><%= err %></li>
+      <% }) %>
+    </ul>
+  <% } else { %>
+    <p>No errors 🎉</p>
+  <% } %>
+</body>
+</html>

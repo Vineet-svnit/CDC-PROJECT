@@ -14,10 +14,14 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const axios = require('axios');
 const { connectDB } = require("./config/db.js")
-const MongoStore = require("connect-mongo")
+const MongoStore = require("connect-mongo");
+const multer = require('multer');
+const xlsx = require('xlsx');
 
 //node-schedule can schedule the task, but cant iteract with the front-end by itself. So we use socket.io
 const schedule = require("node-schedule");
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 //to send backend request to frontend
 const socketIo = require("socket.io");
@@ -439,6 +443,80 @@ app.post("/test/questions/new", isAdmin, async (req, res) => {
 //     await test.save();
 //     res.redirect("/dashboard");
 // })
+
+app.post("/upload", isAdmin, upload.single("file"), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: "No file uploaded" });
+        }
+
+        const workbook = xlsx.read(req.file.buffer, { type: "buffer" });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+
+        const rows = xlsx.utils.sheet_to_json(sheet, { header: 1 });
+        rows.shift(); // remove header row
+
+        const questions = [];
+        const errors = [];
+        
+        const existingQuestions = await Question.find();
+        rows.forEach((row, index) => {
+            // Skip completely empty rows
+            if (!row || row.length === 0) return;
+
+            // Must have 7 columns
+            if (row.length < 7) {
+                errors.push(`Row ${index + 2} has missing columns`);
+                return;
+            }
+
+            const [_type, question, option1, option2, option3, option4, answer] = row;
+
+            // Validate _type
+            if (!_type || !["SCQ", "MCQ"].includes(_type)) {
+                errors.push(`Row ${index + 2}: Invalid _type '${_type}'`);
+                return;
+            }
+
+            // Validate required fields
+            if (!question || !answer) {
+                errors.push(`Row ${index + 2}: Missing question or answer`);
+                return;
+            }
+
+            // Push valid question
+            const isExisting = existingQuestions.find(e => e.question === question);
+            if(!isExisting) {
+                questions.push({
+                    _type,
+                    question,
+                    option1: option1 || "",
+                    option2: option2 || "",
+                    option3: option3 || "",
+                    option4: option4 || "",
+                    answer,
+                });
+            }
+        });
+
+
+        // Insert only valid questions
+        if (questions.length > 0) {
+            await Question.insertMany(questions);
+        }
+
+        res.render("uploadResult", {
+            inserted: questions.length,
+            errors
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Failed to process file" });
+    }
+});
+
 
 //Delete Test
 app.delete("/test/:id", isAdmin, async (req, res) => {
