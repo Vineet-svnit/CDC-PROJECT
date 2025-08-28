@@ -6,7 +6,7 @@ const userSchema = new Schema({
     email: {
         type: String,
         required: true,
-        // unique: true,
+        unique: true,
         // match: /^[a-z][0-9]{2}[a-z]{2}[0-9]{3}@[a-z]+\.svnit\.ac\.in$/i
     },
     name: {

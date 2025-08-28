@@ -30,13 +30,43 @@ const server = http.createServer(app); // Use HTTP server
 const io = socketIo(server); // Initialize socket.io with the server
 const PORT = process.env.PORT || 5000;
 // server.listen(8080);
+const departments = {
+    ai: "ai",
+    che: "che",
+    chm: "chm",
+    ce: "ce",
+    cse: "cse",
+    ee: "ee",
+    ece: "ece",
+    hss: "hss",
+    ms: "ms",
+    math: "math",
+    me: "me",
+    phy: "phy"
+};
+
 
 //Require Schemas
 const User = require('./models/user.js');
 const Test = require("./models/test.js");
 const Admin = require('./models/admin.js');
 const Announcement = require("./models/announcement.js");
-const Question = require("./models/question.js");
+// const Question = require("./models/question.js");
+const {
+    Question,
+    AiDepartment,
+    ChemicalDepartment,
+    ChemistryDepartment,
+    CivilDepartment,
+    ComputerScienceDepartment,
+    ElectricalDepartment,
+    ElectronicsCommunicationDepartment,
+    HumanitiesSocialSciencesDepartment,
+    ManagementStudiesDepartment,
+    MathematicsDepartment,
+    MechanicalDepartment,
+    PhysicsDepartment
+} = require("./models/question.js");
 
 // const mongoURL = 'mongodb://127.0.0.1:27017/CDCproject';
 
@@ -246,7 +276,8 @@ app.post('/admin/login', async (req, res) => {
 
 
 app.get("/", isLoggedIn, async (req, res) => {
-    let allTests = await Test.find({});
+    const branch = req.user.branch;
+    let allTests = await Test.find({ branch: "lr" });
     allTests.reverse();
     allTests.forEach((test) => {
         if (!scheduledJobs.has(test._id.toString())) {
@@ -277,6 +308,26 @@ app.get("/announcement", isLoggedIn, async (req, res) => {
     let allAnnouncements = await Announcement.find({});
     allAnnouncements.reverse();
     res.render("user/announcement.ejs", { allAnnouncements, page: "announcement" });
+});
+
+app.get("/core", isLoggedIn, async (req, res) => {
+    const branch = req.user.branch;
+    let allTests = await Test.find({ branch: branch });
+    allTests.reverse();
+    allTests.forEach((test) => {
+        if (!scheduledJobs.has(test._id.toString())) {
+            const runAt = new Date(test.startTime);
+            schedule.scheduleJob(runAt, () => {
+                io.emit("task-complete", {
+                    message: `You can start "${test.testName}"`,
+                    id: test._id
+                });
+            });
+            scheduledJobs.add(test._id.toString()); // mark as scheduled
+        }
+    });
+    // console.log(req.user);
+    res.render("user/core.ejs", { allTests, user: req.user, page: "core" });
 });
 
 //Show test 
@@ -385,7 +436,7 @@ app.get("/test/new", isAdmin, (req, res) => {
 
 // Create Test Route
 app.post("/test/questions/new", isAdmin, async (req, res) => {
-    let { testName, date, time, duration, numberOfQues } = req.body;
+    let { testName, date, time, duration, numberOfQues, branch } = req.body;
 
     // Combine into ISO string
     const isoString = `${date}T${time}:00`;
@@ -395,9 +446,91 @@ app.post("/test/questions/new", isAdmin, async (req, res) => {
     const endTime = new Date(isoString);
     endTime.setMinutes(endTime.getMinutes() + Number(duration));
 
-    const questions = await Question.aggregate([
-        { $sample: { size: Number(numberOfQues) } },
-    ]);
+    let questions = null;
+    switch (branch) {
+        case 'lr':
+            questions = await Question.aggregate([
+                { $sample: { size: Number(numberOfQues) } },
+            ]);
+            break;
+
+        case 'ai':
+            questions = await AiDepartment.aggregate([
+                { $sample: { size: Number(numberOfQues) } },
+            ]);
+            break;
+
+        case 'che':
+            questions = await ChemicalDepartment.aggregate([
+                { $sample: { size: Number(numberOfQues) } },
+            ]);
+            break;
+
+        case 'chm':
+            questions = await ChemistryDepartment.aggregate([
+                { $sample: { size: Number(numberOfQues) } },
+            ]);
+            break;
+
+        case 'ce':
+            questions = await CivilDepartment.aggregate([
+                { $sample: { size: Number(numberOfQues) } },
+            ]);
+            break;
+
+        case 'cse':
+            questions = await ComputerScienceDepartment.aggregate([
+                { $sample: { size: Number(numberOfQues) } },
+            ]);
+            break;
+
+        case 'ee':
+            questions = await ElectricalDepartment.aggregate([
+                { $sample: { size: Number(numberOfQues) } },
+            ]);
+            break;
+
+        case 'ece':
+            questions = await ElectronicsCommunicationDepartment.aggregate([
+                { $sample: { size: Number(numberOfQues) } },
+            ]);
+            break;
+
+        case 'hss':
+            questions = await HumanitiesSocialSciencesDepartment.aggregate([
+                { $sample: { size: Number(numberOfQues) } },
+            ]);
+            break;
+
+        case 'ms':
+            questions = await ManagementStudiesDepartment.aggregate([
+                { $sample: { size: Number(numberOfQues) } },
+            ]);
+            break;
+
+        case 'math':
+            questions = await MathematicsDepartment.aggregate([
+                { $sample: { size: Number(numberOfQues) } },
+            ]);
+            break;
+
+        case 'me':
+            questions = await MechanicalDepartment.aggregate([
+                { $sample: { size: Number(numberOfQues) } },
+            ]);
+            break;
+
+        case 'phy':
+            questions = await PhysicsDepartment.aggregate([
+                { $sample: { size: Number(numberOfQues) } },
+            ]);
+            break;
+
+        default:
+            questions = [];
+            break;
+    }
+
     // console.log(questions);
     let randomIds = questions.map((q) => q._id.toString());
 
@@ -411,8 +544,23 @@ app.post("/test/questions/new", isAdmin, async (req, res) => {
             totalMarks += 4;
     }
     // console.log('totalmarks', totalMarks);
+    const branchToModel = {
+        lr: 'Question', // assuming LogicalReasoning uses Question model
+        ai: 'AiDepartment',
+        che: 'ChemicalDepartment',
+        chm: 'ChemistryDepartment',
+        ce: 'CivilDepartment',
+        cse: 'ComputerScienceDepartment',
+        ee: 'ElectricalDepartment',
+        ece: 'ElectronicsCommunicationDepartment',
+        hss: 'HumanitiesSocialSciencesDepartment',
+        ms: 'ManagementStudiesDepartment',
+        math: 'MathematicsDepartment',
+        me: 'MechanicalDepartment',
+        phy: 'PhysicsDepartment'
+    };
     const newTest = new Test({
-        testName, startTime, endTime, duration, numberOfQues, questions: randomIds
+        testName, startTime, endTime, duration, numberOfQues, questions: randomIds, branch, branchModel:branchToModel[branch]
     });
 
     newTest.totalMarks = totalMarks;
@@ -454,13 +602,74 @@ app.post("/upload", isAdmin, upload.single("file"), async (req, res) => {
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
 
+        const branch = req.body.branch;
+
         const rows = xlsx.utils.sheet_to_json(sheet, { header: 1 });
         rows.shift(); // remove header row
 
         const questions = [];
         const errors = [];
-        
-        const existingQuestions = await Question.find();
+        let existingQuestions = [];
+
+        // const existingQuestions = await Question.find();
+        switch (branch) {
+            case 'lr':
+                existingQuestions = await Question.find();
+                break;
+
+            case 'ai':
+                existingQuestions = await AiDepartment.find();
+                break;
+
+            case 'che':
+                existingQuestions = await ChemicalDepartment.find();
+                break;
+
+            case 'chm':
+                existingQuestions = await ChemistryDepartment.find();
+                break;
+
+            case 'ce':
+                existingQuestions = await CivilDepartment.find();
+                break;
+
+            case 'cse':
+                existingQuestions = await ComputerScienceDepartment.find();
+                break;
+
+            case 'ee':
+                existingQuestions = await ElectricalDepartment.find();
+                break;
+
+            case 'ece':
+                existingQuestions = await ElectronicsCommunicationDepartment.find();
+                break;
+
+            case 'hss':
+                existingQuestions = await HumanitiesSocialSciencesDepartment.find();
+                break;
+
+            case 'ms':
+                existingQuestions = await ManagementStudiesDepartment.find();
+                break;
+
+            case 'math':
+                existingQuestions = await MathematicsDepartment.find();
+                break;
+
+            case 'me':
+                existingQuestions = await MechanicalDepartment.find();
+                break;
+
+            case 'phy':
+                existingQuestions = await PhysicsDepartment.find();
+                break;
+
+            default:
+                existingQuestions = [];
+                break;
+        }
+
         rows.forEach((row, index) => {
             // Skip completely empty rows
             if (!row || row.length === 0) return;
@@ -487,7 +696,7 @@ app.post("/upload", isAdmin, upload.single("file"), async (req, res) => {
 
             // Push valid question
             const isExisting = existingQuestions.find(e => e.question === question);
-            if(!isExisting) {
+            if (!isExisting) {
                 questions.push({
                     _type,
                     question,
@@ -503,7 +712,62 @@ app.post("/upload", isAdmin, upload.single("file"), async (req, res) => {
 
         // Insert only valid questions
         if (questions.length > 0) {
-            await Question.insertMany(questions);
+            switch (branch) {
+                case 'lr':
+                    await Question.insertMany(questions);
+                    break;
+
+                case 'ai':
+                    await AiDepartment.insertMany(questions);
+                    break;
+
+                case 'che':
+                    await ChemicalDepartment.insertMany(questions);
+                    break;
+
+                case 'chm':
+                    await ChemistryDepartment.insertMany(questions);
+                    break;
+
+                case 'ce':
+                    await CivilDepartment.insertMany(questions);
+                    break;
+
+                case 'cse':
+                    await ComputerScienceDepartment.insertMany(questions);
+                    break;
+
+                case 'ee':
+                    await ElectricalDepartment.insertMany(questions);
+                    break;
+
+                case 'ece':
+                    await ElectronicsCommunicationDepartment.insertMany(questions);
+                    break;
+
+                case 'hss':
+                    await HumanitiesSocialSciencesDepartment.insertMany(questions);
+                    break;
+
+                case 'ms':
+                    await ManagementStudiesDepartment.insertMany(questions);
+                    break;
+
+                case 'math':
+                    await MathematicsDepartment.insertMany(questions);
+                    break;
+
+                case 'me':
+                    await MechanicalDepartment.insertMany(questions);
+                    break;
+
+                case 'phy':
+                    await PhysicsDepartment.insertMany(questions);
+                    break;
+
+                default:
+                    throw new Error("Invalid branch");
+            }
         }
 
         res.render("uploadResult", {
@@ -535,7 +799,7 @@ app.get("/test/:id", isAdmin, async (req, res, next) => {
 //Update Test
 app.put("/test/:id", isAdmin, async (req, res) => {
     let { id } = req.params;
-    let { date, time, duration, testname, questions: changedQuestions } = req.body;
+    let { date, time, duration, testname, questions: changedQuestions, branch } = req.body;
     // console.log(req.body);
 
     // Combine into ISO string
@@ -546,11 +810,45 @@ app.put("/test/:id", isAdmin, async (req, res) => {
     const endTime = new Date(isoString);
     endTime.setMinutes(endTime.getMinutes() + Number(duration));
 
+    // const updatedPromises = changedQuestions.map(q => {
+    //     const { _id, ...rest } = q;
+    //     return Question.findByIdAndUpdate(_id, rest, { new: true });
+    // })
+
     const updatedPromises = changedQuestions.map(q => {
         const { _id, ...rest } = q;
-        return Question.findByIdAndUpdate(_id, rest, { new: true });
-    })
 
+        switch (branch) {
+            case 'lr':
+                return Question.findByIdAndUpdate(_id, rest, { new: true });
+            case 'ai':
+                return AiDepartment.findByIdAndUpdate(_id, rest, { new: true });
+            case 'che':
+                return ChemicalDepartment.findByIdAndUpdate(_id, rest, { new: true });
+            case 'chm':
+                return ChemistryDepartment.findByIdAndUpdate(_id, rest, { new: true });
+            case 'ce':
+                return CivilDepartment.findByIdAndUpdate(_id, rest, { new: true });
+            case 'cse':
+                return ComputerScienceDepartment.findByIdAndUpdate(_id, rest, { new: true });
+            case 'ee':
+                return ElectricalDepartment.findByIdAndUpdate(_id, rest, { new: true });
+            case 'ece':
+                return ElectronicsCommunicationDepartment.findByIdAndUpdate(_id, rest, { new: true });
+            case 'hss':
+                return HumanitiesSocialSciencesDepartment.findByIdAndUpdate(_id, rest, { new: true });
+            case 'ms':
+                return ManagementStudiesDepartment.findByIdAndUpdate(_id, rest, { new: true });
+            case 'math':
+                return MathematicsDepartment.findByIdAndUpdate(_id, rest, { new: true });
+            case 'me':
+                return MechanicalDepartment.findByIdAndUpdate(_id, rest, { new: true });
+            case 'phy':
+                return PhysicsDepartment.findByIdAndUpdate(_id, rest, { new: true });
+            default:
+                throw new Error("Invalid branch");
+        }
+    });
     await Promise.all(updatedPromises);
 
     const test = await Test.findByIdAndUpdate(id, { testname, duration, startTime, endTime }, { new: true }).populate("questions").exec();

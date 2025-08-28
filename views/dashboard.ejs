@@ -120,8 +120,27 @@
                             </button>
                         </form>
                     </div>
+
+
+                    <!-- upload the questions -->
                     <div>
                         <form action="/upload" method="POST" enctype="multipart/form-data">
+                            <select class="form-select form-select-lg mb-3" aria-label="Large select example" name="branch" required>
+                                <option value="" disabled selected>Select branch</option>
+                                <option value="lr">Logical Reasoning and Aptitude</option>
+                                <option value="ai">Artificial Intelligence</option>
+                                <option value="che">Chemical Engineering</option>
+                                <option value="chm">Chemistry</option>
+                                <option value="ce">Civil Engineering</option>
+                                <option value="cse">Computer Science and Engineering</option>
+                                <option value="ee">Electrical Engineering</option>
+                                <option value="ece">Electronics Engineering</option>
+                                <option value="hss">Humanities and Social Sciences</option>
+                                <option value="ms">Management Studies</option>
+                                <option value="math">Mathematics</option>
+                                <option value="me">Mechanical Engineering</option>
+                                <option value="phy">Physics</option>
+                            </select>
                             <input type="file" name="file" accept=".xlsx,.xls" required />
                             <button type="submit" class="btn btn-primary">Upload Questions</button>
                         </form>

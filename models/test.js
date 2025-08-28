@@ -1,6 +1,22 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
+const branchToModel = {
+    lr: 'Question', // assuming LogicalReasoning uses Question model
+    ai: 'AiDepartment',
+    che: 'ChemicalDepartment',
+    chm: 'ChemistryDepartment',
+    ce: 'CivilDepartment',
+    cse: 'ComputerScienceDepartment',
+    ee: 'ElectricalDepartment',
+    ece: 'ElectronicsCommunicationDepartment',
+    hss: 'HumanitiesSocialSciencesDepartment',
+    ms: 'ManagementStudiesDepartment',
+    math: 'MathematicsDepartment',
+    me: 'MechanicalDepartment',
+    phy: 'PhysicsDepartment'
+};
+
 const testSchema = new Schema({
     testName: {
         type: String,
@@ -27,12 +43,20 @@ const testSchema = new Schema({
         type: Number,
         min: 0
     },
-    questions: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: "Question"
-        }
-    ]
+    branchModel: {
+        type: String,
+        required: true,
+        enum: Object.values(branchToModel)
+    },
+    questions: [{
+        type: Schema.Types.ObjectId,
+        refPath: 'branchModel'
+    }],
+    branch: {
+        type: String,
+        enum: ['ai', 'che', 'chm', 'ce', 'cse', 'ee', 'ece', 'hss', 'ms', 'math', 'me', 'phy', 'lr'],
+        required: true
+    }
 });
 
 module.exports = mongoose.model("Test", testSchema);

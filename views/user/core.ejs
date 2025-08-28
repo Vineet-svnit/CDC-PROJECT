@@ -1,0 +1,29 @@
+<% layout("/layouts/userBoilerplate") %>
+    <!-- <% var styles = '<link rel="stylesheet" href="/css/home.css">'; %> -->
+
+    <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1">
+        <% for(let test of allTests){ %>
+
+            <%
+                const dateObj = new Date(test.startTime);
+                const date = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+                const time = dateObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase();
+            %>
+
+            <div class="col">
+                <div class="card p-0 mt-3">
+                    <div class="card-header">
+                        <%= test.testName %>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text"><b>Scheduled date :&MediumSpace;</b><%= date %></p>
+                        <p class="card-text"><b>Scheduled time :&MediumSpace;</b><%= time %></p>
+                        <p class="card-text"><b>Duration :&MediumSpace;</b><%= test.duration %></p>
+                        <p class="card-text"><b>Total questions :&MediumSpace;</b><%= test.numberOfQues %></p>
+                        <p class="card-text"><b>Total marks :&MediumSpace;</b><%= test.totalMarks %></p>
+                        <a href="/tests/<%= test._id %>/<%= user._id %>" class="btn btn-primary" id="<%= test._id %>">START TEST</a>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+    </div>

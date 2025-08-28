@@ -19,165 +19,129 @@
       <div class="card-body">
         <div class="mb-3">
           <label for="testName" class="form-label">Test Name</label>
-          <input
-            name="testName"
-            value="<%= test.testName %>"
-            placeholder="Enter name of the test"
-            type="text"
-            id="testName"
-            class="form-control"
-            required
-          />
+          <input name="testName" value="<%= test.testName %>" placeholder="Enter name of the test" type="text"
+            id="testName" class="form-control" required />
         </div>
 
         <div class="row gx-3 mb-3">
           <div class="col">
             <label for="date" class="form-label">Test Date</label>
-            <input
-              name="date"
-              value="<%= test.startTime.toLocaleDateString('en-CA') %>"
-              type="date"
-              id="date"
-              class="form-control"
-              required
-            />
+            <input name="date" value="<%= test.startTime.toLocaleDateString('en-CA') %>" type="date" id="date"
+              class="form-control" required />
           </div>
           <div class="col">
             <label for="time" class="form-label">Test Timing</label>
-            <input
-              name="time"
+            <input name="time"
               value="<%= test.startTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false }) %>"
-              type="time"
-              id="time"
-              class="form-control"
-              required
-            />
+              type="time" id="time" class="form-control" required />
           </div>
         </div>
 
         <div class="mb-3">
           <label for="duration" class="form-label">Test Duration (in minutes)</label>
-          <input
-            name="duration"
-            value="<%= test.duration %>"
-            placeholder="Enter duration"
-            type="number"
-            id="duration"
-            class="form-control"
-            min="1"
-            required
-          />
+          <input name="duration" value="<%= test.duration %>" placeholder="Enter duration" type="number" id="duration"
+            class="form-control" min="1" required />
+        </div>
+
+        <div class="mb-3">
+          <label for="branch" class="form-label">Test Name</label>
+          <select class="form-select form-select-lg mb-3" aria-label="Large select example" id="branch" name="branch"
+            required disabled>
+            <option value="" disabled>Select branch</option>
+            <option value="lr" <%=test.branch=='lr' ? "selected" : "" %>>Logical Reasoning and Aptitude</option>
+            <option value="ai" <%=test.branch=='ai' ? "selected" : "" %>>Artificial Intelligence</option>
+            <option value="che" <%=test.branch=='che' ? "selected" : "" %>>Chemical Engineering</option>
+            <option value="chm" <%=test.branch=='chm' ? "selected" : "" %>>Chemistry</option>
+            <option value="ce" <%=test.branch=='ce' ? "selected" : "" %>>Civil Engineering</option>
+            <option value="cse" <%=test.branch=='cse' ? "selected" : "" %>>Computer Science and Engineering</option>
+            <option value="ee" <%=test.branch=='ee' ? "selected" : "" %>>Electrical Engineering</option>
+            <option value="ece" <%=test.branch=='ece' ? "selected" : "" %>>Electronics Engineering</option>
+            <option value="hss" <%=test.branch=='hss' ? "selected" : "" %>>Humanities and Social Sciences</option>
+            <option value="ms" <%=test.branch=='ms' ? "selected" : "" %>>Management Studies</option>
+            <option value="math" <%=test.branch=='math' ? "selected" : "" %>>Mathematics</option>
+            <option value="me" <%=test.branch=='me' ? "selected" : "" %>>Mechanical Engineering</option>
+            <option value="phy" <%=test.branch=='phy' ? "selected" : "" %>>Physics</option>
+          </select>
         </div>
       </div>
     </div>
 
     <!-- Test Questions -->
-    <% for(let i = 0; i < test.numberOfQues; i++) { %>
-    <div class="row justify-content-center">
-      <div class="col-md-8 mycard mt-4 mb-4">
-        <div class="serialNumber"><%= i + 1 %></div>
-
-        <div class="row gx-3 mb-3">
-          <div class="col-md-6">
-            <label for="question<%= i %>" class="form-label">Question</label>
-            <input
-              name="questions[<%= i %>][question]"
-              value="<%= test.questions[i].question %>"
-              placeholder="Enter question"
-              type="text"
-              id="question<%= i %>"
-              class="form-control"
-            />
+    <% for(let i=0; i < test.numberOfQues; i++) { %>
+      <div class="row justify-content-center">
+        <div class="col-md-8 mycard mt-4 mb-4">
+          <div class="serialNumber">
+            <%= i + 1 %>
           </div>
 
-          <div class="col-md-6">
-            <label for="questionImage<%= i %>" class="form-label">Question Image</label>
-            <input
-              name="questions[<%= i %>][questionImage]"
-              type="file"
-              id="questionImage<%= i %>"
-              class="form-control"
-            />
+          <div class="row gx-3 mb-3">
+            <div class="col-md-6">
+              <label for="question<%= i %>" class="form-label">Question</label>
+              <input name="questions[<%= i %>][question]" value="<%= test.questions[i].question %>"
+                placeholder="Enter question" type="text" id="question<%= i %>" class="form-control" />
+            </div>
+
+            <div class="col-md-6">
+              <label for="questionImage<%= i %>" class="form-label">Question Image</label>
+              <input name="questions[<%= i %>][questionImage]" type="file" id="questionImage<%= i %>"
+                class="form-control" />
+            </div>
           </div>
-        </div>
 
-        <div class="mb-3">
-          <label for="_type<%= i %>" class="form-label">Type of Question</label>
-          <select
-            class="form-select"
-            name="questions[<%= i %>][_type]"
-            id="_type<%= i %>"
-            required
-          >
-            <option disabled value="" <% if (!test.questions[i]._type) { %>selected<% } %>>
-              Choose...
-            </option>
-            <option value="SCQ" <% if (test.questions[i]._type === "SCQ") { %>selected<% } %>>
-              Single Correct
-            </option>
-            <option value="MCQ" <% if (test.questions[i]._type === "MCQ") { %>selected<% } %>>
-              Multiple Correct
-            </option>
-          </select>
-        </div>
-
-        <p><strong>If Single/Multiple Correct</strong></p>
-
-        <!-- Options 1 to 4 -->
-        <% for(let opt=1; opt<=4; opt++) { %>
-        <div class="row gx-3 mb-3">
-          <div class="col-md-6">
-            <label for="option<%= opt %>_<%= i %>" class="form-label">Enter option <%= opt %></label>
-            <input
-              name="questions[<%= i %>][option<%= opt %>]"
-              value="<%= test.questions[i]["option" + opt] %>"
-              placeholder="Enter option <%= opt %>"
-              type="text"
-              id="option<%= opt %>_<%= i %>"
-              class="form-control"
-            />
+          <div class="mb-3">
+            <label for="_type<%= i %>" class="form-label">Type of Question</label>
+            <select class="form-select" name="questions[<%= i %>][_type]" id="_type<%= i %>" required>
+              <option disabled value="" <% if (!test.questions[i]._type) { %>selected<% } %>>
+                  Choose...
+              </option>
+              <option value="SCQ" <% if (test.questions[i]._type==="SCQ" ) { %>selected<% } %>>
+                  Single Correct
+              </option>
+              <option value="MCQ" <% if (test.questions[i]._type==="MCQ" ) { %>selected<% } %>>
+                  Multiple Correct
+              </option>
+            </select>
           </div>
-          <div class="col-md-6">
-            <label for="image<%= opt %>_<%= i %>" class="form-label">Option <%= opt %> Image</label>
-            <input
-              name="questions[<%= i %>][image<%= opt %>]"
-              type="file"
-              id="image<%= opt %>_<%= i %>"
-              class="form-control"
-            />
-          </div>
-        </div>
-        <% } %>
 
-        <div class="mb-3">
-          <label for="answer<%= i %>" class="form-label"
-            >Enter Answer ("ABC" for Single/Multiple Correct)</label
-          >
-          <input
-            name="questions[<%= i %>][answer]"
-            value="<%= test.questions[i].answer %>"
-            placeholder="Enter answer"
-            type="text"
-            id="answer<%= i %>"
-            class="form-control"
-            required
-          />
-        </div>
+          <p><strong>If Single/Multiple Correct</strong></p>
 
-        <input
-          type="hidden"
-          name="questions[<%= i %>][_id]"
-          value="<%= test.questions[i]._id.toString() %>"
-        />
+          <!-- Options 1 to 4 -->
+          <% for(let opt=1; opt<=4; opt++) { %>
+            <div class="row gx-3 mb-3">
+              <div class="col-md-6">
+                <label for="option<%= opt %>_<%= i %>" class="form-label">Enter option <%= opt %></label>
+                <input name="questions[<%= i %>][option<%= opt %>]" value="<%= test.questions[i]["option" + opt] %>"
+                placeholder="Enter option <%= opt %>"
+                  type="text"
+                  id="option<%= opt %>_<%= i %>"
+                      class="form-control"
+                      />
+              </div>
+              <div class="col-md-6">
+                <label for="image<%= opt %>_<%= i %>" class="form-label">Option <%= opt %> Image</label>
+                <input name="questions[<%= i %>][image<%= opt %>]" type="file" id="image<%= opt %>_<%= i %>"
+                  class="form-control" />
+              </div>
+            </div>
+            <% } %>
+
+              <div class="mb-3">
+                <label for="answer<%= i %>" class="form-label">Enter Answer ("ABC" for Single/Multiple Correct)</label>
+                <input name="questions[<%= i %>][answer]" value="<%= test.questions[i].answer %>"
+                  placeholder="Enter answer" type="text" id="answer<%= i %>" class="form-control" required />
+              </div>
+
+              <input type="hidden" name="questions[<%= i %>][_id]" value="<%= test.questions[i]._id.toString() %>" />
+        </div>
       </div>
-    </div>
-    <% } %>
+      <% } %>
 
-    <div class="text-center mb-5">
-      <button type="submit" class="btn btn-success btn-lg px-5">Update Test</button>
-    </div>
+        <div class="text-center mb-5">
+          <button type="submit" class="btn btn-success btn-lg px-5">Update Test</button>
+        </div>
   </form>
 
   <script src="/js/script.js"></script>
 </body>
+
 </html>
