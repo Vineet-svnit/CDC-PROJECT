@@ -80,6 +80,7 @@ passport.deserializeUser(User.deserializeUser());
 app.use((req, res, next) => {
     res.locals.currentUser = req.user;
     res.locals.currentPath = req.path;
+    res.locals.page = '';
     res.locals.error = req.flash("error");
     res.locals.success = req.flash("success");
     req.isAdmin = req.session.isAdmin || false;
