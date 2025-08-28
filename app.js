@@ -79,8 +79,7 @@ passport.deserializeUser(User.deserializeUser());
 
 app.use((req, res, next) => {
     res.locals.currentUser = req.user;
-    // res.locals.currentPath = req.path;
-    res.locals.page = '';
+    res.locals.currentPath = req.path;
     res.locals.error = req.flash("error");
     res.locals.success = req.flash("success");
     req.isAdmin = req.session.isAdmin || false;
@@ -95,7 +94,7 @@ const checkValidity = async (req, res, next) => {
     );
     let { startTime, endTime } = test;
     if (currentTime < startTime) {
-        // console.log(currentTime, startTime, endTime);
+        console.log(currentTime, startTime, endTime);
         req.flash("error", "The test cannot be started!");
         return res.redirect("/");
     }
