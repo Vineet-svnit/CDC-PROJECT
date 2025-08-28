@@ -103,29 +103,33 @@ function display(index) {
     // Generate options HTML
     const inputType = q._type === "SCQ" ? "radio" : "checkbox";
     options.innerHTML = `
+        <div style="display:flex; justify-content: space-between; gap: 15px; align-items: center;">
         <input type="${inputType}" name="options" id="opt1">
-        <label for="opt1">
+        <label for="opt1" style="width: 100%">
             ${q.image1 ? `<img src="${q.image1}" alt="Option 1">` : ""}
             ${q.option1 ? `<p>${q.option1}</p>` : ""}
-        </label><br>
+        </label></div><br>
 
+        <div style="display:flex; justify-content: space-between; gap: 15px; align-items: center;">
         <input type="${inputType}" name="options" id="opt2">
-        <label for="opt2">
+        <label for="opt2" style="width: 100%">
             ${q.image2 ? `<img src="${q.image2}" alt="Option 2">` : ""}
             ${q.option2 ? `<p>${q.option2}</p>` : ""}
-        </label><br>
+        </label></div><br>
 
+        <div style="display:flex; justify-content: space-between; gap: 15px; align-items: center;">
         <input type="${inputType}" name="options" id="opt3">
-        <label for="opt3">
+        <label for="opt3" style="width: 100%">
             ${q.image3 ? `<img src="${q.image3}" alt="Option 3">` : ""}
             ${q.option3 ? `<p>${q.option3}</p>` : ""}
-        </label><br>
+        </label></div><br>
 
+        <div style="display:flex; justify-content: space-between; gap: 15px; align-items: center;">
         <input type="${inputType}" name="options" id="opt4">
-        <label for="opt4">
+        <label for="opt4" style="width: 100%">
             ${q.image4 ? `<img src="${q.image4}" alt="Option 4">` : ""}
             ${q.option4 ? `<p>${q.option4}</p>` : ""}
-        </label><br>
+        </label></div><br>
     `;
 
     // Restore checked state from submissions
