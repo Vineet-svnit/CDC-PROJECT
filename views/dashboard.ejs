@@ -113,28 +113,48 @@
                 </div>
 
                 <div class="section">
-                    <div>
-                        <form action="/upload" method="POST" enctype="multipart/form-data">
-                            <select class="form-select form-select-lg mb-3" aria-label="Large select example" name="branch" required>
-                                <option value="" disabled selected>Select branch</option>
-                                <option value="lr">Logical Reasoning and Aptitude</option>
-                                <option value="ai">Artificial Intelligence</option>
-                                <option value="che">Chemical Engineering</option>
-                                <option value="chm">Chemistry</option>
-                                <option value="ce">Civil Engineering</option>
-                                <option value="cse">Computer Science and Engineering</option>
-                                <option value="ee">Electrical Engineering</option>
-                                <option value="ece">Electronics Engineering</option>
-                                <option value="hss">Humanities and Social Sciences</option>
-                                <option value="ms">Management Studies</option>
-                                <option value="math">Mathematics</option>
-                                <option value="me">Mechanical Engineering</option>
-                                <option value="phy">Physics</option>
-                            </select>
-                            <input type="file" name="file" accept=".xlsx,.xls" required />
-                            <button type="submit" class="btn btn-primary">Upload Questions</button>
+                    <div class="container mt-4">
+                        <form action="/upload" method="POST" enctype="multipart/form-data" class="card p-4 shadow-sm">
+
+                            <!-- Branch selection -->
+                            <div class="mb-3">
+                                <label for="branch" class="form-label">Select Branch</label>
+                                <select class="form-select form-select-lg" id="branch" name="branch" required>
+                                    <option value="" disabled selected>Select branch</option>
+                                    <option value="lr">Logical Reasoning and Aptitude</option>
+                                    <option value="ai">Artificial Intelligence</option>
+                                    <option value="che">Chemical Engineering</option>
+                                    <option value="chm">Chemistry</option>
+                                    <option value="ce">Civil Engineering</option>
+                                    <option value="cse">Computer Science and Engineering</option>
+                                    <option value="ee">Electrical Engineering</option>
+                                    <option value="ece">Electronics Engineering</option>
+                                    <option value="hss">Humanities and Social Sciences</option>
+                                    <option value="ms">Management Studies</option>
+                                    <option value="math">Mathematics</option>
+                                    <option value="me">Mechanical Engineering</option>
+                                    <option value="phy">Physics</option>
+                                </select>
+                            </div>
+
+                            <!-- File upload + button in one row -->
+                            <div class="row g-3 align-items-center">
+                                <div class="col-md-8">
+                                    <label for="file" class="form-label">Upload Excel File</label>
+                                    <input class="form-control" type="file" id="file" name="file" accept=".xlsx,.xls"
+                                        required>
+                                </div>
+                                <div class="col-md-4 d-grid">
+                                    <label class="form-label invisible">Upload</label>
+                                    <button type="submit" class="btn btn-success btn-md">
+                                        <i class="fa fa-upload me-2"></i> Upload Questions
+                                    </button>
+                                </div>
+                            </div>
+
                         </form>
                     </div>
+
                     <hr><br>
                     <div class="section-header">
 
@@ -260,56 +280,59 @@
     </div>
     </div>
     <footer class="custom-footer py-3">
-    <div class="container text-center">
-        <h6 class="text-white mb-3">Developed By</h6>
+        <div class="container text-center">
+            <h6 class="text-white mb-3">Developed By</h6>
 
-        <div class="d-flex justify-content-center gap-5 flex-wrap">
+            <div class="d-flex justify-content-center gap-5 flex-wrap">
 
-            <!-- Jenil -->
-            <div class="dev-profile">
-                <span class="dev-name text-white">Jenil Prajapati</span>
-                <span class="social-links ms-2">
-                    <a href="https://github.com/jenil1236" class="text-white mx-1"><i class="fab fa-github"></i></a>
-                    <a href="https://www.linkedin.com/in/jenil-prajapati-b31505307/" class="text-white mx-1"><i class="fab fa-linkedin"></i></a>
-                    <a href="#" class="text-white mx-1"><i class="fab fa-twitter"></i></a>
-                </span>
+                <!-- Jenil -->
+                <div class="dev-profile">
+                    <span class="dev-name text-white">Jenil Prajapati</span>
+                    <span class="social-links ms-2">
+                        <a href="https://github.com/jenil1236" class="text-white mx-1"><i class="fab fa-github"></i></a>
+                        <a href="https://www.linkedin.com/in/jenil-prajapati-b31505307/" class="text-white mx-1"><i
+                                class="fab fa-linkedin"></i></a>
+                        <a href="#" class="text-white mx-1"><i class="fab fa-twitter"></i></a>
+                    </span>
+                </div>
+
+                <!-- Vineet -->
+                <div class="dev-profile">
+                    <span class="dev-name text-white">Vineet Gupta</span>
+                    <span class="social-links ms-2">
+                        <a href="https://github.com/Vineet-svnit" class="text-white mx-1"><i
+                                class="fab fa-github"></i></a>
+                        <a href="https://www.linkedin.com/in/vineet-gupta-431396272/" class="text-white mx-1"><i
+                                class="fab fa-linkedin"></i></a>
+                        <a href="#" class="text-white mx-1"><i class="fab fa-twitter"></i></a>
+                    </span>
+                </div>
+
             </div>
 
-            <!-- Vineet -->
-            <div class="dev-profile">
-                <span class="dev-name text-white">Vineet Gupta</span>
-                <span class="social-links ms-2">
-                    <a href="https://github.com/Vineet-svnit" class="text-white mx-1"><i class="fab fa-github"></i></a>
-                    <a href="https://www.linkedin.com/in/vineet-gupta-431396272/" class="text-white mx-1"><i class="fab fa-linkedin"></i></a>
-                    <a href="#" class="text-white mx-1"><i class="fab fa-twitter"></i></a>
-                </span>
-            </div>
-
+            <p class="mt-3 mb-0 text-white-50 small">
+                &copy; <%= new Date().getFullYear() %> Career Development Cell. All rights reserved.
+            </p>
         </div>
+    </footer>
 
-        <p class="mt-3 mb-0 text-white-50 small">
-            &copy; <%= new Date().getFullYear() %> Career Development Cell. All rights reserved.
-        </p>
-    </div>
-</footer>
+    <style>
+        .custom-footer {
+            background-color: #0d47a1;
+            /* dark bluish */
+            border-top: 2px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.25);
+            width: 100%;
+        }
 
-<style>
-    .custom-footer {
-        background-color: #0d47a1;
-        /* dark bluish */
-        border-top: 2px solid rgba(255, 255, 255, 0.15);
-        box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.25);
-        width: 100%;
-    }
+        .custom-footer .dev-profile {
+            font-size: 0.95rem;
+        }
 
-    .custom-footer .dev-profile {
-        font-size: 0.95rem;
-    }
-
-    .custom-footer .social-links a:hover {
-        color: #90caf9;
-    }
-</style>
+        .custom-footer .social-links a:hover {
+            color: #90caf9;
+        }
+    </style>
 </body>
 
 </html>

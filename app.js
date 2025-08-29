@@ -793,14 +793,15 @@ app.delete("/test/:id", isAdmin, async (req, res) => {
 app.get("/test/:id", isAdmin, async (req, res, next) => {
     let { id } = req.params;
     let test = await Test.findById(id).populate("questions");
+    // console.log(test);
     res.render("testEditForm.ejs", { id, test });
 });
 
 //Update Test
 app.put("/test/:id", isAdmin, async (req, res) => {
     let { id } = req.params;
-    let { date, time, duration, testname, questions: changedQuestions, branch } = req.body;
-    // console.log(req.body);
+    let { date, time, duration, testName, questions: changedQuestions, branch } = req.body;
+    console.log(req.body);
 
     // Combine into ISO string
     const isoString = `${date}T${time}:00`;
@@ -851,8 +852,8 @@ app.put("/test/:id", isAdmin, async (req, res) => {
     });
     await Promise.all(updatedPromises);
 
-    const test = await Test.findByIdAndUpdate(id, { testname, duration, startTime, endTime }, { new: true }).populate("questions").exec();
-    console.log(test.questions);
+    const test = await Test.findByIdAndUpdate(id, { testName, duration, startTime, endTime }, { new: true }).populate("questions").exec();
+    // console.log(test.questions);
     const questions = test.questions;
     let totalMarks = 0;
     for (const question of questions) {

@@ -3,11 +3,17 @@ const passportLocalMongoose = require('passport-local-mongoose');
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
+    username: {
+        type: String,
+        required: true,
+        unique: true,
+        match: /^[a-z][0-9]{2}[a-z]{2,5}[0-9]{3}/i
+    },
     email: {
         type: String,
         required: true,
         unique: true,
-        // match: /^[a-z][0-9]{2}[a-z]{2}[0-9]{3}@[a-z]+\.svnit\.ac\.in$/i
+        match: /^[a-z][0-9]{2}[a-z]{2,5}[0-9]{3}@[a-z]+\.svnit\.ac\.in$/i
     },
     name: {
         type: String,

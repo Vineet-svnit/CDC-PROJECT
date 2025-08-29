@@ -45,7 +45,7 @@
         </div>
 
         <div class="mb-3">
-          <label for="branch" class="form-label">Test Name</label>
+          <label for="branch" class="form-label">Branch</label>
           <select class="form-select form-select-lg mb-3" aria-label="Large select example" id="branch" name="branch"
             required disabled>
             <option value="" disabled>Select branch</option>
@@ -63,6 +63,7 @@
             <option value="me" <%=test.branch=='me' ? "selected" : "" %>>Mechanical Engineering</option>
             <option value="phy" <%=test.branch=='phy' ? "selected" : "" %>>Physics</option>
           </select>
+          <input type="hidden" name="branch" value="<%= test.branch %>"/>
         </div>
       </div>
     </div>
@@ -146,27 +147,6 @@
         <% } %>
 
           <p><strong>If Single/Multiple Correct</strong></p>
-
-          <!-- Options 1 to 4 -->
-          <% for(let opt=1; opt<=4; opt++) { %>
-            <div class="row gx-3 mb-3">
-              <div class="col-md-6">
-                <label for="option<%= opt %>_<%= i %>" class="form-label">Enter option <%= opt %></label>
-                <input name="questions[<%= i %>][option<%= opt %>]" value="<%= test.questions[i]["option" + opt] %>"
-                placeholder="Enter option <%= opt %>"
-                  type="text"
-                  id="option<%= opt %>_<%= i %>"
-                      class="form-control"
-                      />
-              </div>
-              <div class="col-md-6">
-                <label for="image<%= opt %>_<%= i %>" class="form-label">Option <%= opt %> Image</label>
-                <input name="questions[<%= i %>][image<%= opt %>]" type="file" id="image<%= opt %>_<%= i %>"
-                  class="form-control" />
-              </div>
-            </div>
-            <% } %>
-
               <div class="mb-3">
                 <label for="answer<%= i %>" class="form-label">Enter Answer ("ABC" for Single/Multiple Correct)</label>
                 <input name="questions[<%= i %>][answer]" value="<%= test.questions[i].answer %>"

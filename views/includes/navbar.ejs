@@ -1,25 +1,34 @@
 <nav class="navbar bg-body-tertiary sticky-top pt-2 pb-0">
-    <div class="container-fluid">
-        <ul class="nav nav-tabs">
-            <li class="nav-item">
-                <a class="nav-link navTab p-4 <%= currentPath === '/' ? 'active' : '' %>" href="/">HOMEPAGE</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link navTab p-4 <%= currentPath === '/history' ? 'active' : '' %>"
-                    href="/history">HISTORY</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link navTab p-4 <%= currentPath === '/announcement' ? 'active' : '' %>"
-                    href="/announcement">ANNOUNCEMENT</a>
-            </li>
-            <li class="nav-item">
+  <div class="container-fluid d-flex align-items-center">
+    <!-- Center: Tabs -->
+    <ul class="nav nav-tabs">
+      <li class="nav-item">
+        <a class="nav-link navTab p-4 <%= currentPath === '/' ? 'active' : '' %>" href="/">HOMEPAGE</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link navTab p-4 <%= currentPath === '/history' ? 'active' : '' %>"
+          href="/history">HISTORY</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link navTab p-4 <%= currentPath === '/announcement' ? 'active' : '' %>"
+          href="/announcement">ANNOUNCEMENT</a>
+      </li>
+      <li class="nav-item">
                 <a class="nav-link navTab p-4 <%= currentPath === '/core' ? 'active' : '' %>"
                     href="/core">CORE</a>
             </li>
-        </ul>
-        <a href="/logout" class="btn btn-danger ms-auto m-2">Logout</a>
+    </ul>
+
+    <!-- Right side: Welcome + Logout together -->
+    <div class="d-flex align-items-center ms-auto">
+      <div class="admission-number me-2">
+        Welcome, <%= currentUser.username %>
+      </div>
+      <a href="/logout" class="btn btn-danger">Logout</a>
     </div>
+  </div>
 </nav>
+
 <style>
     /* Navbar specific styles */
     .nav-tabs {
@@ -47,6 +56,14 @@
     .navbar {
         border-bottom: 1px solid #ccc;
         /* Light grey */
+    }
+
+    .admission-number {
+        background: #e3f2fd;
+        color: #0d47a1;
+        font-weight: 600;
+        padding: 10px 15px;
+        border-radius: 8px;
     }
 
     @media (max-width: 768px) {
