@@ -387,7 +387,83 @@ body {
     margin-bottom: 25px;
 }
 
+/* ----- Custom Options Styling ----- */
 .options label {
+    display: flex;
+    align-items: center; /* ✅ align text + box vertically */
+    gap: 12px;
+    padding: 14px 16px;
+    background-color: #f0f4f8;
+    border-radius: 8px;
+    border: 1.5px solid transparent;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.25s ease;
+    user-select: none;
+}
+
+.options label:hover {
+    background-color: #bbdefb;
+    border-color: #1976d2;
+    transform: scale(1.02);
+}
+
+/* Reset browser styles */
+.options input[type="checkbox"],
+.options input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #1976d2;
+    border-radius: 4px; /* square */
+    background: #fff;
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+/* Radios round */
+.options input[type="radio"] {
+    border-radius: 50%;
+}
+
+/* Checked state → blue fill */
+.options input[type="checkbox"]:checked,
+.options input[type="radio"]:checked {
+    background: #1976d2;
+    border-color: #1976d2;
+}
+
+/* Tick for checkbox */
+.options input[type="checkbox"]:checked::after {
+    content: "✓";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -55%);
+    font-size: 14px;
+    color: #fff;
+    font-weight: bold;
+}
+
+/* Dot for radio */
+.options input[type="radio"]:checked::after {
+    content: "";
+    width: 10px;
+    height: 10px;
+    background: #fff;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* .options label {
     display: flex;
     align-items: flex-start;
     padding: 14px 16px;
@@ -422,7 +498,7 @@ body {
     margin-left: 15px;
     border-radius: 6px;
     box-shadow: 0 1px 5px rgba(0,0,0,0.1);
-}
+} */
 
 button {
     border: none;

@@ -327,7 +327,7 @@ app.get("/core", isLoggedIn, async (req, res) => {
         }
     });
     // console.log(req.user);
-    res.render("user/core.ejs", { allTests, user: req.user, page: "core" });
+    res.render("user/core.ejs", { allTests, user: req.user, page: "home" });
 });
 
 //Show test 
