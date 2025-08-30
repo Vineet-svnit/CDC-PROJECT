@@ -259,8 +259,8 @@ app.post('/login', storeReturnTo, passport.authenticate('local', {
 });
 
 app.post('/admin/login', async (req, res) => {
-    const { adminUsername, password } = req.body;
-    const admin = await Admin.findOne({ adminUsername });
+    const { adminUserName, password } = req.body;
+    const admin = await Admin.findOne({ adminUserName });
     if (!admin) {
         req.flash("error", "Invalid credentials");
         return res.redirect("/admin/login");
@@ -270,7 +270,7 @@ app.post('/admin/login', async (req, res) => {
         req.flash("error", "Invalid credentials");
         return res.redirect("/admin/login");
     }
-    req.session.isAdmin = admin._id;
+    req.session.isAdmin = true;
     res.redirect('/dashboard');
 })
 
