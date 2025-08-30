@@ -532,6 +532,11 @@ app.post("/test/questions/new", isAdmin, async (req, res) => {
     }
 
     // console.log(questions);
+    if(questions.length === 0)
+    {
+        req.flash('error', 'Test could not be created!');
+        return res.redirect("/dashboard");
+    }
     let randomIds = questions.map((q) => q._id.toString());
 
     randomIds.sort((a, b) => a.localeCompare(b));
@@ -569,6 +574,7 @@ app.post("/test/questions/new", isAdmin, async (req, res) => {
     await newTest.save()
         .then((response) => {
             // const id = response._id;
+            req.flash('success', 'Test generated successfully!');
             res.redirect("/dashboard");
         })
         .catch((err) => console.log(err));
