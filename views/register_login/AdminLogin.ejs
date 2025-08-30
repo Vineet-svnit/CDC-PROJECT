@@ -30,5 +30,19 @@
     <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="/js/script.js"></script>
     <!-- <script src="/js/register_login.js"></script> -->
+    <script>
+        let i=document.querySelector("i");
+        let input=document.querySelector("#password");
+        let btn=document.querySelector("#btn");
+        btn.addEventListener("click", () => {
+            if (i.classList.contains("fa-eye")) {
+                i.classList.replace("fa-eye", "fa-eye-slash");
+                input.type = "password"; 
+            } else {
+                i.classList.replace("fa-eye-slash", "fa-eye");
+                input.type = "text"; 
+            }
+        });
+    </script>
 </body>
 </html>
