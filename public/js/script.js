@@ -31,6 +31,33 @@ function getCookie(name) {
   return null;
 }
 
+let key = Object.keys(localStorage).find(k => k.startsWith("questions_"));
+console.log(key);
+if (key) {
+  let testId = key.split("_")[1];
+  let questions = JSON.parse(localStorage.getItem(`questions_${testId}`));
+  let submissions = JSON.parse(localStorage.getItem(`submissions_${testId}`));
+  console.log(testId);
+  console.log(submissions);
+  
+  for (let i = 0; i < questions.length; i++) {
+    submissions[i].question = questions[i]._id;
+  }
+  console.log('checking again', submissions);
+  
+  axios.post(`/submission/${testId}`, { submissions })
+    .then(() => {
+      console.log(localStorage);
+      localStorage.clear();
+      console.log(localStorage);
+      
+      window.location.href = `/submission/${testId}`;
+    }
+    )
+    .catch((e) => { console.log('nahi hua submit', e); }
+    )
+}
+
 // --- Toggle theme and update cookie ---
 // let button = document.getElementById("theme-toggle");
 // let icon = document.getElementById("theme-icon");

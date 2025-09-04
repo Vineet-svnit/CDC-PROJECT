@@ -55,8 +55,9 @@
             const timeLeft = endTime - now;
 
             if (timeLeft <= 0) {
-                alert("Time's up");
                 // Optionally submit the form automatically
+                clearInterval(timeInterval);
+                alert("hi");
                 document.querySelector('#submit').click();
                 return;
             }
@@ -76,23 +77,38 @@
 
 
         let questions =<%- JSON.stringify(test.questions) %>;
+        let submissions;
+        // // console.log(questions);
+        // function shuffle(questions) {
+        //     for (let i = questions.length - 1; i > 0; i--) {
+        //         // Pick a random index from 0 to i
+        //         const j = Math.floor(Math.random() * (i + 1));
+        //         // Swap elements array[i] and array[j]
+        //         [questions[i], questions[j]] = [questions[j], questions[i]];
+        //     }
+        //     return questions;
+        // }
+        // questions=shuffle(questions);
         // console.log(questions);
-        function shuffle(questions) {
-            for (let i = questions.length - 1; i > 0; i--) {
-                // Pick a random index from 0 to i
-                const j = Math.floor(Math.random() * (i + 1));
-                // Swap elements array[i] and array[j]
-                [questions[i], questions[j]] = [questions[j], questions[i]];
-            }
-            return questions;
-        }
-        questions=shuffle(questions);
-        // console.log(questions);
+        
     </script>
     <script>
         const testId = "<%= test._id %>";
         const userId = "<%= user_id %>";
         let legalSubmission = false;
+        let isReloading = false;
+
+        // =============================
+    // 1) Before unload → mark reload and store in localStorage
+    // =============================
+    window.addEventListener("beforeunload", () => {
+        isReloading = true;
+        // Save current state of submissions + questions to localStorage
+        console.log('sadly i was triggered');
+        
+        localStorage.setItem(`questions_${testId}`, JSON.stringify(questions));
+        localStorage.setItem(`submissions_${testId}`, JSON.stringify(submissions));
+    });
 
         document.querySelector("#submit").addEventListener("mousedown", () => {
             legalSubmission = true;
@@ -102,26 +118,72 @@
             // await axios.post(`/submission/${testId}`, { submissions, questions });
             await axios.post(`/submission/${testId}`, { submissions });
             legalSubmission = true;
+            localStorage.clear();
             window.location.href = `/submission/${testId}`;
 
         });
 
+        // document.addEventListener("visibilitychange", async () => {
+        //     if (document.visibilityState === 'hidden' && !legalSubmission) {
+        //         document.querySelector('#submit').click();
+        //         // await axios.post(`/submission/${testId}`, { submissions });
+        //         // window.location.href = `/submission/${testId}`;
+        //     }
+        // });
         document.addEventListener("visibilitychange", async () => {
+        setTimeout(async () => {
             if (document.visibilityState === 'hidden' && !legalSubmission) {
+                if (isReloading) {
+                    // Ignore tab close if it was just a reload
+                    isReloading = false;
+                    return;
+                }
+                // Force submit if tab was closed/switched
                 document.querySelector('#submit').click();
-                // await axios.post(`/submission/${testId}`, { submissions });
-                // window.location.href = `/submission/${testId}`;
             }
-        });
+        }, 500); // small delay lets isReloading update first
+    });
+        history.pushState(null, null, location.href);
+    window.onpopstate = function () {
+        history.pushState(null, null, location.href);
+        document.querySelector('#submit').click();
+    };
+
+    let storedQuestions = localStorage.getItem(`questions_${testId}`);
+    let storedSubmissions = localStorage.getItem(`submissions_${testId}`);
+
+    if (storedQuestions !== null && storedSubmissions !== null) {
+        // Reload case → use saved data
+        questions = JSON.parse(storedQuestions);
+        submissions = JSON.parse(storedSubmissions);
+        // display(0);
+    } else {
+        // First load → shuffle questions
+        localStorage.clear();
+        function shuffle(questions) {
+            for (let i = questions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [questions[i], questions[j]] = [questions[j], questions[i]];
+            }
+            return questions;
+        }
+        questions = shuffle(questions);
+
+        // Initialize submissions array
+        submissions = Array(questions.length).fill().map(() => ({
+            answer: "",
+            isMarked: false
+        }));
+    }
+
     </script>
     <script src="/js/question.js"></script>
 
     <!-- Enforce full screen -->
     <!-- Detect tab switching -->
     <script>
-
-
-
+        count_atm_unatm_mark();
+        // count_atm_unatm_mark();
         // window.addEventListener("blur", async () => {
         //     if(!legalSubmit) {
         //         await axios.post(`http://localhost:8080/submission/${testId}`, { submissions });
@@ -130,7 +192,16 @@
         // });
     for(let i = 0; i < questions.length; i++)
             submissions[i].question = questions[i]._id;
-    </script>
+    
+//     </script>
+//     <script type="module">
+//     import 'url-change-event';
+
+//     window.addEventListener('urlchangeevent', (e) => {
+//       console.log('URL changed:', e.detail);
+//     });
+//   </script>
+
     <script>
         document.addEventListener("contextmenu", e => e.preventDefault());
         document.onkeydown = function (e) {
@@ -138,7 +209,7 @@
                 e.keyCode == 123 || // F12
                 (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74)) || // Ctrl+Shift+I/J
                 (e.ctrlKey && e.keyCode == 85) // Ctrl+U
-            ) {
+            ) {  
                 return false;
             }
         };

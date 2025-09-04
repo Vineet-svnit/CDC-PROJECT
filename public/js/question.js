@@ -13,10 +13,10 @@ const next = document.querySelector("#next");
 const instructionElement = document.getElementById("instruction");
 
 // Initialize submissions array properly
-let submissions = Array(questions.length).fill().map(() => ({
-    answer: "",
-    isMarked: false
-}));
+// let submissions = Array(questions.length).fill().map(() => ({
+//     answer: "",
+//     isMarked: false
+// }));
 
 // Create navigation palette
 for (let i = 1; i <= questions.length; i++) {

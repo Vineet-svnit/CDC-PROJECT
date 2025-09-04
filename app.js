@@ -124,7 +124,7 @@ const checkValidity = async (req, res, next) => {
     );
     let { startTime, endTime } = test;
     if (currentTime < startTime) {
-        console.log(currentTime, startTime, endTime);
+        // console.log(currentTime, startTime, endTime); 
         req.flash("error", "The test cannot be started!");
         return res.redirect("/");
     }
@@ -360,7 +360,11 @@ app.get("/submission/:id", isLoggedIn, async (req, res) => {
 app.post("/submission/:id", isLoggedIn, checkSubmit, async (req, res) => {
     // const { submissions, questions } = req.body; // Array from frontend
     const { submissions } = req.body; // Array from frontend
+    // console.log(submissions);
+    
     const testId = req.params.id;
+    // console.log(testId);
+    
     const id = req.user._id;
     // 1. Transform submissions into the correct schema format
     const formattedSubmissions = submissions.map(sub => ({
@@ -724,11 +728,11 @@ app.post("/upload", isAdmin, upload.single("file"), async (req, res) => {
                     break;
 
                 case 'ai':
-                    await AiDepartment.insertMany(questions);
+                    await AiDepartment.insertMany(questions); 
                     break;
 
                 case 'che':
-                    await ChemicalDepartment.insertMany(questions);
+                    await ChemicalDepartment.insertMany(questions); 
                     break;
 
                 case 'chm':
@@ -736,7 +740,7 @@ app.post("/upload", isAdmin, upload.single("file"), async (req, res) => {
                     break;
 
                 case 'ce':
-                    await CivilDepartment.insertMany(questions);
+                    await CivilDepartment.insertMany(questions);  
                     break;
 
                 case 'cse':
@@ -807,13 +811,13 @@ app.get("/test/:id", isAdmin, async (req, res, next) => {
 app.put("/test/:id", isAdmin, async (req, res) => {
     let { id } = req.params;
     let { date, time, duration, testName, questions: changedQuestions, branch } = req.body;
-    console.log(req.body);
+    // console.log(req.body);
 
     // Combine into ISO string
     const isoString = `${date}T${time}:00`;
 
     // Convert to Date object (for MongoDB)
-    const startTime = new Date(isoString);
+    const startTime = new Date(isoString); 
     const endTime = new Date(isoString);
     endTime.setMinutes(endTime.getMinutes() + Number(duration));
 
