@@ -691,9 +691,9 @@ app.post("/upload", isAdmin, upload.single("file"), async (req, res) => {
             }
 
             const [_type, question, option1, option2, option3, option4, answer] = row;
-
+            const normalizedType = _type.trim().toUpperCase();
             // Validate _type
-            if (!_type || !["SCQ", "MCQ"].includes(_type)) {
+            if (!_type || !["SCQ", "MCQ"].includes(normalizedType)) {
                 errors.push(`Row ${index + 2}: Invalid _type '${_type}'`);
                 return;
             }
@@ -708,7 +708,7 @@ app.post("/upload", isAdmin, upload.single("file"), async (req, res) => {
             const isExisting = existingQuestions.find(e => e.question === question);
             if (!isExisting) {
                 questions.push({
-                    _type,
+                    _type: normalizedType,
                     question,
                     option1: option1 || "",
                     option2: option2 || "",
