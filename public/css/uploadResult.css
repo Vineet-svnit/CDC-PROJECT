@@ -1,0 +1,71 @@
+/* ===== Upload Result Page ===== */
+
+/* Page background and text */
+body {
+    background-color: #f5f5f5;
+    /* match your main body bg */
+    color: #212121;
+    /* main text color */
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+
+/* Heading */
+h1 {
+    color: #1976d2;
+    /* primary color */
+    margin-bottom: 20px;
+}
+
+/* Inserted count */
+p strong {
+    color: #1565c0;
+    /* darker shade for emphasis */
+}
+
+/* Errors section */
+h3 {
+    color: #d32f2f;
+    /* red for errors */
+    margin-top: 20px;
+}
+
+ul {
+    background-color: #fff3f3;
+    /* light red/pink background */
+    border: 1px solid #d32f2f;
+    border-radius: 5px;
+    padding: 15px 20px;
+    list-style-type: disc;
+    color: #d32f2f;
+}
+
+/* Individual error item */
+ul li {
+    margin-bottom: 8px;
+}
+
+/* No errors message */
+p:has(> .no-errors) {
+    color: #388e3c;
+    /* green for success */
+    font-weight: bold;
+}
+
+/* Links or buttons (if any) */
+a,
+.btn {
+    color: white;
+    background-color: #1976d2;
+    padding: 8px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 15px;
+    transition: background-color 0.3s ease;
+}
+
+a:hover,
+.btn:hover {
+    background-color: #1565c0;
+}

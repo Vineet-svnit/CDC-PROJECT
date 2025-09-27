@@ -310,8 +310,14 @@ app.get("/announcement", isLoggedIn, async (req, res) => {
     res.render("user/announcement.ejs", { allAnnouncements, page: "announcement" });
 });
 
+app.get('/branchTests', isAdmin, async (req, res) => {
+    const { branch_name } = req.query;
+    const allTests = await Test.find({ branch: branch_name });
+    res.send(allTests);
+})
+
 app.get("/core", isLoggedIn, async (req, res) => {
-    const branch = req.user.branch;
+    let branch = req.user.branch;
     let allTests = await Test.find({ branch: branch });
     allTests.reverse();
     allTests.forEach((test) => {
@@ -361,10 +367,10 @@ app.post("/submission/:id", isLoggedIn, checkSubmit, async (req, res) => {
     // const { submissions, questions } = req.body; // Array from frontend
     const { submissions } = req.body; // Array from frontend
     // console.log(submissions);
-    
+
     const testId = req.params.id;
     // console.log(testId);
-    
+
     const id = req.user._id;
     // 1. Transform submissions into the correct schema format
     const formattedSubmissions = submissions.map(sub => ({
@@ -536,8 +542,7 @@ app.post("/test/questions/new", isAdmin, async (req, res) => {
     }
 
     // console.log(questions);
-    if(questions.length === 0)
-    {
+    if (questions.length === 0) {
         req.flash('error', 'Test could not be created!');
         return res.redirect("/dashboard");
     }
@@ -569,7 +574,7 @@ app.post("/test/questions/new", isAdmin, async (req, res) => {
         phy: 'PhysicsDepartment'
     };
     const newTest = new Test({
-        testName, startTime, endTime, duration, numberOfQues, questions: randomIds, branch, branchModel:branchToModel[branch]
+        testName, startTime, endTime, duration, numberOfQues, questions: randomIds, branch, branchModel: branchToModel[branch]
     });
 
     newTest.totalMarks = totalMarks;
@@ -719,7 +724,6 @@ app.post("/upload", isAdmin, upload.single("file"), async (req, res) => {
             }
         });
 
-
         // Insert only valid questions
         if (questions.length > 0) {
             switch (branch) {
@@ -728,11 +732,11 @@ app.post("/upload", isAdmin, upload.single("file"), async (req, res) => {
                     break;
 
                 case 'ai':
-                    await AiDepartment.insertMany(questions); 
+                    await AiDepartment.insertMany(questions);
                     break;
 
                 case 'che':
-                    await ChemicalDepartment.insertMany(questions); 
+                    await ChemicalDepartment.insertMany(questions);
                     break;
 
                 case 'chm':
@@ -740,7 +744,7 @@ app.post("/upload", isAdmin, upload.single("file"), async (req, res) => {
                     break;
 
                 case 'ce':
-                    await CivilDepartment.insertMany(questions);  
+                    await CivilDepartment.insertMany(questions);
                     break;
 
                 case 'cse':
@@ -791,6 +795,56 @@ app.post("/upload", isAdmin, upload.single("file"), async (req, res) => {
     }
 });
 
+app.post("/download", isAdmin, async (req, res) => {
+    const { test_id, branch_name } = req.body;
+    if (!test_id) return res.status(400).send("Test ID is required");
+    const query = {
+        'submissions.test_id': test_id
+    }
+    if (branch_name !== 'lr')
+        query.branch = branch_name;
+    const users = await User.find(query).lean();
+    const test = await Test.findById(test_id).lean();
+    const testName = test ? `Test Name: ${test.testName}` : "Test Name: Test";
+
+    // Prepare data array for xlsx
+    const data = [
+        [testName], // Test Name at top
+        [], // blank row
+        ['Username', 'Name', 'Branch', 'Year', 'Score'] // headers
+    ];
+
+    // Add each user's data
+    users.forEach(user => {
+        const submission = user.submissions.find(sub => sub.test_id.toString() === test_id);
+        data.push([
+            user.username,
+            user.name,
+            user.branch,
+            user.year,
+            submission ? submission.score : 0
+        ]);
+    });
+
+    // Create worksheet and workbook
+    const ws = xlsx.utils.aoa_to_sheet(data);
+    const wb = xlsx.utils.book_new();
+    xlsx.utils.book_append_sheet(wb, ws, 'Results');
+
+    // Write workbook to buffer
+    const buf = xlsx.write(wb, { type: 'buffer', bookType: 'xlsx' });
+
+    // Send as downloadable file
+    res.setHeader(
+        'Content-Disposition',
+        `attachment; filename=${testName}_results.xlsx`
+    );
+    res.setHeader(
+        'Content-Type',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    );
+    res.send(buf);
+})
 
 //Delete Test
 app.delete("/test/:id", isAdmin, async (req, res) => {
@@ -817,7 +871,7 @@ app.put("/test/:id", isAdmin, async (req, res) => {
     const isoString = `${date}T${time}:00`;
 
     // Convert to Date object (for MongoDB)
-    const startTime = new Date(isoString); 
+    const startTime = new Date(isoString);
     const endTime = new Date(isoString);
     endTime.setMinutes(endTime.getMinutes() + Number(duration));
 

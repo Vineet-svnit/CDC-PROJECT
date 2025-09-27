@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="/css/dashboard.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <title>Dashboard</title>
 </head>
 
@@ -110,7 +111,41 @@
                                     </div>
                             </li>
                             <% } %>
-                    </ul>
+                    </ul> <hr>
+                    <div class="container mt-4">
+                        <form action="/download" method="POST" class="card p-4 shadow-sm">
+
+                            <!-- Branch selection -->
+                            <div class="mb-3">
+                                <label for="branch_name" class="form-label">Select Branch</label>
+                                <select class="form-select form-select-lg" id="branch_name" name="branch_name" required>
+                                    <option value="" disabled selected>Select branch</option>
+                                    <option value="lr">Logical Reasoning and Aptitude</option>
+                                    <option value="ai">Artificial Intelligence</option>
+                                    <option value="che">Chemical Engineering</option>
+                                    <option value="chm">Chemistry</option>
+                                    <option value="ce">Civil Engineering</option>
+                                    <option value="cse">Computer Science and Engineering</option>
+                                    <option value="ee">Electrical Engineering</option>
+                                    <option value="ece">Electronics Engineering</option>
+                                    <option value="hss">Humanities and Social Sciences</option>
+                                    <option value="ms">Management Studies</option>
+                                    <option value="math">Mathematics</option>
+                                    <option value="me">Mechanical Engineering</option>
+                                    <option value="phy">Physics</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="test_id" class="form-label">Select Test</label>
+                                <select class="form-select form-select-lg" id="test_id" name="test_id" required>
+                                    
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-success btn-md">
+                                        <i class="fa fa-download me-2"></i> Download Result
+                            </button>
+                        </form>
+                    </div>
                 </div>
 
                 <div class="section">
@@ -335,7 +370,7 @@
         }
     </style>
     <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
-
+    <script src="/js/dashboard.js"></script>
 </body>
 
 </html>
