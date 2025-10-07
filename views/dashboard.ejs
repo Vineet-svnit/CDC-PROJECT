@@ -75,6 +75,51 @@
                     </div>
                 </div>
 
+                <div class="section leaderboard-section mb-3">
+                <div class="section-header">
+                    <h2 class="section-title">Leaderboard</h2>
+
+                    <div class="filter-container">
+                        <select id="branchSelect">
+                            <option value="lr" selected>Logical Reasoning</option>
+                            <option value="ai">Artificial Intelligence</option>
+                            <option value="che">Chemical Engineering</option>
+                            <option value="chm">Chemistry</option>
+                            <option value="ce">Civil Engineering</option>
+                            <option value="cse">Computer Science & Engineering</option>
+                            <option value="ee">Electrical Engineering</option>
+                            <option value="ece">Electronics & Communication</option>
+                            <option value="hss">Humanities & Social Sciences</option>
+                            <option value="ms">Management Studies</option>
+                            <option value="math">Mathematics</option>
+                            <option value="me">Mechanical Engineering</option>
+                            <option value="phy">Physics</option>
+                        </select>
+
+                        <select id="testSelect">
+                            <option value="">Select Test</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="leaderboard-table">
+                        <caption id="testCaption">Select a test to view leaderboard</caption>
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Name</th>
+                                <th>Score</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboardBody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
                 <div class="sections">
                     <div class="section">
                         <div class="section-header">
@@ -153,50 +198,7 @@
                     </div>
 
                     <div class="section">
-                        <div class="container mt-4">
-                            <form action="/upload" method="POST" enctype="multipart/form-data"
-                                class="card p-4 shadow-sm">
 
-                                <!-- Branch selection -->
-                                <div class="mb-3">
-                                    <label for="branch" class="form-label">Select Branch</label>
-                                    <select class="form-select form-select-lg" id="branch" name="branch" required>
-                                        <option value="" disabled selected>Select branch</option>
-                                        <option value="lr">Logical Reasoning and Aptitude</option>
-                                        <option value="ai">Artificial Intelligence</option>
-                                        <option value="che">Chemical Engineering</option>
-                                        <option value="chm">Chemistry</option>
-                                        <option value="ce">Civil Engineering</option>
-                                        <option value="cse">Computer Science and Engineering</option>
-                                        <option value="ee">Electrical Engineering</option>
-                                        <option value="ece">Electronics Engineering</option>
-                                        <option value="hss">Humanities and Social Sciences</option>
-                                        <option value="ms">Management Studies</option>
-                                        <option value="math">Mathematics</option>
-                                        <option value="me">Mechanical Engineering</option>
-                                        <option value="phy">Physics</option>
-                                    </select>
-                                </div>
-
-                                <!-- File upload + button in one row -->
-                                <div class="row g-3 align-items-center">
-                                    <div class="col-md-8">
-                                        <label for="file" class="form-label">Upload Excel File</label>
-                                        <input class="form-control" type="file" id="file" name="file"
-                                            accept=".xlsx,.xls" required>
-                                    </div>
-                                    <div class="col-md-4 d-grid">
-                                        <label class="form-label invisible">Upload</label>
-                                        <button type="submit" class="btn btn-success btn-md">
-                                            <i class="fa fa-upload me-2"></i> Upload Questions
-                                        </button>
-                                    </div>
-                                </div>
-
-                            </form>
-                        </div>
-
-                        <hr><br>
                         <div class="section-header">
 
                             <h2 class="section-title">Create New Test</h2>
@@ -250,54 +252,53 @@
                                     </li>
                                     <% } %>
                         </ul>
+                        <hr>
+                        <div class="container mt-4">
+                            <form action="/upload" method="POST" enctype="multipart/form-data"
+                                class="card p-4 shadow-sm">
+
+                                <!-- Branch selection -->
+                                <div class="mb-3">
+                                    <label for="branch" class="form-label">Select Branch</label>
+                                    <select class="form-select form-select-lg" id="branch" name="branch" required>
+                                        <option value="" disabled selected>Select branch</option>
+                                        <option value="lr">Logical Reasoning and Aptitude</option>
+                                        <option value="ai">Artificial Intelligence</option>
+                                        <option value="che">Chemical Engineering</option>
+                                        <option value="chm">Chemistry</option>
+                                        <option value="ce">Civil Engineering</option>
+                                        <option value="cse">Computer Science and Engineering</option>
+                                        <option value="ee">Electrical Engineering</option>
+                                        <option value="ece">Electronics Engineering</option>
+                                        <option value="hss">Humanities and Social Sciences</option>
+                                        <option value="ms">Management Studies</option>
+                                        <option value="math">Mathematics</option>
+                                        <option value="me">Mechanical Engineering</option>
+                                        <option value="phy">Physics</option>
+                                    </select>
+                                </div>
+
+                                <!-- File upload + button in one row -->
+                                <div class="row g-3 align-items-center">
+                                    <div class="col-md-8">
+                                        <label for="file" class="form-label">Upload Excel File</label>
+                                        <input class="form-control" type="file" id="file" name="file"
+                                            accept=".xlsx,.xls" required>
+                                    </div>
+                                    <div class="col-md-4 d-grid">
+                                        <label class="form-label invisible">Upload</label>
+                                    </div>
+                                    <button type="submit" class="btn btn-success btn-md">
+                                        <i class="fa fa-upload me-2"></i> Upload Questions
+                                    </button>
+                                </div>
+
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="section leaderboard-section">
-                <div class="section-header">
-                    <h2 class="section-title">Leaderboard</h2>
-
-                    <div class="filter-container">
-                        <select id="branchSelect">
-                            <option value="lr" selected>Logical Reasoning</option>
-                            <option value="ai">Artificial Intelligence</option>
-                            <option value="che">Chemical Engineering</option>
-                            <option value="chm">Chemistry</option>
-                            <option value="ce">Civil Engineering</option>
-                            <option value="cse">Computer Science & Engineering</option>
-                            <option value="ee">Electrical Engineering</option>
-                            <option value="ece">Electronics & Communication</option>
-                            <option value="hss">Humanities & Social Sciences</option>
-                            <option value="ms">Management Studies</option>
-                            <option value="math">Mathematics</option>
-                            <option value="me">Mechanical Engineering</option>
-                            <option value="phy">Physics</option>
-                        </select>
-
-                        <select id="testSelect">
-                            <option value="">Select Test</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="table-container">
-                    <table class="leaderboard-table">
-                        <caption id="testCaption">Select a test to view leaderboard</caption>
-                        <thead>
-                            <tr>
-                                <th>Rank</th>
-                                <th>Name</th>
-                                <th>Score</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="leaderboardBody">
-                            <!-- Populated dynamically -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
         </div>
         </div>
         <footer class="custom-footer py-3">
