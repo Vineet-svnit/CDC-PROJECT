@@ -1018,7 +1018,64 @@ app.get("/dashboard", isAdmin, async (req, res) => {
     let allTests = await Test.find({});
     allTests.reverse();
     res.render("dashboard.ejs", { allAnnouncements, allTests });
-})
+});
+
+app.get("/leaderboard", isAdmin, async (req, res) => {
+    try {
+        const users = await User.find({})
+            .populate({
+                path: "submissions.test_id",   // populate test details
+                model: "Test",
+                select: "testName branch totalMarks" // limit fields if needed
+            })
+            .lean(); // faster read-only objects
+
+        res.status(200).json(users);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.get("/stats", isAdmin, async (req, res) => {
+  try {
+    const now = new Date();
+
+    // Count users
+    const totalUsers = await User.countDocuments();
+
+    // Fetch all tests once for efficiency
+    const tests = await Test.find({}, "startTime endTime");
+
+    // Calculate counts
+    let activeTests = 0;
+    let completedTests = 0;
+    let upcomingTests = 0;
+
+    tests.forEach(test => {
+      const start = new Date(test.startTime);
+      const end = new Date(test.endTime);
+
+      if (start <= now && end >= now) {
+        activeTests++;
+      } else if (end < now) {
+        completedTests++;
+      } else if (start > now) {
+        upcomingTests++;
+      }
+    });
+
+    res.status(200).json({
+      success: true,
+      totalUsers,
+      activeTests,
+      completedTests,
+      upcomingTests
+    });
+  } catch (err) {
+    console.error("Error fetching stats:", err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
 
 // Error Handler
 app.use((err, req, res, next) => {

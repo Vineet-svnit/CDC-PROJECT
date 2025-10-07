@@ -16,361 +16,347 @@
 
 <body>
     <%- include("./includes/flash.ejs") %>
-    <div class="dashboard">
-        <div class="main-content">
-            <div class="header">
-                <h1>Dashboard</h1>
-                <div class="user-info">
-                    <a href="/admin/logout" class="btn btn-danger ms-auto m-2">Logout</a>
-                </div>
-            </div>
-
-            <div class="cards">
-                <div class="dashboard-card">
-                    <div class="card-header">
-                        <h3 class="card-title">Total Students</h3>
-                        <div class="card-icon blue">
-                            <i class="fas fa-users"></i>
-                        </div>
+        <div class="dashboard">
+            <div class="main-content">
+                <div class="header">
+                    <h1>Dashboard</h1>
+                    <div class="user-info">
+                        <a href="/admin/logout" class="btn btn-danger ms-auto m-2">Logout</a>
                     </div>
-                    <div class="card-value">1,248</div>
-                    <div class="card-description">+12% from last month</div>
                 </div>
 
-                <div class="dashboard-card">
-                    <div class="card-header">
-                        <h3 class="card-title">Active Tests</h3>
-                        <div class="card-icon green">
-                            <i class="fas fa-edit"></i>
-                        </div>
-                    </div>
-                    <div class="card-value">15</div>
-                    <div class="card-description">3 ending today</div>
-                </div>
-
-                <div class="dashboard-card">
-                    <div class="card-header">
-                        <h3 class="card-title">Average Score</h3>
-                        <div class="card-icon red">
-                            <i class="fas fa-chart-line"></i>
-                        </div>
-                    </div>
-                    <div class="card-value">78.5%</div>
-                    <div class="card-description">+2.3% from last test</div>
-                </div>
-
-                <div class="dashboard-card">
-                    <div class="card-header">
-                        <h3 class="card-title">Total Students</h3>
-                        <div class="card-icon blue">
-                            <i class="fas fa-users"></i>
-                        </div>
-                    </div>
-                    <div class="card-value">1,248</div>
-                    <div class="card-description">+12% from last month</div>
-                </div>
-
-            </div>
-
-
-            <div class="sections">
-                <div class="section">
-                    <div class="section-header">
-                        <h2 class="section-title">Announcements</h2>
-                        <form method="GET" action="/announcement/new">
-                            <button class="btn btn-primary" id="newAnnouncementBtn">
-                                <i class="fas fa-plus"></i> New Announcement
-                            </button>
-                        </form>
-                    </div>
-                    <ul class="announcement-list">
-                        <% for(announcement of allAnnouncements){ %>
-                            <li class="announcement-item">
-                                <div class="announcement-box position-relative">
-                                    <div class="announcement-title">
-                                        <%= announcement.title %>
-                                    </div>
-                                    <div class="announcement-date">
-                                        Date: <%= announcement.date %>
-                                    </div>
-                                    <div class="announcement-body">
-                                        <%- announcement.body %>
-                                    </div>
-                                    <div class="announcement-footer">
-                                        Issued By: <%= announcement.issued_by %>
-                                    </div>
-
-                                    <div class="position-absolute bottom-0 end-0 p-3 d-flex gap-3">
-                                        <form action="/announcement/<%= announcement._id %>" method="GET">
-                                            <button type="submit" class="btn btn-warning btn-sm">Edit</button>
-                                        </form>
-                                        <form action="/announcement/<%= announcement._id %>?_method=DELETE"
-                                            method="POST">
-                                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                        </form>
-                                    </div>
-                            </li>
-                            <% } %>
-                    </ul> <hr>
-                    <div class="container mt-4">
-                        <form action="/download" method="POST" class="card p-4 shadow-sm">
-
-                            <!-- Branch selection -->
-                            <div class="mb-3">
-                                <label for="branch_name" class="form-label">Select Branch</label>
-                                <select class="form-select form-select-lg" id="branch_name" name="branch_name" required>
-                                    <option value="" disabled selected>Select branch</option>
-                                    <option value="lr">Logical Reasoning and Aptitude</option>
-                                    <option value="ai">Artificial Intelligence</option>
-                                    <option value="che">Chemical Engineering</option>
-                                    <option value="chm">Chemistry</option>
-                                    <option value="ce">Civil Engineering</option>
-                                    <option value="cse">Computer Science and Engineering</option>
-                                    <option value="ee">Electrical Engineering</option>
-                                    <option value="ece">Electronics Engineering</option>
-                                    <option value="hss">Humanities and Social Sciences</option>
-                                    <option value="ms">Management Studies</option>
-                                    <option value="math">Mathematics</option>
-                                    <option value="me">Mechanical Engineering</option>
-                                    <option value="phy">Physics</option>
-                                </select>
+                <div class="cards">
+                    <!-- Total Students -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Total Students</h3>
+                            <div class="card-icon blue">
+                                <i class="fas fa-user-graduate"></i>
                             </div>
-                            <div class="mb-3">
-                                <label for="test_id" class="form-label">Select Test</label>
-                                <select class="form-select form-select-lg" id="test_id" name="test_id" required>
-                                    
-                                </select>
+                        </div>
+                        <div class="card-value" id="totalStudents">--</div>
+                        <div class="card-description">Registered Users</div>
+                    </div>
+
+                    <!-- Active Tests -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Active Tests</h3>
+                            <div class="card-icon green">
+                                <i class="fas fa-play-circle"></i>
                             </div>
-                            <button type="submit" class="btn btn-success btn-md">
-                                        <i class="fa fa-download me-2"></i> Download Result
-                            </button>
-                        </form>
+                        </div>
+                        <div class="card-value" id="activeTests">--</div>
+                        <div class="card-description">Ongoing right now</div>
+                    </div>
+
+                    <!-- Completed Tests -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Completed Tests</h3>
+                            <div class="card-icon red">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                        <div class="card-value" id="completedTests">--</div>
+                        <div class="card-description">Already finished</div>
+                    </div>
+
+                    <!-- Upcoming Tests -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Upcoming Tests</h3>
+                            <div class="card-icon yellow">
+                                <i class="fa-solid fa-calendar-days"></i>
+                            </div>
+                        </div>
+                        <div class="card-value" id="upcomingTests">--</div>
+                        <div class="card-description">Starting soon</div>
                     </div>
                 </div>
 
-                <div class="section">
-                    <div class="container mt-4">
-                        <form action="/upload" method="POST" enctype="multipart/form-data" class="card p-4 shadow-sm">
-
-                            <!-- Branch selection -->
-                            <div class="mb-3">
-                                <label for="branch" class="form-label">Select Branch</label>
-                                <select class="form-select form-select-lg" id="branch" name="branch" required>
-                                    <option value="" disabled selected>Select branch</option>
-                                    <option value="lr">Logical Reasoning and Aptitude</option>
-                                    <option value="ai">Artificial Intelligence</option>
-                                    <option value="che">Chemical Engineering</option>
-                                    <option value="chm">Chemistry</option>
-                                    <option value="ce">Civil Engineering</option>
-                                    <option value="cse">Computer Science and Engineering</option>
-                                    <option value="ee">Electrical Engineering</option>
-                                    <option value="ece">Electronics Engineering</option>
-                                    <option value="hss">Humanities and Social Sciences</option>
-                                    <option value="ms">Management Studies</option>
-                                    <option value="math">Mathematics</option>
-                                    <option value="me">Mechanical Engineering</option>
-                                    <option value="phy">Physics</option>
-                                </select>
-                            </div>
-
-                            <!-- File upload + button in one row -->
-                            <div class="row g-3 align-items-center">
-                                <div class="col-md-8">
-                                    <label for="file" class="form-label">Upload Excel File</label>
-                                    <input class="form-control" type="file" id="file" name="file" accept=".xlsx,.xls"
-                                        required>
-                                </div>
-                                <div class="col-md-4 d-grid">
-                                    <label class="form-label invisible">Upload</label>
-                                    <button type="submit" class="btn btn-success btn-md">
-                                        <i class="fa fa-upload me-2"></i> Upload Questions
-                                    </button>
-                                </div>
-                            </div>
-
-                        </form>
-                    </div>
-
-                    <hr><br>
-                    <div class="section-header">
-
-                        <h2 class="section-title">Create New Test</h2>
-                        <form method="GET" action="/test/new">
-                            <button class="btn btn-primary" id="newAnnouncementBtn">
-                                <i class="fas fa-plus"></i> New Test
-                            </button>
-                        </form>
-                    </div>
-
-
-                    <!-- upload the questions -->
-
-                    <ul class="announcement-list">
-                        <% for(test of allTests){ %>
-
-                            <% const dateObj=new Date(test.startTime); const date=dateObj.toLocaleDateString('en-GB', {
-                                day: 'numeric' , month: 'long' , year: 'numeric' }); const
-                                time=dateObj.toLocaleTimeString('en-US', { hour: 'numeric' , minute: '2-digit' , hour12:
-                                true }).toLowerCase(); %>
-
+                <div class="sections">
+                    <div class="section">
+                        <div class="section-header">
+                            <h2 class="section-title">Announcements</h2>
+                            <form method="GET" action="/announcement/new">
+                                <button class="btn btn-primary" id="newAnnouncementBtn">
+                                    <i class="fas fa-plus"></i> New Announcement
+                                </button>
+                            </form>
+                        </div>
+                        <ul class="announcement-list">
+                            <% for(announcement of allAnnouncements){ %>
                                 <li class="announcement-item">
-                                    <div class="position-relative">
-                                        <div class="card p-0">
-                                            <div class="card-header">
-                                                <%= test.testName %>
-                                            </div>
-                                            <div class="card-body">
-                                                <p class="card-text"><b>Scheduled date :&MediumSpace;</b>
-                                                    <%= date %>
-                                                </p>
-                                                <p class="card-text"><b>Scheduled time :&MediumSpace;</b>
-                                                    <%= time %>
-                                                </p>
-                                                <p class="card-text"><b>Total questions :&MediumSpace;</b>
-                                                    <%= test.numberOfQues %>
-                                                </p>
-                                                <p class="card-text"><b>Total marks :&MediumSpace;</b>
-                                                    <%= test.totalMarks %>
-                                                </p>
-                                            </div>
+                                    <div class="announcement-box position-relative">
+                                        <div class="announcement-title">
+                                            <%= announcement.title %>
                                         </div>
+                                        <div class="announcement-date">
+                                            Date: <%= announcement.date %>
+                                        </div>
+                                        <div class="announcement-body">
+                                            <%- announcement.body %>
+                                        </div>
+                                        <div class="announcement-footer">
+                                            Issued By: <%= announcement.issued_by %>
+                                        </div>
+
                                         <div class="position-absolute bottom-0 end-0 p-3 d-flex gap-3">
-                                            <form action="/test/<%= test._id %>" method="GET">
+                                            <form action="/announcement/<%= announcement._id %>" method="GET">
                                                 <button type="submit" class="btn btn-warning btn-sm">Edit</button>
                                             </form>
-                                            <form action="/test/<%= test._id %>?_method=DELETE" method="POST">
+                                            <form action="/announcement/<%= announcement._id %>?_method=DELETE"
+                                                method="POST">
                                                 <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                                             </form>
                                         </div>
                                 </li>
                                 <% } %>
-                    </ul>
+                        </ul>
+                        <hr>
+                        <div class="container mt-4">
+                            <form action="/download" method="POST" class="card p-4 shadow-sm">
+
+                                <!-- Branch selection -->
+                                <div class="mb-3">
+                                    <label for="branch_name" class="form-label">Select Branch</label>
+                                    <select class="form-select form-select-lg" id="branch_name" name="branch_name"
+                                        required>
+                                        <option value="" disabled selected>Select branch</option>
+                                        <option value="lr">Logical Reasoning and Aptitude</option>
+                                        <option value="ai">Artificial Intelligence</option>
+                                        <option value="che">Chemical Engineering</option>
+                                        <option value="chm">Chemistry</option>
+                                        <option value="ce">Civil Engineering</option>
+                                        <option value="cse">Computer Science and Engineering</option>
+                                        <option value="ee">Electrical Engineering</option>
+                                        <option value="ece">Electronics Engineering</option>
+                                        <option value="hss">Humanities and Social Sciences</option>
+                                        <option value="ms">Management Studies</option>
+                                        <option value="math">Mathematics</option>
+                                        <option value="me">Mechanical Engineering</option>
+                                        <option value="phy">Physics</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="test_id" class="form-label">Select Test</label>
+                                    <select class="form-select form-select-lg" id="test_id" name="test_id" required>
+
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-success btn-md">
+                                    <i class="fa fa-download me-2"></i> Download Result
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="container mt-4">
+                            <form action="/upload" method="POST" enctype="multipart/form-data"
+                                class="card p-4 shadow-sm">
+
+                                <!-- Branch selection -->
+                                <div class="mb-3">
+                                    <label for="branch" class="form-label">Select Branch</label>
+                                    <select class="form-select form-select-lg" id="branch" name="branch" required>
+                                        <option value="" disabled selected>Select branch</option>
+                                        <option value="lr">Logical Reasoning and Aptitude</option>
+                                        <option value="ai">Artificial Intelligence</option>
+                                        <option value="che">Chemical Engineering</option>
+                                        <option value="chm">Chemistry</option>
+                                        <option value="ce">Civil Engineering</option>
+                                        <option value="cse">Computer Science and Engineering</option>
+                                        <option value="ee">Electrical Engineering</option>
+                                        <option value="ece">Electronics Engineering</option>
+                                        <option value="hss">Humanities and Social Sciences</option>
+                                        <option value="ms">Management Studies</option>
+                                        <option value="math">Mathematics</option>
+                                        <option value="me">Mechanical Engineering</option>
+                                        <option value="phy">Physics</option>
+                                    </select>
+                                </div>
+
+                                <!-- File upload + button in one row -->
+                                <div class="row g-3 align-items-center">
+                                    <div class="col-md-8">
+                                        <label for="file" class="form-label">Upload Excel File</label>
+                                        <input class="form-control" type="file" id="file" name="file"
+                                            accept=".xlsx,.xls" required>
+                                    </div>
+                                    <div class="col-md-4 d-grid">
+                                        <label class="form-label invisible">Upload</label>
+                                        <button type="submit" class="btn btn-success btn-md">
+                                            <i class="fa fa-upload me-2"></i> Upload Questions
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </div>
+
+                        <hr><br>
+                        <div class="section-header">
+
+                            <h2 class="section-title">Create New Test</h2>
+                            <form method="GET" action="/test/new">
+                                <button class="btn btn-primary" id="newAnnouncementBtn">
+                                    <i class="fas fa-plus"></i> New Test
+                                </button>
+                            </form>
+                        </div>
+
+
+                        <!-- upload the questions -->
+
+                        <ul class="announcement-list">
+                            <% for(test of allTests){ %>
+
+                                <% const dateObj=new Date(test.startTime); const
+                                    date=dateObj.toLocaleDateString('en-GB', { day: 'numeric' , month: 'long' ,
+                                    year: 'numeric' }); const time=dateObj.toLocaleTimeString('en-US', { hour: 'numeric'
+                                    , minute: '2-digit' , hour12: true }).toLowerCase(); %>
+
+                                    <li class="announcement-item">
+                                        <div class="position-relative">
+                                            <div class="card p-0">
+                                                <div class="card-header">
+                                                    <%= test.testName %>
+                                                </div>
+                                                <div class="card-body">
+                                                    <p class="card-text"><b>Scheduled date :&MediumSpace;</b>
+                                                        <%= date %>
+                                                    </p>
+                                                    <p class="card-text"><b>Scheduled time :&MediumSpace;</b>
+                                                        <%= time %>
+                                                    </p>
+                                                    <p class="card-text"><b>Total questions :&MediumSpace;</b>
+                                                        <%= test.numberOfQues %>
+                                                    </p>
+                                                    <p class="card-text"><b>Total marks :&MediumSpace;</b>
+                                                        <%= test.totalMarks %>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div class="position-absolute bottom-0 end-0 p-3 d-flex gap-3">
+                                                <form action="/test/<%= test._id %>" method="GET">
+                                                    <button type="submit" class="btn btn-warning btn-sm">Edit</button>
+                                                </form>
+                                                <form action="/test/<%= test._id %>?_method=DELETE" method="POST">
+                                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                                </form>
+                                            </div>
+                                    </li>
+                                    <% } %>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section leaderboard-section">
+                <div class="section-header">
+                    <h2 class="section-title">Leaderboard</h2>
+
+                    <div class="filter-container">
+                        <select id="branchSelect">
+                            <option value="lr" selected>Logical Reasoning</option>
+                            <option value="ai">Artificial Intelligence</option>
+                            <option value="che">Chemical Engineering</option>
+                            <option value="chm">Chemistry</option>
+                            <option value="ce">Civil Engineering</option>
+                            <option value="cse">Computer Science & Engineering</option>
+                            <option value="ee">Electrical Engineering</option>
+                            <option value="ece">Electronics & Communication</option>
+                            <option value="hss">Humanities & Social Sciences</option>
+                            <option value="ms">Management Studies</option>
+                            <option value="math">Mathematics</option>
+                            <option value="me">Mechanical Engineering</option>
+                            <option value="phy">Physics</option>
+                        </select>
+
+                        <select id="testSelect">
+                            <option value="">Select Test</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="leaderboard-table">
+                        <caption id="testCaption">Select a test to view leaderboard</caption>
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Name</th>
+                                <th>Score</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboardBody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-
-        <div class="section" style="margin-top: 20px;">
-            <div class="section-header">
-                <h2 class="section-title">Recent Student Performance</h2>
-                <button class="btn btn-primary">
-                    <i class="fas fa-download"></i> Export Data
-                </button>
-            </div>
-            <div class="table-responsive">
-                <table class="student-table">
-                    <thead>
-                        <tr>
-                            <th>Student ID</th>
-                            <th>Name</th>
-                            <th>Course</th>
-                            <th>Last Test</th>
-                            <th>Score</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>S1001</td>
-                            <td>John Smith</td>
-                            <td>CS 101</td>
-                            <td>Midterm Exam</td>
-                            <td>85%</td>
-                            <td><span class="badge badge-success">Passed</span></td>
-                        </tr>
-                        <tr>
-                            <td>S1002</td>
-                            <td>Emily Johnson</td>
-                            <td>Math 201</td>
-                            <td>Chapter 5 Quiz</td>
-                            <td>92%</td>
-                            <td><span class="badge badge-success">Passed</span></td>
-                        </tr>
-                        <tr>
-                            <td>S1003</td>
-                            <td>Michael Brown</td>
-                            <td>Physics 301</td>
-                            <td>Weekly Test 3</td>
-                            <td>68%</td>
-                            <td><span class="badge badge-warning">Borderline</span></td>
-                        </tr>
-                        <tr>
-                            <td>S1004</td>
-                            <td>Sarah Davis</td>
-                            <td>Engineering 401</td>
-                            <td>Final Exam</td>
-                            <td>45%</td>
-                            <td><span class="badge badge-danger">Failed</span></td>
-                        </tr>
-                        <tr>
-                            <td>S1005</td>
-                            <td>Robert Wilson</td>
-                            <td>CS 101</td>
-                            <td>Midterm Exam</td>
-                            <td>78%</td>
-                            <td><span class="badge badge-success">Passed</span></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
         </div>
-    </div>
-    </div>
-    <footer class="custom-footer py-3">
-        <div class="container text-center">
-            <h6 class="text-white mb-3">Developed By</h6>
+        <footer class="custom-footer py-3">
+            <div class="container text-center">
+                <h6 class="text-white mb-3">Developed By</h6>
 
-            <div class="d-flex justify-content-center gap-5 flex-wrap">
+                <div class="d-flex justify-content-center gap-5 flex-wrap">
 
-                <!-- Jenil -->
-                <div class="dev-profile">
-                    <span class="dev-name text-white">Jenil Prajapati</span>
-                    <span class="social-links ms-2">
-                        <a href="https://github.com/jenil1236" class="text-white mx-1"><i class="fab fa-github"></i></a>
-                        <a href="https://www.linkedin.com/in/jenil-prajapati-b31505307/" class="text-white mx-1"><i
-                                class="fab fa-linkedin"></i></a>
-                        <a href="#" class="text-white mx-1"><i class="fab fa-twitter"></i></a>
-                    </span>
+                    <!-- Jenil -->
+                    <div class="dev-profile">
+                        <span class="dev-name text-white">Jenil Prajapati</span>
+                        <span class="social-links ms-2">
+                            <a href="https://github.com/jenil1236" class="text-white mx-1"><i
+                                    class="fab fa-github"></i></a>
+                            <a href="https://www.linkedin.com/in/jenil-prajapati-b31505307/" class="text-white mx-1"><i
+                                    class="fab fa-linkedin"></i></a>
+                            <a href="#" class="text-white mx-1"><i class="fab fa-twitter"></i></a>
+                        </span>
+                    </div>
+
+                    <!-- Vineet -->
+                    <div class="dev-profile">
+                        <span class="dev-name text-white">Vineet Gupta</span>
+                        <span class="social-links ms-2">
+                            <a href="https://github.com/Vineet-svnit" class="text-white mx-1"><i
+                                    class="fab fa-github"></i></a>
+                            <a href="https://www.linkedin.com/in/vineet-gupta-431396272/" class="text-white mx-1"><i
+                                    class="fab fa-linkedin"></i></a>
+                            <a href="#" class="text-white mx-1"><i class="fab fa-twitter"></i></a>
+                        </span>
+                    </div>
+
                 </div>
 
-                <!-- Vineet -->
-                <div class="dev-profile">
-                    <span class="dev-name text-white">Vineet Gupta</span>
-                    <span class="social-links ms-2">
-                        <a href="https://github.com/Vineet-svnit" class="text-white mx-1"><i
-                                class="fab fa-github"></i></a>
-                        <a href="https://www.linkedin.com/in/vineet-gupta-431396272/" class="text-white mx-1"><i
-                                class="fab fa-linkedin"></i></a>
-                        <a href="#" class="text-white mx-1"><i class="fab fa-twitter"></i></a>
-                    </span>
-                </div>
-
+                <p class="mt-3 mb-0 text-white-50 small">
+                    &copy; <%= new Date().getFullYear() %> Career Development Cell. All rights reserved.
+                </p>
             </div>
+        </footer>
 
-            <p class="mt-3 mb-0 text-white-50 small">
-                &copy; <%= new Date().getFullYear() %> Career Development Cell. All rights reserved.
-            </p>
-        </div>
-    </footer>
+        <style>
+            .custom-footer {
+                background-color: #0d47a1;
+                /* dark bluish */
+                border-top: 2px solid rgba(255, 255, 255, 0.15);
+                box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.25);
+                width: 100%;
+            }
 
-    <style>
-        .custom-footer {
-            background-color: #0d47a1;
-            /* dark bluish */
-            border-top: 2px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.25);
-            width: 100%;
-        }
+            .custom-footer .dev-profile {
+                font-size: 0.95rem;
+            }
 
-        .custom-footer .dev-profile {
-            font-size: 0.95rem;
-        }
-
-        .custom-footer .social-links a:hover {
-            color: #90caf9;
-        }
-    </style>
-    <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/dashboard.js"></script>
+            .custom-footer .social-links a:hover {
+                color: #90caf9;
+            }
+        </style>
+        <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <script src="/js/dashboard.js"></script>
 </body>
 
 </html>
