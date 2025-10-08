@@ -11,6 +11,13 @@
 </head>
 
 <body>
+  <%
+  // Current IST time
+  const nowIST = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+  // Make inputs read-only if test has started
+  const readOnlyEdit = nowIST > new Date(test.startTime) ? "readonly" : "";
+  const disableSelect = nowIST > new Date(test.startTime) ? "disabled" : "";
+%>
   <form method="POST" action="/test/<%= test._id %>?_method=PUT" class="needs-validation" novalidate>
     <!-- Test form -->
     <div class="card col-md-6 mt-5 mb-4 mx-auto shadow-sm">
@@ -18,31 +25,33 @@
         <h3>Edit Test</h3>
       </div>
       <div class="card-body">
-        <div class="mb-3">
-          <label for="testName" class="form-label">Test Name</label>
-          <input name="testName" value="<%= test.testName %>" placeholder="Enter name of the test" type="text"
-            id="testName" class="form-control" required />
-        </div>
+      <div class="mb-3">
+        <label for="testName" class="form-label">Test Name</label>
+        <input name="testName" value="<%= test.testName %>" placeholder="Enter name of the test"
+          type="text" id="testName" class="form-control" required <%= readOnlyEdit %> />
+      </div>
 
-        <div class="row gx-3 mb-3">
-          <div class="col">
-            <label for="date" class="form-label">Test Date</label>
-            <input name="date" value="<%= test.startTime.toLocaleDateString('en-CA') %>" type="date" id="date"
-              class="form-control" required />
-          </div>
-          <div class="col">
-            <label for="time" class="form-label">Test Timing</label>
-            <input name="time"
-              value="<%= test.startTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false }) %>"
-              type="time" id="time" class="form-control" required />
-          </div>
+      <!-- Date & Time -->
+      <div class="row gx-3 mb-3">
+        <div class="col">
+          <label for="date" class="form-label">Test Date</label>
+          <input name="date" value="<%= test.startTime.toLocaleDateString('en-CA') %>" type="date"
+            id="date" class="form-control" required <%= readOnlyEdit %> />
         </div>
+        <div class="col">
+          <label for="time" class="form-label">Test Timing</label>
+          <input name="time"
+            value="<%= test.startTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false }) %>"
+            type="time" id="time" class="form-control" required <%= readOnlyEdit %> />
+        </div>
+      </div>
 
-        <div class="mb-3">
-          <label for="duration" class="form-label">Test Duration (in minutes)</label>
-          <input name="duration" value="<%= test.duration %>" placeholder="Enter duration" type="number" id="duration"
-            class="form-control" min="1" required />
-        </div>
+      <!-- Duration -->
+      <div class="mb-3">
+        <label for="duration" class="form-label">Test Duration (in minutes)</label>
+        <input name="duration" value="<%= test.duration %>" placeholder="Enter duration" type="number"
+          id="duration" class="form-control" min="1" required <%= readOnlyEdit %> />
+      </div>
 
         <div class="mb-3">
           <label for="branch" class="form-label">Branch</label>
