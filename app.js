@@ -416,8 +416,8 @@ app.post("/submission/:id", isLoggedIn, checkSubmit, async (req, res) => {
             let falseAns = false;
             for (const a of givenAns) {
                 if (correctAns.indexOf(a) === -1) {
-                    score -= 2;
-                    answers[i].score = -2;
+                    // score -= 2;
+                    answers[i].score = 0;
                     falseAns = true;
                     break;
                 }

@@ -75,51 +75,6 @@
                     </div>
                 </div>
 
-                <div class="section leaderboard-section mb-3">
-                <div class="section-header">
-                    <h2 class="section-title">Leaderboard</h2>
-
-                    <div class="filter-container">
-                        <select id="branchSelect">
-                            <option value="lr" selected>Logical Reasoning</option>
-                            <option value="ai">Artificial Intelligence</option>
-                            <option value="che">Chemical Engineering</option>
-                            <option value="chm">Chemistry</option>
-                            <option value="ce">Civil Engineering</option>
-                            <option value="cse">Computer Science & Engineering</option>
-                            <option value="ee">Electrical Engineering</option>
-                            <option value="ece">Electronics & Communication</option>
-                            <option value="hss">Humanities & Social Sciences</option>
-                            <option value="ms">Management Studies</option>
-                            <option value="math">Mathematics</option>
-                            <option value="me">Mechanical Engineering</option>
-                            <option value="phy">Physics</option>
-                        </select>
-
-                        <select id="testSelect">
-                            <option value="">Select Test</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="table-container">
-                    <table class="leaderboard-table">
-                        <caption id="testCaption">Select a test to view leaderboard</caption>
-                        <thead>
-                            <tr>
-                                <th>Rank</th>
-                                <th>Name</th>
-                                <th>Score</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="leaderboardBody">
-                            <!-- Populated dynamically -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
                 <div class="sections">
                     <div class="section">
                         <div class="section-header">
@@ -296,6 +251,50 @@
                             </form>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="section leaderboard-section mb-3">
+                <div class="section-header">
+                    <h2 class="section-title">Leaderboard</h2>
+
+                    <div class="filter-container">
+                        <select id="branchSelect">
+                            <option value="lr" selected>Logical Reasoning</option>
+                            <option value="ai">Artificial Intelligence</option>
+                            <option value="che">Chemical Engineering</option>
+                            <option value="chm">Chemistry</option>
+                            <option value="ce">Civil Engineering</option>
+                            <option value="cse">Computer Science & Engineering</option>
+                            <option value="ee">Electrical Engineering</option>
+                            <option value="ece">Electronics & Communication</option>
+                            <option value="hss">Humanities & Social Sciences</option>
+                            <option value="ms">Management Studies</option>
+                            <option value="math">Mathematics</option>
+                            <option value="me">Mechanical Engineering</option>
+                            <option value="phy">Physics</option>
+                        </select>
+
+                        <select id="testSelect">
+                            <option value="">Select Test</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="leaderboard-table">
+                        <caption id="testCaption">Select a test to view leaderboard</caption>
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Name</th>
+                                <th>Score</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboardBody">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
