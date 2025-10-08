@@ -849,7 +849,12 @@ app.post("/download", isAdmin, async (req, res) => {
 //Delete Test
 app.delete("/test/:id", isAdmin, async (req, res) => {
     let { id } = req.params;
-    await Test.findByIdAndDelete(id);
+    const now = new Date(
+        new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
+    ); 
+    const test = await Test.findById(id);
+    if(test.startTime > now)
+        await Test.findByIdAndDelete(id);
     res.redirect("/dashboard");
 });
 

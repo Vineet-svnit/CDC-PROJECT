@@ -1,29 +1,91 @@
 <% layout("/layouts/userBoilerplate") %>
-    <!-- < % var styles = '<link rel="stylesheet" href="/css/home.css">'; %> -->
 
-    <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1">
-        <% for(let test of allTests){ %>
+<% 
+    const now = new Date(
+        new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
+    ); 
+    const upcomingTests = [];
+    const activeTests = [];
+    const inactiveTests = [];
 
-            <%
-                const dateObj = new Date(test.startTime);
-                const date = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-                const time = dateObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase();
-            %>
+    for(let test of allTests) {
+        const start = new Date(test.startTime);
+        const end = new Date(start.getTime() + test.duration * 60000); // assuming duration is in minutes
 
-            <div class="col">
-                <div class="card p-0 mt-3">
-                    <div class="card-header">
-                        <%= test.testName %>
-                    </div>
-                    <div class="card-body">
-                        <p class="card-text"><b>Scheduled date :&MediumSpace;</b><%= date %></p>
-                        <p class="card-text"><b>Scheduled time :&MediumSpace;</b><%= time %></p>
-                        <p class="card-text"><b>Duration :&MediumSpace;</b><%= test.duration %></p>
-                        <p class="card-text"><b>Total questions :&MediumSpace;</b><%= test.numberOfQues %></p>
-                        <p class="card-text"><b>Total marks :&MediumSpace;</b><%= test.totalMarks %></p>
-                        <a href="/tests/<%= test._id %>/<%= user._id %>" class="btn btn-primary" id="<%= test._id %>">START TEST</a>
-                    </div>
+        if(now < start) {
+            upcomingTests.push(test);
+        } else if(now >= start && now <= end) {
+            activeTests.push(test);
+        } else {
+            inactiveTests.push(test);
+        }
+    }
+
+    function formatDateTime(dateObj){
+        const date = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+        const time = dateObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase();
+        return { date, time };
+    }
+%>
+<h2>Active Tests</h2>
+<div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1">
+    <% for(let test of activeTests){ 
+        const { date, time } = formatDateTime(new Date(test.startTime));
+    %>
+        <div class="col">
+            <div class="card p-0 mt-3 border-success">
+                <div class="card-header"><%= test.testName %></div>
+                <div class="card-body">
+                    <p class="card-text"><b>Scheduled date :</b> <%= date %></p>
+                    <p class="card-text"><b>Scheduled time :</b> <%= time %></p>
+                    <p class="card-text"><b>Duration :</b> <%= test.duration %></p>
+                    <p class="card-text"><b>Total questions :</b> <%= test.numberOfQues %></p>
+                    <p class="card-text"><b>Total marks :</b> <%= test.totalMarks %></p>
+                    <a href="/tests/<%= test._id %>/<%= user._id %>" class="btn btn-primary" id="<%= test._id %>">CONTINUE TEST</a>
                 </div>
             </div>
-            <% } %>
-    </div>
+        </div>
+    <% } %>
+</div>
+
+<h2>Upcoming Tests</h2>
+<div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1">
+    <% for(let test of upcomingTests){ 
+        const { date, time } = formatDateTime(new Date(test.startTime));
+    %>
+        <div class="col">
+            <div class="card p-0 mt-3">
+                <div class="card-header"><%= test.testName %></div>
+                <div class="card-body">
+                    <p class="card-text"><b>Scheduled date :</b> <%= date %></p>
+                    <p class="card-text"><b>Scheduled time :</b> <%= time %></p>
+                    <p class="card-text"><b>Duration :</b> <%= test.duration %></p>
+                    <p class="card-text"><b>Total questions :</b> <%= test.numberOfQues %></p>
+                    <p class="card-text"><b>Total marks :</b> <%= test.totalMarks %></p>
+                    <a href="/tests/<%= test._id %>/<%= user._id %>" class="btn btn-primary" id="<%= test._id %>">START TEST</a>
+                </div>
+            </div>
+        </div>
+    <% } %>
+</div>
+
+<h2>Inactive / Past Tests</h2>
+<div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1">
+    <% for(let test of inactiveTests){ 
+        const { date, time } = formatDateTime(new Date(test.startTime));
+    %>
+        <div class="col">
+            <div class="card p-0 mt-3 border-secondary">
+                <div class="card-header"><%= test.testName %></div>
+                <div class="card-body">
+                    <p class="card-text"><b>Scheduled date :</b> <%= date %></p>
+                    <p class="card-text"><b>Scheduled time :</b> <%= time %></p>
+                    <p class="card-text"><b>Duration :</b> <%= test.duration %></p>
+                    <p class="card-text"><b>Total questions :</b> <%= test.numberOfQues %></p>
+                    <p class="card-text"><b>Total marks :</b> <%= test.totalMarks %></p>
+                    <button class="btn btn-secondary" disabled>COMPLETED</button>
+                </div>
+            </div>
+        </div>
+    <% } %>
+</div>

@@ -200,10 +200,18 @@
                                                 <form action="/test/<%= test._id %>" method="GET">
                                                     <button type="submit" class="btn btn-warning btn-sm">Edit</button>
                                                 </form>
-                                                <form action="/test/<%= test._id %>?_method=DELETE" method="POST">
-                                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                                </form>
+
+                                                <% const nowIST=new Date(new Date().toLocaleString("en-US", {
+                                                    timeZone: "Asia/Kolkata" })); const disableDelete=nowIST> new
+                                                    Date(test.startTime) ? "disabled" : "";
+                                                    %>
+
+                                                    <form action="/test/<%= test._id %>?_method=DELETE" method="POST">
+                                                        <button type="submit" class="btn btn-danger btn-sm"
+                                                            <%=disableDelete %>>Delete</button>
+                                                    </form>
                                             </div>
+
                                     </li>
                                     <% } %>
                         </ul>
