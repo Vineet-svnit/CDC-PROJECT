@@ -6,23 +6,22 @@
         <a class="nav-link navTab p-4 <%= currentPath === '/' ? 'active' : '' %>" href="/">HOMEPAGE</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link navTab p-4 <%= currentPath === '/history' ? 'active' : '' %>"
-          href="/history">HISTORY</a>
+        <a class="nav-link navTab p-4 <%= currentPath === '/history' ? 'active' : '' %>" href="/history">HISTORY</a>
       </li>
       <li class="nav-item">
         <a class="nav-link navTab p-4 <%= currentPath === '/announcement' ? 'active' : '' %>"
           href="/announcement">ANNOUNCEMENT</a>
       </li>
       <li class="nav-item">
-                <a class="nav-link navTab p-4 <%= currentPath === '/core' ? 'active' : '' %>"
-                    href="/core">CORE</a>
-            </li>
+        <a class="nav-link navTab p-4 <%= currentPath === '/core' ? 'active' : '' %>" href="/core">CORE</a>
+      </li>
     </ul>
 
     <!-- Right side: Welcome + Logout together -->
     <div class="d-flex align-items-center ms-auto">
       <div class="admission-number me-2">
-        Welcome, <%= currentUser.username %>
+        Welcome, <%= currentUser ? currentUser.username : (typeof isAdmin !=='undefined' && isAdmin ? 'Admin' : 'Guest'
+          ) %>
       </div>
       <a href="/logout" class="btn btn-danger">Logout</a>
     </div>
@@ -30,45 +29,45 @@
 </nav>
 
 <style>
-    /* Navbar specific styles */
-    .nav-tabs {
-        border-bottom: none;
-    }
+  /* Navbar specific styles */
+  .nav-tabs {
+    border-bottom: none;
+  }
 
+  .nav-link {
+    color: #555;
+    font-weight: 500;
+    transition: all 0.3s;
+  }
+
+  .nav-link:hover {
+    color: #1976d2;
+    background-color: rgba(25, 118, 210, 0.1);
+  }
+
+  .nav-link.active {
+    color: #1976d2;
+    background-color: white;
+    border-color: #e0e0e0 #e0e0e0 white;
+    border-bottom: 3px solid #1976d2;
+  }
+
+  .navbar {
+    border-bottom: 1px solid #ccc;
+    /* Light grey */
+  }
+
+  .admission-number {
+    background: #e3f2fd;
+    color: #0d47a1;
+    font-weight: 600;
+    padding: 10px 15px;
+    border-radius: 8px;
+  }
+
+  @media (max-width: 768px) {
     .nav-link {
-        color: #555;
-        font-weight: 500;
-        transition: all 0.3s;
+      padding: 10px 15px !important;
     }
-
-    .nav-link:hover {
-        color: #1976d2;
-        background-color: rgba(25, 118, 210, 0.1);
-    }
-
-    .nav-link.active {
-        color: #1976d2;
-        background-color: white;
-        border-color: #e0e0e0 #e0e0e0 white;
-        border-bottom: 3px solid #1976d2;
-    }
-
-    .navbar {
-        border-bottom: 1px solid #ccc;
-        /* Light grey */
-    }
-
-    .admission-number {
-        background: #e3f2fd;
-        color: #0d47a1;
-        font-weight: 600;
-        padding: 10px 15px;
-        border-radius: 8px;
-    }
-
-    @media (max-width: 768px) {
-        .nav-link {
-            padding: 10px 15px !important;
-        }
-    }
+  }
 </style>

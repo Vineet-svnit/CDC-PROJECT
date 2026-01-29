@@ -316,6 +316,33 @@ app.get('/branchTests', isAdmin, async (req, res) => {
     res.send(allTests);
 })
 
+app.get("/api/categories/:branch", isAdmin, async (req, res) => {
+    const { branch } = req.params;
+    let model;
+    switch (branch) {
+        case 'lr': model = Question; break;
+        case 'ai': model = AiDepartment; break;
+        case 'che': model = ChemicalDepartment; break;
+        case 'chm': model = ChemistryDepartment; break;
+        case 'ce': model = CivilDepartment; break;
+        case 'cse': model = ComputerScienceDepartment; break;
+        case 'ee': model = ElectricalDepartment; break;
+        case 'ece': model = ElectronicsCommunicationDepartment; break;
+        case 'hss': model = HumanitiesSocialSciencesDepartment; break;
+        case 'ms': model = ManagementStudiesDepartment; break;
+        case 'math': model = MathematicsDepartment; break;
+        case 'me': model = MechanicalDepartment; break;
+        case 'phy': model = PhysicsDepartment; break;
+        default: return res.status(400).json({ error: "Invalid branch" });
+    }
+    try {
+        const categories = await model.distinct("category");
+        res.json(categories);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 app.get("/core", isLoggedIn, async (req, res) => {
     let branch = req.user.branch;
     let allTests = await Test.find({ branch: branch });
@@ -446,7 +473,18 @@ app.get("/test/new", isAdmin, (req, res) => {
 
 // Create Test Route
 app.post("/test/questions/new", isAdmin, async (req, res) => {
-    let { testName, date, time, duration, numberOfQues, branch } = req.body;
+    let { testName, date, time, duration, branch, category_name, catNumberOfQues } = req.body;
+
+    // Normalize categories from form input
+    let categories = [];
+    if (category_name) {
+        const names = Array.isArray(category_name) ? category_name : [category_name];
+        const counts = Array.isArray(catNumberOfQues) ? catNumberOfQues : [catNumberOfQues];
+        categories = names.map((name, i) => ({
+            category_name: name,
+            numberOfQues: Number(counts[i])
+        }));
+    }
 
     // Combine into ISO string
     const isoString = `${date}T${time}:00`;
@@ -456,110 +494,59 @@ app.post("/test/questions/new", isAdmin, async (req, res) => {
     const endTime = new Date(isoString);
     endTime.setMinutes(endTime.getMinutes() + Number(duration));
 
-    let questions = null;
+    let Model;
     switch (branch) {
-        case 'lr':
-            questions = await Question.aggregate([
-                { $sample: { size: Number(numberOfQues) } },
-            ]);
-            break;
-
-        case 'ai':
-            questions = await AiDepartment.aggregate([
-                { $sample: { size: Number(numberOfQues) } },
-            ]);
-            break;
-
-        case 'che':
-            questions = await ChemicalDepartment.aggregate([
-                { $sample: { size: Number(numberOfQues) } },
-            ]);
-            break;
-
-        case 'chm':
-            questions = await ChemistryDepartment.aggregate([
-                { $sample: { size: Number(numberOfQues) } },
-            ]);
-            break;
-
-        case 'ce':
-            questions = await CivilDepartment.aggregate([
-                { $sample: { size: Number(numberOfQues) } },
-            ]);
-            break;
-
-        case 'cse':
-            questions = await ComputerScienceDepartment.aggregate([
-                { $sample: { size: Number(numberOfQues) } },
-            ]);
-            break;
-
-        case 'ee':
-            questions = await ElectricalDepartment.aggregate([
-                { $sample: { size: Number(numberOfQues) } },
-            ]);
-            break;
-
-        case 'ece':
-            questions = await ElectronicsCommunicationDepartment.aggregate([
-                { $sample: { size: Number(numberOfQues) } },
-            ]);
-            break;
-
-        case 'hss':
-            questions = await HumanitiesSocialSciencesDepartment.aggregate([
-                { $sample: { size: Number(numberOfQues) } },
-            ]);
-            break;
-
-        case 'ms':
-            questions = await ManagementStudiesDepartment.aggregate([
-                { $sample: { size: Number(numberOfQues) } },
-            ]);
-            break;
-
-        case 'math':
-            questions = await MathematicsDepartment.aggregate([
-                { $sample: { size: Number(numberOfQues) } },
-            ]);
-            break;
-
-        case 'me':
-            questions = await MechanicalDepartment.aggregate([
-                { $sample: { size: Number(numberOfQues) } },
-            ]);
-            break;
-
-        case 'phy':
-            questions = await PhysicsDepartment.aggregate([
-                { $sample: { size: Number(numberOfQues) } },
-            ]);
-            break;
-
-        default:
-            questions = [];
-            break;
+        case 'lr': Model = Question; break;
+        case 'ai': Model = AiDepartment; break;
+        case 'che': Model = ChemicalDepartment; break;
+        case 'chm': Model = ChemistryDepartment; break;
+        case 'ce': Model = CivilDepartment; break;
+        case 'cse': Model = ComputerScienceDepartment; break;
+        case 'ee': Model = ElectricalDepartment; break;
+        case 'ece': Model = ElectronicsCommunicationDepartment; break;
+        case 'hss': Model = HumanitiesSocialSciencesDepartment; break;
+        case 'ms': Model = ManagementStudiesDepartment; break;
+        case 'math': Model = MathematicsDepartment; break;
+        case 'me': Model = MechanicalDepartment; break;
+        case 'phy': Model = PhysicsDepartment; break;
+        default: Model = null; break;
     }
 
-    // console.log(questions);
-    if (questions.length === 0) {
-        req.flash('error', 'Test could not be created!');
+    if (!Model || categories.length === 0) {
+        req.flash('error', 'Invalid branch or no categories selected!');
         return res.redirect("/dashboard");
     }
-    let randomIds = questions.map((q) => q._id.toString());
 
+    let allQuestions = [];
+    let totalNumberOfQues = 0;
+
+    for (let cat of categories) {
+        const catQuestions = await Model.aggregate([
+            { $match: { category: cat.category_name } },
+            { $sample: { size: Number(cat.numberOfQues) } }
+        ]);
+        allQuestions = allQuestions.concat(catQuestions);
+        totalNumberOfQues += Number(cat.numberOfQues);
+    }
+
+    if (allQuestions.length === 0) {
+        req.flash('error', 'No questions found for selected categories!');
+        return res.redirect("/dashboard");
+    }
+
+    let randomIds = allQuestions.map((q) => q._id.toString());
     randomIds.sort((a, b) => a.localeCompare(b));
 
     let totalMarks = 0;
-    for (const question of questions) {
+    for (const question of allQuestions) {
         if (question._type === 'SCQ')
             totalMarks += 3;
         else if (question._type === 'MCQ')
             totalMarks += 4;
     }
-    // console.log('totalmarks', totalMarks);
+
     const branchToModel = {
-        lr: 'Question', // assuming LogicalReasoning uses Question model
+        lr: 'Question',
         ai: 'AiDepartment',
         che: 'ChemicalDepartment',
         chm: 'ChemistryDepartment',
@@ -573,20 +560,31 @@ app.post("/test/questions/new", isAdmin, async (req, res) => {
         me: 'MechanicalDepartment',
         phy: 'PhysicsDepartment'
     };
+
     const newTest = new Test({
-        testName, startTime, endTime, duration, numberOfQues, questions: randomIds, branch, branchModel: branchToModel[branch]
+        testName,
+        startTime,
+        endTime,
+        duration,
+        numberOfQues: totalNumberOfQues,
+        category: categories,
+        questions: randomIds,
+        branch,
+        branchModel: branchToModel[branch]
     });
 
     newTest.totalMarks = totalMarks;
 
-
     await newTest.save()
-        .then((response) => {
-            // const id = response._id;
+        .then(() => {
             req.flash('success', 'Test generated successfully!');
             res.redirect("/dashboard");
         })
-        .catch((err) => console.log(err));
+        .catch((err) => {
+            console.log(err);
+            req.flash('error', 'Failed to save test!');
+            res.redirect("/dashboard");
+        });
 });
 
 //Create Ques Route
@@ -695,7 +693,7 @@ app.post("/upload", isAdmin, upload.single("file"), async (req, res) => {
                 return;
             }
 
-            const [_type, question, option1, option2, option3, option4, answer] = row;
+            const [_type, question, option1, option2, option3, option4, answer, category] = row;
             const normalizedType = _type.trim().toUpperCase();
             // Validate _type
             if (!_type || !["SCQ", "MCQ"].includes(normalizedType)) {
@@ -704,8 +702,8 @@ app.post("/upload", isAdmin, upload.single("file"), async (req, res) => {
             }
 
             // Validate required fields
-            if (!question || !answer) {
-                errors.push(`Row ${index + 2}: Missing question or answer`);
+            if (!question || !answer || !category) {
+                errors.push(`Row ${index + 2}: Missing question or answer or category`);
                 return;
             }
 
@@ -720,6 +718,7 @@ app.post("/upload", isAdmin, upload.single("file"), async (req, res) => {
                     option3: option3 || "",
                     option4: option4 || "",
                     answer,
+                    category
                 });
             }
         });
@@ -851,9 +850,9 @@ app.delete("/test/:id", isAdmin, async (req, res) => {
     let { id } = req.params;
     const now = new Date(
         new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
-    ); 
+    );
     const test = await Test.findById(id);
-    if(test.startTime > now)
+    if (test.startTime > now)
         await Test.findByIdAndDelete(id);
     res.redirect("/dashboard");
 });
@@ -869,8 +868,18 @@ app.get("/test/:id", isAdmin, async (req, res, next) => {
 //Update Test
 app.put("/test/:id", isAdmin, async (req, res) => {
     let { id } = req.params;
-    let { date, time, duration, testName, questions: changedQuestions, branch } = req.body;
-    // console.log(req.body);
+    let { date, time, duration, testName, questions: changedQuestions, branch, category_name, catNumberOfQues } = req.body;
+
+    const oldTest = await Test.findById(id);
+    let newCategories = oldTest.category || [];
+    if (category_name) {
+        const names = Array.isArray(category_name) ? category_name : [category_name];
+        const counts = Array.isArray(catNumberOfQues) ? catNumberOfQues : [catNumberOfQues];
+        newCategories = names.map((name, i) => ({
+            category_name: name,
+            numberOfQues: Number(counts[i])
+        }));
+    }
 
     // Combine into ISO string
     const isoString = `${date}T${time}:00`;
@@ -880,49 +889,77 @@ app.put("/test/:id", isAdmin, async (req, res) => {
     const endTime = new Date(isoString);
     endTime.setMinutes(endTime.getMinutes() + Number(duration));
 
-    // const updatedPromises = changedQuestions.map(q => {
-    //     const { _id, ...rest } = q;
-    //     return Question.findByIdAndUpdate(_id, rest, { new: true });
-    // })
+    let questionsIds = oldTest.questions;
+    let totalNumberOfQues = oldTest.numberOfQues;
 
-    const updatedPromises = changedQuestions.map(q => {
-        const { _id, ...rest } = q;
+    // Check if categories or counts have changed
+    const categoriesChanged = JSON.stringify(oldTest.category) !== JSON.stringify(newCategories);
 
+    if (categoriesChanged && newCategories.length > 0) {
+        // Resample questions
+        let Model;
         switch (branch) {
-            case 'lr':
-                return Question.findByIdAndUpdate(_id, rest, { new: true });
-            case 'ai':
-                return AiDepartment.findByIdAndUpdate(_id, rest, { new: true });
-            case 'che':
-                return ChemicalDepartment.findByIdAndUpdate(_id, rest, { new: true });
-            case 'chm':
-                return ChemistryDepartment.findByIdAndUpdate(_id, rest, { new: true });
-            case 'ce':
-                return CivilDepartment.findByIdAndUpdate(_id, rest, { new: true });
-            case 'cse':
-                return ComputerScienceDepartment.findByIdAndUpdate(_id, rest, { new: true });
-            case 'ee':
-                return ElectricalDepartment.findByIdAndUpdate(_id, rest, { new: true });
-            case 'ece':
-                return ElectronicsCommunicationDepartment.findByIdAndUpdate(_id, rest, { new: true });
-            case 'hss':
-                return HumanitiesSocialSciencesDepartment.findByIdAndUpdate(_id, rest, { new: true });
-            case 'ms':
-                return ManagementStudiesDepartment.findByIdAndUpdate(_id, rest, { new: true });
-            case 'math':
-                return MathematicsDepartment.findByIdAndUpdate(_id, rest, { new: true });
-            case 'me':
-                return MechanicalDepartment.findByIdAndUpdate(_id, rest, { new: true });
-            case 'phy':
-                return PhysicsDepartment.findByIdAndUpdate(_id, rest, { new: true });
-            default:
-                throw new Error("Invalid branch");
+            case 'lr': Model = Question; break;
+            case 'ai': Model = AiDepartment; break;
+            case 'che': Model = ChemicalDepartment; break;
+            case 'chm': Model = ChemistryDepartment; break;
+            case 'ce': Model = CivilDepartment; break;
+            case 'cse': Model = ComputerScienceDepartment; break;
+            case 'ee': Model = ElectricalDepartment; break;
+            case 'ece': Model = ElectronicsCommunicationDepartment; break;
+            case 'hss': Model = HumanitiesSocialSciencesDepartment; break;
+            case 'ms': Model = ManagementStudiesDepartment; break;
+            case 'math': Model = MathematicsDepartment; break;
+            case 'me': Model = MechanicalDepartment; break;
+            case 'phy': Model = PhysicsDepartment; break;
         }
-    });
-    await Promise.all(updatedPromises);
 
-    const test = await Test.findByIdAndUpdate(id, { testName, duration, startTime, endTime }, { new: true }).populate("questions").exec();
-    // console.log(test.questions);
+        let allQuestions = [];
+        totalNumberOfQues = 0;
+        for (let cat of newCategories) {
+            const catQuestions = await Model.aggregate([
+                { $match: { category: cat.category_name } },
+                { $sample: { size: Number(cat.numberOfQues) } }
+            ]);
+            allQuestions = allQuestions.concat(catQuestions);
+            totalNumberOfQues += Number(cat.numberOfQues);
+        }
+        questionsIds = allQuestions.map(q => q._id);
+        questionsIds.sort((a, b) => a.toString().localeCompare(b.toString()));
+    } else if (changedQuestions) {
+        // Update individual questions
+        const updatedPromises = changedQuestions.map(q => {
+            const { _id, ...rest } = q;
+            switch (branch) {
+                case 'lr': return Question.findByIdAndUpdate(_id, rest, { new: true });
+                case 'ai': return AiDepartment.findByIdAndUpdate(_id, rest, { new: true });
+                case 'che': return ChemicalDepartment.findByIdAndUpdate(_id, rest, { new: true });
+                case 'chm': return ChemistryDepartment.findByIdAndUpdate(_id, rest, { new: true });
+                case 'ce': return CivilDepartment.findByIdAndUpdate(_id, rest, { new: true });
+                case 'cse': return ComputerScienceDepartment.findByIdAndUpdate(_id, rest, { new: true });
+                case 'ee': return ElectricalDepartment.findByIdAndUpdate(_id, rest, { new: true });
+                case 'ece': return ElectronicsCommunicationDepartment.findByIdAndUpdate(_id, rest, { new: true });
+                case 'hss': return HumanitiesSocialSciencesDepartment.findByIdAndUpdate(_id, rest, { new: true });
+                case 'ms': return ManagementStudiesDepartment.findByIdAndUpdate(_id, rest, { new: true });
+                case 'math': return MathematicsDepartment.findByIdAndUpdate(_id, rest, { new: true });
+                case 'me': return MechanicalDepartment.findByIdAndUpdate(_id, rest, { new: true });
+                case 'phy': return PhysicsDepartment.findByIdAndUpdate(_id, rest, { new: true });
+                default: throw new Error("Invalid branch");
+            }
+        });
+        await Promise.all(updatedPromises);
+    }
+
+    const test = await Test.findByIdAndUpdate(id, {
+        testName,
+        duration,
+        startTime,
+        endTime,
+        category: newCategories,
+        questions: questionsIds,
+        numberOfQues: totalNumberOfQues
+    }, { new: true }).populate("questions").exec();
+
     const questions = test.questions;
     let totalMarks = 0;
     for (const question of questions) {
@@ -1042,44 +1079,44 @@ app.get("/leaderboard", isAdmin, async (req, res) => {
 });
 
 app.get("/stats", isAdmin, async (req, res) => {
-  try {
-    const now = new Date();
+    try {
+        const now = new Date();
 
-    // Count users
-    const totalUsers = await User.countDocuments();
+        // Count users
+        const totalUsers = await User.countDocuments();
 
-    // Fetch all tests once for efficiency
-    const tests = await Test.find({}, "startTime endTime");
+        // Fetch all tests once for efficiency
+        const tests = await Test.find({}, "startTime endTime");
 
-    // Calculate counts
-    let activeTests = 0;
-    let completedTests = 0;
-    let upcomingTests = 0;
+        // Calculate counts
+        let activeTests = 0;
+        let completedTests = 0;
+        let upcomingTests = 0;
 
-    tests.forEach(test => {
-      const start = new Date(test.startTime);
-      const end = new Date(test.endTime);
+        tests.forEach(test => {
+            const start = new Date(test.startTime);
+            const end = new Date(test.endTime);
 
-      if (start <= now && end >= now) {
-        activeTests++;
-      } else if (end < now) {
-        completedTests++;
-      } else if (start > now) {
-        upcomingTests++;
-      }
-    });
+            if (start <= now && end >= now) {
+                activeTests++;
+            } else if (end < now) {
+                completedTests++;
+            } else if (start > now) {
+                upcomingTests++;
+            }
+        });
 
-    res.status(200).json({
-      success: true,
-      totalUsers,
-      activeTests,
-      completedTests,
-      upcomingTests
-    });
-  } catch (err) {
-    console.error("Error fetching stats:", err);
-    res.status(500).json({ success: false, error: err.message });
-  }
+        res.status(200).json({
+            success: true,
+            totalUsers,
+            activeTests,
+            completedTests,
+            upcomingTests
+        });
+    } catch (err) {
+        console.error("Error fetching stats:", err);
+        res.status(500).json({ success: false, error: err.message });
+    }
 });
 
 // Error Handler

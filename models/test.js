@@ -39,6 +39,10 @@ const testSchema = new Schema({
         required: true,
         min: 1
     },
+    category: [{
+        category_name: String,
+        numberOfQues: Number
+    }],
     totalMarks: {
         type: Number,
         min: 0
