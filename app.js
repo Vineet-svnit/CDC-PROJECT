@@ -1039,6 +1039,7 @@ app.get("/leaderboard", isAdmin, async (req, res) => {
 app.get("/stats", isAdmin, async (req, res) => {
   try {
     const now = new Date();
+    console.log(now);
 
     // Count users
     const totalUsers = await User.countDocuments();
