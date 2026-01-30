@@ -54,7 +54,21 @@ const Announcement = require("./models/announcement.js");
 const OtpVerification = require('./models/otpVerification.js');
 
 // Import OTP service
-const { generateOTP, sendOTPEmail } = require('./utils/otpService.js');
+const { generateOTP, sendOTPEmail } = require('./utils/emailjsService.js');
+
+// Import time utilities
+const {
+    getCurrentUTC,
+    convertISTToUTC,
+    hasTestStarted,
+    hasTestEnded,
+    isTestActive,
+    getTestStatus,
+    getAnnouncementDate
+} = require('./utils/timeUtils.js');
+
+// Import template helpers
+const templateHelpers = require('./utils/templateHelpers.js');
 // const Question = require("./models/question.js");
 const {
     Question,
@@ -117,23 +131,23 @@ app.use((req, res, next) => {
     res.locals.error = req.flash("error");
     res.locals.success = req.flash("success");
     req.isAdmin = req.session.isAdmin || false;
+    
+    // Make time helpers available to all templates
+    Object.assign(res.locals, templateHelpers);
+    
     next();
 });
 
 const checkValidity = async (req, res, next) => {
     let { id } = req.params;
     let test = await Test.findById(id);
-    let currentTime = new Date(
-        new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
-    );
-    let { startTime, endTime } = test;
-    if (currentTime < startTime) {
-        // console.log(currentTime, startTime, endTime); 
-        req.flash("error", "The test cannot be started!");
+    
+    if (hasTestEnded(test.endTime)) {
+        req.flash("error", "The test is completed!");
         return res.redirect("/");
     }
-    else if (currentTime > endTime) {
-        req.flash("error", "The test is completed!");
+    else if (!hasTestStarted(test.startTime)) {
+        req.flash("error", "The test cannot be started!");
         return res.redirect("/");
     }
     else {
@@ -593,13 +607,9 @@ app.post("/test/questions/new", isAdmin, async (req, res) => {
         }));
     }
 
-    // Combine into ISO string
-    const isoString = `${date}T${time}:00`;
-
-    // Convert to Date object (for MongoDB)
-    const startTime = new Date(isoString);
-    const endTime = new Date(isoString);
-    endTime.setMinutes(endTime.getMinutes() + Number(duration));
+    // Convert IST input to UTC for storage
+    const startTime = convertISTToUTC(date, time);
+    const endTime = new Date(startTime.getTime() + (Number(duration) * 60 * 1000));
 
     let Model;
     switch (branch) {
@@ -955,11 +965,8 @@ app.post("/download", isAdmin, async (req, res) => {
 //Delete Test
 app.delete("/test/:id", isAdmin, async (req, res) => {
     let { id } = req.params;
-    const now = new Date(
-        new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
-    );
     const test = await Test.findById(id);
-    if (test.startTime > now)
+    if (!hasTestStarted(test.startTime))
         await Test.findByIdAndDelete(id);
     res.redirect("/dashboard");
 });
@@ -988,13 +995,9 @@ app.put("/test/:id", isAdmin, async (req, res) => {
         }));
     }
 
-    // Combine into ISO string
-    const isoString = `${date}T${time}:00`;
-
-    // Convert to Date object (for MongoDB)
-    const startTime = new Date(isoString);
-    const endTime = new Date(isoString);
-    endTime.setMinutes(endTime.getMinutes() + Number(duration));
+    // Convert IST input to UTC for storage
+    const startTime = convertISTToUTC(date, time);
+    const endTime = new Date(startTime.getTime() + (Number(duration) * 60 * 1000));
 
     let questionsIds = oldTest.questions;
     let totalNumberOfQues = oldTest.numberOfQues;
@@ -1132,8 +1135,7 @@ app.get("/announcement/new", isAdmin, (req, res) => {
 //Create Announcement
 app.post("/announcement/new", isAdmin, async (req, res) => {
     let announcement = req.body;
-    let now = new Date();
-    let date = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+    let date = getAnnouncementDate();
     newAnnouncement = new Announcement({ ...announcement, date });
     await newAnnouncement.save();
     res.redirect("/dashboard");
@@ -1187,7 +1189,7 @@ app.get("/leaderboard", isAdmin, async (req, res) => {
 
 app.get("/stats", isAdmin, async (req, res) => {
     try {
-        const now = new Date();
+        const now = getCurrentUTC();
 
         // Count users
         const totalUsers = await User.countDocuments();
@@ -1201,14 +1203,13 @@ app.get("/stats", isAdmin, async (req, res) => {
         let upcomingTests = 0;
 
         tests.forEach(test => {
-            const start = new Date(test.startTime);
-            const end = new Date(test.endTime);
-
-            if (start <= now && end >= now) {
+            const status = getTestStatus(test.startTime, test.endTime);
+            
+            if (status === 'active') {
                 activeTests++;
-            } else if (end < now) {
+            } else if (status === 'completed') {
                 completedTests++;
-            } else if (start > now) {
+            } else if (status === 'upcoming') {
                 upcomingTests++;
             }
         });

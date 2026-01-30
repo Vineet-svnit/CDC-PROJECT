@@ -47,6 +47,7 @@
     </div>
 
     <script>
+        // Times are already in UTC from server, convert to local time for timer
         const startTime = new Date("<%= test.startTime.toISOString() %>");
         const endTime = new Date("<%= test.endTime.toISOString() %>");
 

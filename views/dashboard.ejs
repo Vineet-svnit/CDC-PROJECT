@@ -170,10 +170,8 @@
                         <ul class="announcement-list">
                             <% for(test of allTests){ %>
 
-                                <% const dateObj=new Date(test.startTime); const
-                                    date=dateObj.toLocaleDateString('en-GB', { day: 'numeric' , month: 'long' ,
-                                    year: 'numeric' }); const time=dateObj.toLocaleTimeString('en-US', { hour: 'numeric'
-                                    , minute: '2-digit' , hour12: true }).toLowerCase(); %>
+                                <% const date = formatDate(test.startTime); 
+                                   const time = formatTime(test.startTime); %>
 
                                     <li class="announcement-item">
                                         <div class="position-relative">
@@ -201,15 +199,10 @@
                                                     <button type="submit" class="btn btn-warning btn-sm">Edit</button>
                                                 </form>
 
-                                                <% const nowIST=new Date(new Date().toLocaleString("en-US", {
-                                                    timeZone: "Asia/Kolkata" })); const disableDelete=nowIST> new
-                                                    Date(test.startTime) ? "disabled" : "";
-                                                    %>
-
-                                                    <form action="/test/<%= test._id %>?_method=DELETE" method="POST">
-                                                        <button type="submit" class="btn btn-danger btn-sm"
-                                                            <%=disableDelete %>>Delete</button>
-                                                    </form>
+                                                <form action="/test/<%= test._id %>?_method=DELETE" method="POST">
+                                                    <button type="submit" class="btn btn-danger btn-sm"
+                                                        <%= hasStarted(test.startTime) ? "disabled" : "" %>>Delete</button>
+                                                </form>
                                             </div>
 
                                     </li>
@@ -341,7 +334,7 @@
                 </div>
 
                 <p class="mt-3 mb-0 text-white-50 small">
-                    &copy; <%= new Date().getFullYear() %> Career Development Cell. All rights reserved.
+                    &copy; <%= getCurrentYear() %> Career Development Cell. All rights reserved.
                 </p>
             </div>
         </footer>

@@ -19,7 +19,7 @@
                     <div class="meta">
                         <p><strong>Score:</strong> <%= sub.score %></p>
                         <p><strong>Accuracy:</strong> <span class="<%= accuracyClass %>"><%= accuracy %></span></p>
-                        <p><strong>Start Time:</strong> <%= new Date(test.startTime).toLocaleString() %></p>
+                        <p><strong>Start Time:</strong> <%= formatDateTime(test.startTime) %></p>
                     </div>
                     <a class="history-btn" href="/submission/<%= test._id %>">View Submission</a>
                 </div>
