@@ -86,7 +86,7 @@ function display(index) {
     <strong>MCQ (Multiple Correct Question)</strong>: 
     <em>Below is a multiple correct question with <b>4</b> options — select all that apply.</em><br>
     <span style="color:green;">+4 marks</span> for all correct selections,<br>
-    <span style="color:red;">-2 marks</span> for any wrong selection.<br>
+    <span style="color:red;">0 marks</span> for any wrong selection.<br>
     Partial marking: if only some correct options are selected (and none wrong), marks awarded will be proportional to the number of correct options chosen.<br>
     <span style="color:gray;">0 marks</span> for unattempted.
 </li>

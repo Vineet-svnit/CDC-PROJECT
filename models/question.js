@@ -32,7 +32,8 @@ const questionSchema = new Schema({
         default: undefined
     },
     option4: String,
-    answer: String
+    answer: String,
+    category: String
 });
 
 module.exports = {
