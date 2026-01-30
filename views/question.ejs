@@ -58,7 +58,8 @@
             if (timeLeft <= 0) {
                 // Optionally submit the form automatically
                 clearInterval(timeInterval);
-                alert("hi");
+                // alert("hi");
+                legalSubmission = true;
                 document.querySelector('#submit').click();
                 return;
             }
@@ -73,7 +74,7 @@
                         .toString().padStart(2, '0')}`;
         }
 
-        setInterval(updateTimer, 1000);
+        const timeInterval = setInterval(updateTimer, 1000);
         updateTimer(); // Initial call
 
 
