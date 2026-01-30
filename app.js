@@ -51,6 +51,10 @@ const User = require('./models/user.js');
 const Test = require("./models/test.js");
 const Admin = require('./models/admin.js');
 const Announcement = require("./models/announcement.js");
+const OtpVerification = require('./models/otpVerification.js');
+
+// Import OTP service
+const { generateOTP, sendOTPEmail } = require('./utils/otpService.js');
 // const Question = require("./models/question.js");
 const {
     Question,
@@ -229,23 +233,126 @@ app.get('/admin/logout', (req, res, next) => {
 
 app.post('/register', async (req, res) => {
     try {
-        // console.log(req.body);
         const { username, password, email, name, phone, branch, year } = req.body;
-        const user = new User({ username, email, name, phone, branch, year });
-        const registeredUser = await User.register(user, password);
-        req.login(registeredUser, err => {
-            if (err) return next(err);
-            req.flash('success', 'User registered successfully');
-            res.redirect('/');
-        })
-    } catch (e) {
-        if (e) {
-            req.flash('error', e.message || 'Registration Failed!!');
-            // console.log(e);
+        
+        // Check if user already exists
+        const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+        if (existingUser) {
+            req.flash('error', 'User with this username or email already exists');
+            return res.redirect('/register');
         }
+
+        // Generate OTP
+        const otp = generateOTP();
+        
+        // Store user data and OTP temporarily
+        await OtpVerification.findOneAndUpdate(
+            { email },
+            {
+                email,
+                otp,
+                userData: { username, password, email, name, phone, branch, year }
+            },
+            { upsert: true, new: true }
+        );
+
+        // Send OTP email
+        const emailResult = await sendOTPEmail(email, otp, name);
+        
+        if (!emailResult.success) {
+            req.flash('error', 'Failed to send verification email. Please try again.');
+            return res.redirect('/register');
+        }
+
+        req.flash('success', 'Verification code sent to your email. Please check your inbox.');
+        res.render('register_login/otpVerification.ejs', { email });
+        
+    } catch (e) {
+        console.error('Registration error:', e);
+        req.flash('error', e.message || 'Registration Failed!!');
         res.redirect('/register');
     }
 })
+
+// OTP Verification Route
+app.post('/verify-otp', async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+        
+        // Find OTP verification record
+        const otpRecord = await OtpVerification.findOne({ email });
+        
+        if (!otpRecord) {
+            req.flash('error', 'OTP expired or invalid. Please register again.');
+            return res.redirect('/register');
+        }
+        
+        // Verify OTP
+        if (otpRecord.otp !== otp) {
+            req.flash('error', 'Invalid OTP. Please try again.');
+            return res.render('register_login/otpVerification.ejs', { email });
+        }
+        
+        // OTP is correct, create user account
+        const { username, password, name, phone, branch, year } = otpRecord.userData;
+        const user = new User({ username, email, name, phone, branch, year });
+        const registeredUser = await User.register(user, password);
+        
+        // Delete OTP record
+        await OtpVerification.deleteOne({ email });
+        
+        // Log in the user
+        req.login(registeredUser, err => {
+            if (err) {
+                console.error('Login error after registration:', err);
+                req.flash('error', 'Registration successful but login failed. Please login manually.');
+                return res.redirect('/login');
+            }
+            req.flash('success', 'Registration successful! Welcome to CDC.');
+            res.redirect('/');
+        });
+        
+    } catch (e) {
+        console.error('OTP verification error:', e);
+        req.flash('error', 'Verification failed. Please try again.');
+        res.render('register_login/otpVerification.ejs', { email: req.body.email });
+    }
+});
+
+// Resend OTP Route
+app.post('/resend-otp', async (req, res) => {
+    try {
+        const { email } = req.body;
+        
+        // Find existing OTP record
+        const otpRecord = await OtpVerification.findOne({ email });
+        
+        if (!otpRecord) {
+            return res.status(400).json({ success: false, message: 'No pending verification found' });
+        }
+        
+        // Generate new OTP
+        const newOtp = generateOTP();
+        
+        // Update OTP record
+        otpRecord.otp = newOtp;
+        otpRecord.createdAt = new Date(); // Reset expiration timer
+        await otpRecord.save();
+        
+        // Send new OTP email
+        const emailResult = await sendOTPEmail(email, newOtp, otpRecord.userData.name);
+        
+        if (!emailResult.success) {
+            return res.status(500).json({ success: false, message: 'Failed to send email' });
+        }
+        
+        res.json({ success: true, message: 'OTP resent successfully' });
+        
+    } catch (e) {
+        console.error('Resend OTP error:', e);
+        res.status(500).json({ success: false, message: 'Failed to resend OTP' });
+    }
+});
 
 app.post('/login', storeReturnTo, passport.authenticate('local', {
     failureFlash: true,
