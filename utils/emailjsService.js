@@ -14,12 +14,30 @@ const generateOTP = () => {
 // Send OTP email using EmailJS
 const sendOTPEmail = async (email, otp, name) => {
     try {
+        console.log('🚀 Starting EmailJS send process...');
+        console.log('📧 To Email:', email);
+        console.log('👤 Name:', name);
+        console.log('🔢 OTP:', otp);
+        
+        // Check environment variables
+        console.log('🔑 Public Key:', process.env.EMAILJS_PUBLIC_KEY ? 'Set' : 'Missing');
+        console.log('🔐 Private Key:', process.env.EMAILJS_PRIVATE_KEY ? 'Set' : 'Missing');
+        console.log('🆔 Service ID:', process.env.EMAILJS_SERVICE_ID || 'Missing');
+        console.log('📄 Template ID:', process.env.EMAILJS_TEMPLATE_ID || 'Missing');
+        
+        // Check if required environment variables are set
+        if (!process.env.EMAILJS_SERVICE_ID || !process.env.EMAILJS_TEMPLATE_ID) {
+            throw new Error('EmailJS Service ID or Template ID is missing in environment variables');
+        }
+        
+        if (!process.env.EMAILJS_PUBLIC_KEY || !process.env.EMAILJS_PRIVATE_KEY) {
+            throw new Error('EmailJS Public Key or Private Key is missing in environment variables');
+        }
+
         const templateParams = {
-            to_email: email,
-            to_name: name,
-            otp_code: otp,
-            from_name: 'CDC Registration',
-            message: `Your OTP verification code is: ${otp}. This code is valid for 10 minutes.`
+            email: email,        // For {{email}} in "To Email" field
+            to_name: name,       // For {{to_name}} in template content
+            otp_code: otp,       // For {{otp_code}} in template content
         };
 
         const response = await emailjs.send(
@@ -28,12 +46,19 @@ const sendOTPEmail = async (email, otp, name) => {
             templateParams
         );
 
-        console.log('Email sent successfully:', response);
         return { success: true, data: response };
 
     } catch (error) {
-        console.error('Error sending email:', error);
-        return { success: false, error: error.message };
+        console.error('❌ EmailJS Error Details:');
+        console.error('Error message:', error.message);
+        console.error('Error status:', error.status);
+        console.error('Error text:', error.text);
+        console.error('Full error object:', error);
+        
+        return { 
+            success: false, 
+            error: error.message || 'Failed to send email via EmailJS'
+        };
     }
 };
 
