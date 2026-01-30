@@ -11,7 +11,8 @@ const {
     getTimeInputValue,
     hasTestStarted,
     getCurrentUTC,
-    convertUTCToIST
+    convertUTCToIST,
+    getTestStatus
 } = require('./timeUtils');
 
 /**
@@ -43,7 +44,13 @@ const templateHelpers = {
     toIST: (utcDate) => convertUTCToIST(utcDate),
     
     // Get current UTC time
-    now: () => getCurrentUTC()
+    now: () => getCurrentUTC(),
+    
+    // Get test status (upcoming/active/completed)
+    getTestStatus: (startTime, endTime) => getTestStatus(startTime, endTime),
+    
+    // Get current UTC time for comparisons
+    getCurrentUTC: () => getCurrentUTC()
 };
 
 module.exports = templateHelpers;

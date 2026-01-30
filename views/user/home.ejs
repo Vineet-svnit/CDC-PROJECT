@@ -1,44 +1,35 @@
 <% layout("/layouts/userBoilerplate") %>
 
 <% 
-    const now = new Date(
-        new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
-    ); 
+    // Use standardized time utilities (same as admin side)
+    const now = getCurrentUTC();
     const upcomingTests = [];
     const activeTests = [];
     const inactiveTests = [];
 
     for(let test of allTests) {
-        const start = new Date(test.startTime);
-        const end = new Date(start.getTime() + test.duration * 60000); // assuming duration is in minutes
-
-        if(now < start) {
+        const status = getTestStatus(test.startTime, test.endTime);
+        
+        if(status === 'upcoming') {
             upcomingTests.push(test);
-        } else if(now >= start && now <= end) {
+        } else if(status === 'active') {
             activeTests.push(test);
         } else {
             inactiveTests.push(test);
         }
     }
-
-    function formatDateTime(dateObj){
-        const date = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-        const time = dateObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase();
-        return { date, time };
-    }
 %>
+
 <h2>Active Tests</h2>
 <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1">
-    <% for(let test of activeTests){ 
-        const { date, time } = formatDateTime(new Date(test.startTime));
-    %>
+    <% for(let test of activeTests){ %>
         <div class="col">
             <div class="card p-0 mt-3 border-success">
                 <div class="card-header"><%= test.testName %></div>
                 <div class="card-body">
-                    <p class="card-text"><b>Scheduled date :</b> <%= date %></p>
-                    <p class="card-text"><b>Scheduled time :</b> <%= time %></p>
-                    <p class="card-text"><b>Duration :</b> <%= test.duration %></p>
+                    <p class="card-text"><b>Scheduled date :</b> <%= formatDate(test.startTime) %></p>
+                    <p class="card-text"><b>Scheduled time :</b> <%= formatTime(test.startTime) %></p>
+                    <p class="card-text"><b>Duration :</b> <%= test.duration %> minutes</p>
                     <p class="card-text"><b>Total questions :</b> <%= test.numberOfQues %></p>
                     <p class="card-text"><b>Total marks :</b> <%= test.totalMarks %></p>
                     <a href="/tests/<%= test._id %>/<%= user._id %>" class="btn btn-primary" id="<%= test._id %>">CONTINUE TEST</a>
@@ -50,16 +41,14 @@
 
 <h2>Upcoming Tests</h2>
 <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1">
-    <% for(let test of upcomingTests){ 
-        const { date, time } = formatDateTime(new Date(test.startTime));
-    %>
+    <% for(let test of upcomingTests){ %>
         <div class="col">
             <div class="card p-0 mt-3">
                 <div class="card-header"><%= test.testName %></div>
                 <div class="card-body">
-                    <p class="card-text"><b>Scheduled date :</b> <%= date %></p>
-                    <p class="card-text"><b>Scheduled time :</b> <%= time %></p>
-                    <p class="card-text"><b>Duration :</b> <%= test.duration %></p>
+                    <p class="card-text"><b>Scheduled date :</b> <%= formatDate(test.startTime) %></p>
+                    <p class="card-text"><b>Scheduled time :</b> <%= formatTime(test.startTime) %></p>
+                    <p class="card-text"><b>Duration :</b> <%= test.duration %> minutes</p>
                     <p class="card-text"><b>Total questions :</b> <%= test.numberOfQues %></p>
                     <p class="card-text"><b>Total marks :</b> <%= test.totalMarks %></p>
                     <a href="/tests/<%= test._id %>/<%= user._id %>" class="btn btn-primary" id="<%= test._id %>">START TEST</a>
@@ -71,16 +60,14 @@
 
 <h2>Inactive / Past Tests</h2>
 <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1">
-    <% for(let test of inactiveTests){ 
-        const { date, time } = formatDateTime(new Date(test.startTime));
-    %>
+    <% for(let test of inactiveTests){ %>
         <div class="col">
             <div class="card p-0 mt-3 border-secondary">
                 <div class="card-header"><%= test.testName %></div>
                 <div class="card-body">
-                    <p class="card-text"><b>Scheduled date :</b> <%= date %></p>
-                    <p class="card-text"><b>Scheduled time :</b> <%= time %></p>
-                    <p class="card-text"><b>Duration :</b> <%= test.duration %></p>
+                    <p class="card-text"><b>Scheduled date :</b> <%= formatDate(test.startTime) %></p>
+                    <p class="card-text"><b>Scheduled time :</b> <%= formatTime(test.startTime) %></p>
+                    <p class="card-text"><b>Duration :</b> <%= test.duration %> minutes</p>
                     <p class="card-text"><b>Total questions :</b> <%= test.numberOfQues %></p>
                     <p class="card-text"><b>Total marks :</b> <%= test.totalMarks %></p>
                     <button class="btn btn-secondary" disabled>COMPLETED</button>
