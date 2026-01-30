@@ -53,8 +53,8 @@ const Admin = require('./models/admin.js');
 const Announcement = require("./models/announcement.js");
 const OtpVerification = require('./models/otpVerification.js');
 
-// Import OTP service
-const { generateOTP, sendOTPEmail } = require('./utils/emailjsService.js');
+// Import OTP service - Using Postmark
+const { generateOTP, sendOTPEmail } = require('./utils/postmarkService.js');
 
 // Import time utilities
 const {
