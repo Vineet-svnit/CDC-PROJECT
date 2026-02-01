@@ -17,6 +17,7 @@ const { connectDB } = require("./config/db.js")
 const MongoStore = require("connect-mongo");
 const multer = require('multer');
 const xlsx = require('xlsx');
+const sebOnly = require("./middleware/sebOnly");
 
 //node-schedule can schedule the task, but cant iteract with the front-end by itself. So we use socket.io
 const schedule = require("node-schedule");
@@ -512,7 +513,7 @@ app.get("/core", isLoggedIn, async (req, res) => {
 });
 
 //Show test 
-app.get("/tests/:id/:user_id", isLoggedIn, checkValidity, checkSubmit, async (req, res) => {
+app.get("/tests/:id/:user_id", isLoggedIn, checkValidity, checkSubmit, sebOnly, async (req, res) => {
     try {
         let { id, user_id } = req.params;
 
