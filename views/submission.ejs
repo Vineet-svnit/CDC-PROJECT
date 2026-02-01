@@ -1,84 +1,233 @@
 <% layout("/layouts/userBoilerplate") %>
-    <!-- <% var styles = '<link rel="stylesheet" href="/css/submission.css">'; %> -->
 
-<body class="maxm-width">
-    <h1><%= test.testName %> - Submission Result</h1>
-
-    <table>
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Question & Options</th>
-                <th>Correct Answer(s)</th>
-                <th>Your Answer(s)</th>
-                <th>Score</th>
-            </tr>
-        </thead>
-        <tbody>
-            <% 
-            const questions = test.questions;
-            const answers = submission.submittedAns;
-            let attemptedCount = 0;
-
-            for(let i = 0; i < questions.length; i++) { 
-                const q = questions[i];
-                const ans = answers[i] || {};
-                const userAnswer = ans.answer || "";
-                const score = ans.score != null ? ans.score : 0;
-                const isMarked = ans.isMarked;
-                const attempted = userAnswer.trim().length > 0;
-
-                if (attempted) attemptedCount++;
-
-                function optionText(label, text, img) {
-                    return `<li><span class="option-label">${label}.</span> ${text || ''} ${img ? `<br><img src="${img}" alt="option ${label}" style="max-width:150px; max-height:100px;">` : ''}</li>`;
-                }
-
-                const opts = [
-                    optionText('A', q.option1, q.image1),
-                    optionText('B', q.option2, q.image2),
-                    optionText('C', q.option3, q.image3),
-                    optionText('D', q.option4, q.image4)
-                ].join('');
-
-                let rowClass = "";
-                if (isMarked) {
-                    rowClass += " marked";
-                }
-                if (attempted && score > 0) {
-                    rowClass += " correct";
-                } else if (attempted && score <= 0) {
-                    rowClass += " wrong";
-                }
-            %>
-            <tr class="<%= rowClass.trim() %>">
-                <td><%= i + 1 %></td>
-                <td>
-                    <p><%= q.question %></p>
-                    <% if(q.questionImage) { %>
-                        <img src="<%= q.questionImage %>" alt="Question Image" style="max-width:300px; max-height:200px;"><br>
-                    <% } %>
-                    <ul class="options"><%- opts %></ul>
-                </td>
-                <td><%= q.answer %></td>
-                <td><%= userAnswer %></td>
-                <td><%= score %></td>
-            </tr>
-            <% } %>
-        </tbody>
-    </table>
-
-    <div class="summary">
-        <p><strong>Total Questions:</strong> <%= questions.length %></p>
-        <p><strong>Attempted Questions:</strong> <%= attemptedCount %></p>
-        <p><strong>Total Score:</strong> <%= submission.score %></p>
-        <p><strong>Max Possible Score:</strong> <%= test.totalMarks || 'N/A' %></p>
-        <p><strong>Accuracy:</strong> 
-            <%= attemptedCount > 0 && test.totalMarks 
-                ? Math.max(((submission.score / test.totalMarks) * 100), 0).toFixed(2) + '%' 
-                : 'N/A' 
-            %>
-        </p>
+<main class="py-5">
+  <div class="container-lg">
+    <div class="row mb-5">
+      <div class="col-lg-8 mx-auto">
+        <div class="d-flex align-items-center gap-3 mb-4">
+          <div style="width: 4px; height: 40px; background: #27496d; border-radius: 2px;"></div>
+          <h1 class="h3 mb-0 fw-bold" style="color: #27496d;"><%= test.testName %></h1>
+        </div>
+        <p class="text-muted">Review your submission and performance below.</p>
+      </div>
     </div>
 
-</body>
+    <% 
+      const questions = test.questions || [];
+      const answers = submission.submittedAns || [];
+      let attemptedCount = 0;
+
+      for (let i = 0; i < questions.length; i++) {
+        const ans = answers[i] || {};
+        if ((ans.answer || "").toString().trim().length > 0) attemptedCount++;
+      }
+
+      const accuracy =
+        test.totalMarks > 0
+          ? Math.max((submission.score / test.totalMarks) * 100, 0)
+          : 0;
+    %>
+
+    <div class="row mb-5">
+      <div class="col-12">
+        <div class="row g-3 mb-4">
+          <div class="col-lg-3 col-md-6">
+            <div class="card border-0 text-center p-4" style="background: linear-gradient(135deg, #e0e7ff, #f3e8ff);">
+              <h6 class="text-muted mb-1">Total Questions</h6>
+              <h3 class="fw-bold mb-0" style="color:#27496d"><%= questions.length %></h3>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <div class="card border-0 text-center p-4" style="background: linear-gradient(135deg, #dbeafe, #e0e7ff);">
+              <h6 class="text-muted mb-1">Attempted</h6>
+              <h3 class="fw-bold mb-0" style="color:#2b6cb0"><%= attemptedCount %></h3>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <div class="card border-0 text-center p-4" style="background: linear-gradient(135deg, #fef3c7, #fde68a);">
+              <h6 class="text-muted mb-1">Your Score</h6>
+              <h3 class="fw-bold mb-0" style="color:#27496d">
+                <%= submission.score %> / <%= test.totalMarks %>
+              </h3>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <div class="card border-0 text-center p-4" style="background: linear-gradient(135deg, #dcfce7, #bbf7d0);">
+              <h6 class="text-muted mb-1">Accuracy</h6>
+              <h3 class="fw-bold mb-0"
+                  style="color:<%= accuracy >= 75 ? '#22c55e' : accuracy >= 30 ? '#f59e0b' : '#ef4444' %>">
+                <%= accuracy.toFixed(1) %>%
+              </h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-white border-bottom d-flex justify-content-between">
+            <h5 class="fw-bold mb-0" style="color:#27496d">Detailed Review</h5>
+            <button id="expandToggle" class="btn btn-sm btn-outline-primary">Expand All</button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Q.</th>
+                  <th>Question</th>
+                  <th>Your Answer</th>
+                  <th>Correct</th>
+                  <th>Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% for (let i = 0; i < questions.length; i++) {
+                  const q = questions[i] || {};
+                  const ans = answers[i] || {};
+                  const userAnswer = (ans.answer || "").toString();
+                  const score = (ans.score != null && ans.score !== undefined) ? ans.score : 0;
+                  const attempted = userAnswer.trim().length > 0;
+                  const correctAns = (q.answer || "").toString().trim();
+
+                  const rowBgColor = attempted
+                    ? score > 0 ? "#d4edda" : "#f8d7da"
+                    : "#f1f5f9";
+                %>
+
+                <tr data-bs-toggle="collapse" data-bs-target="#opt-<%= i %>" style="cursor:pointer" aria-controls="opt-<%= i %>">
+                  <td style="background:<%= rowBgColor %>"><%= i + 1 %></td>
+                  <td style="background:<%= rowBgColor %>">
+                    <div><strong><%= q.question %></strong></div>
+                    <% if (q.questionImage) { %>
+                      <img src="<%= q.questionImage %>" alt="question-image-<%= i %>" style="max-width:120px; max-height:80px; border-radius:4px; margin-top:8px;">
+                    <% } %>
+                  </td>
+                  <td style="background:<%= rowBgColor %>"><%= userAnswer && userAnswer.trim().length ? userAnswer : "-" %></td>
+                  <td style="background:<%= rowBgColor %>"><%= correctAns %></td>
+                  <td style="background:<%= rowBgColor %>"><%= score %></td>
+                </tr>
+
+                <tr class="collapse" id="opt-<%= i %>">
+                  <td colspan="5" class="p-0">
+                    <div style="background:<%= rowBgColor %>; padding: 16px;">
+                      <div class="options-container">
+                        <% 
+                          const opts = [q.option1, q.option2, q.option3, q.option4].filter(Boolean);
+                          for (let oi = 0; oi < opts.length; oi++) {
+                            const optRaw = opts[oi] || "";
+                            const opt = optRaw.toString();
+                            const isCorrect = opt.trim() === correctAns;
+                            const isUser = opt.trim() === userAnswer.trim();
+                            
+                            let optionClass = "option-item";
+                            let badge = "";
+                            
+                            if (isCorrect) {
+                              optionClass += " option-correct";
+                              badge = '<span class="option-badge correct-badge">Correct</span>';
+                            } else if (attempted && isUser && !isCorrect) {
+                              optionClass += " option-incorrect";
+                              badge = '<span class="option-badge incorrect-badge">Your Answer</span>';
+                            }
+                        %>
+                        
+                        <div class="<%= optionClass %>">
+                          <div class="option-content">
+                            <strong><%= String.fromCharCode(65 + oi) %>.</strong> <%= opt %>
+                          </div>
+                          <div class="option-badge-container">
+                            <%= badge %>
+                          </div>
+                        </div>
+                        
+                        <% } %>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<style>
+.options-container {
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid #dee2e6;
+}
+
+.option-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: white;
+  border-bottom: 1px solid #dee2e6;
+  transition: all 0.2s;
+}
+
+.option-item:last-child {
+  border-bottom: none;
+}
+
+.option-correct {
+  background-color: #198754 !important;
+  color: white !important;
+}
+
+.option-incorrect {
+  background-color: #dc3545 !important;
+  color: white !important;
+}
+
+.option-content {
+  flex: 1;
+}
+
+.option-badge-container {
+  margin-left: 12px;
+}
+
+.option-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.correct-badge {
+  background-color: white;
+  color: #198754;
+}
+
+.incorrect-badge {
+  background-color: white;
+  color: #dc3545;
+}
+</style>
+
+<script>
+(function () {
+  const btn = document.getElementById("expandToggle");
+  let open = false;
+
+  btn?.addEventListener("click", () => {
+    document.querySelectorAll(".collapse").forEach(el => {
+      const c = bootstrap.Collapse.getOrCreateInstance(el, { toggle: false });
+      open ? c.hide() : c.show();
+    });
+    btn.innerText = open ? "Expand All" : "Collapse All";
+    open = !open;
+  });
+})();
+</script>

@@ -235,6 +235,33 @@ app.get('/logout', (req, res, next) => {
     })
 })
 
+// Settings Routes
+app.get('/settings', isLoggedIn, async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        res.render('user/settings', { user, page: 'settings' });
+    } catch (err) {
+        req.flash('error', 'Error loading settings');
+        res.redirect('/');
+    }
+});
+
+app.post('/settings/update', isLoggedIn, async (req, res) => {
+    try {
+        const { name, email, phone } = req.body;
+        const user = await User.findByIdAndUpdate(
+            req.user._id,
+            { name, email, phone },
+            { new: true, runValidators: true }
+        );
+        req.flash('success', 'Profile updated successfully!');
+        res.redirect('/settings');
+    } catch (err) {
+        req.flash('error', err.message || 'Error updating profile');
+        res.redirect('/settings');
+    }
+});
+
 app.get('/admin/logout', (req, res, next) => {
     req.session.destroy((err) => {
         if (err) {

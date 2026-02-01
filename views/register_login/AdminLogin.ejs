@@ -1,48 +1,83 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/register_login.css">
-</head>
-<body>
-    <%- include("../includes/flash.ejs") %>
-    <div class="circle orange"></div>
-    <div class="circle blue"></div>
-    <div id="container">
-        <h1>Admin Login</h1>
-        <form method="POST" action="/admin/login" class="needs-validation" novalidate>
-            <div class="form-floating mb-3">
-                <input type="text" class="form-control" name="adminUserName" placeholder="Enter Admin Username" id="adminUserName" required>
-                <label for="adminUserName">Admin Username</label>
+<% layout('/layouts/adminBoilerplate') %>
+
+    <style>
+        header,
+        footer {
+            display: none !important;
+        }
+
+        main {
+            padding: 0 !important;
+        }
+
+        .container-lg {
+            max-width: 100% !important;
+            padding: 0 !important;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 55%;
+            /* Shifted up slightly from 60% */
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 115vw;
+            height: 115vh;
+            background-image: url('/images/CDC Logo.png');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            opacity: 0.12;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.55) !important;
+            backdrop-filter: blur(10px);
+            border: none;
+        }
+    </style>
+
+    <div class="row justify-content-center align-items-center m-0" style="min-height: 100vh;">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-sm mt-5">
+                <div class="card-body">
+                    <h3 class="mb-3">Admin Login</h3>
+                    <form method="POST" action="/admin/login" class="needs-validation" novalidate>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" name="adminUserName"
+                                placeholder="Enter Admin Username" id="adminUserName" required>
+                            <label for="adminUserName">Admin Username</label>
+                        </div>
+                        <div class="form-floating mb-3 position-relative">
+                            <input type="password" class="form-control" name="password" placeholder="Enter Password"
+                                id="password" required>
+                            <label for="password">Password</label>
+                            <button id="btn" type="button" class="btn btn-sm btn-outline-secondary position-absolute"
+                                style="right:10px;top:10px;"><i class="fa fa-eye-slash"></i></button>
+                        </div>
+                        <div class="d-grid">
+                            <button class="btn btn-dark" id="login">Login</button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="form-floating mb-3 position-relative">
-                <input type="password" class="form-control" name="password" placeholder="Enter Password" id="password" required>
-                <label for="password">Password</label>
-                <button id="btn" type="button"><i class="fa fa-eye-slash"></i></button>
-            </div>
-            <button class="btn btn-dark mb-3" id="login">Login</button>
-        </form>
+        </div>
     </div>
-    <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+
     <script src="/js/script.js"></script>
-    <!-- <script src="/js/register_login.js"></script> -->
     <script>
-        let i=document.querySelector("i");
-        let input=document.querySelector("#password");
-        let btn=document.querySelector("#btn");
-        btn.addEventListener("click", () => {
-            if (i.classList.contains("fa-eye")) {
-                i.classList.replace("fa-eye", "fa-eye-slash");
-                input.type = "password"; 
-            } else {
-                i.classList.replace("fa-eye-slash", "fa-eye");
-                input.type = "text"; 
-            }
-        });
+        (function () {
+            const icon = document.querySelector('#btn i');
+            const input = document.querySelector('#password');
+            const btn = document.getElementById('btn');
+            if (!btn) return;
+            btn.addEventListener('click', () => {
+                if (icon.classList.contains('fa-eye')) {
+                    icon.classList.replace('fa-eye', 'fa-eye-slash'); input.type = 'password';
+                } else { icon.classList.replace('fa-eye-slash', 'fa-eye'); input.type = 'text'; }
+            });
+        })();
     </script>
-</body>
-</html>

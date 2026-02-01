@@ -1,363 +1,276 @@
-<!DOCTYPE html>
-<html lang="en">
+<% layout("/layouts/adminBoilerplate") %>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="/css/announcement.css" />
-    <link rel="stylesheet" href="/css/dashboard.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <title>Dashboard</title>
-</head>
+<div class="py-5">
+  <div class="container-lg">
+    <div class="d-flex align-items-center mb-4">
+      <div style="width:4px;height:40px;background:#27496d;border-radius:2px;margin-right:12px"></div>
+      <h1 class="h4 mb-0 fw-bold" style="color:#27496d">Admin Dashboard</h1>
+    </div>
 
-<body>
-    <%- include("./includes/flash.ejs") %>
-        <div class="dashboard">
-            <div class="main-content">
-                <div class="header">
-                    <h1>Dashboard</h1>
-                    <div class="user-info">
-                        <a href="/admin/logout" class="btn btn-danger ms-auto m-2">Logout</a>
-                    </div>
-                </div>
-
-                <div class="cards">
-                    <!-- Total Students -->
-                    <div class="dashboard-card">
-                        <div class="card-header">
-                            <h3 class="card-title">Total Students</h3>
-                            <div class="card-icon blue">
-                                <i class="fas fa-user-graduate"></i>
-                            </div>
-                        </div>
-                        <div class="card-value" id="totalStudents">--</div>
-                        <div class="card-description">Registered Users</div>
-                    </div>
-
-                    <!-- Active Tests -->
-                    <div class="dashboard-card">
-                        <div class="card-header">
-                            <h3 class="card-title">Active Tests</h3>
-                            <div class="card-icon green">
-                                <i class="fas fa-play-circle"></i>
-                            </div>
-                        </div>
-                        <div class="card-value" id="activeTests">--</div>
-                        <div class="card-description">Ongoing right now</div>
-                    </div>
-
-                    <!-- Completed Tests -->
-                    <div class="dashboard-card">
-                        <div class="card-header">
-                            <h3 class="card-title">Completed Tests</h3>
-                            <div class="card-icon red">
-                                <i class="fas fa-check-circle"></i>
-                            </div>
-                        </div>
-                        <div class="card-value" id="completedTests">--</div>
-                        <div class="card-description">Already finished</div>
-                    </div>
-
-                    <!-- Upcoming Tests -->
-                    <div class="dashboard-card">
-                        <div class="card-header">
-                            <h3 class="card-title">Upcoming Tests</h3>
-                            <div class="card-icon yellow">
-                                <i class="fa-solid fa-calendar-days"></i>
-                            </div>
-                        </div>
-                        <div class="card-value" id="upcomingTests">--</div>
-                        <div class="card-description">Starting soon</div>
-                    </div>
-                </div>
-
-                <div class="sections">
-                    <div class="section">
-                        <div class="section-header">
-                            <h2 class="section-title">Announcements</h2>
-                            <form method="GET" action="/announcement/new">
-                                <button class="btn btn-primary" id="newAnnouncementBtn">
-                                    <i class="fas fa-plus"></i> New Announcement
-                                </button>
-                            </form>
-                        </div>
-                        <ul class="announcement-list">
-                            <% for(announcement of allAnnouncements){ %>
-                                <li class="announcement-item">
-                                    <div class="announcement-box position-relative">
-                                        <div class="announcement-title">
-                                            <%= announcement.title %>
-                                        </div>
-                                        <div class="announcement-date">
-                                            Date: <%= announcement.date %>
-                                        </div>
-                                        <div class="announcement-body">
-                                            <%- announcement.body %>
-                                        </div>
-                                        <div class="announcement-footer">
-                                            Issued By: <%= announcement.issued_by %>
-                                        </div>
-
-                                        <div class="position-absolute bottom-0 end-0 p-3 d-flex gap-3">
-                                            <form action="/announcement/<%= announcement._id %>" method="GET">
-                                                <button type="submit" class="btn btn-warning btn-sm">Edit</button>
-                                            </form>
-                                            <form action="/announcement/<%= announcement._id %>?_method=DELETE"
-                                                method="POST">
-                                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                            </form>
-                                        </div>
-                                </li>
-                                <% } %>
-                        </ul>
-                        <hr>
-                        <div class="container mt-4">
-                            <form action="/download" method="POST" class="card p-4 shadow-sm">
-
-                                <!-- Branch selection -->
-                                <div class="mb-3">
-                                    <label for="branch_name" class="form-label">Select Branch</label>
-                                    <select class="form-select form-select-lg" id="branch_name" name="branch_name"
-                                        required>
-                                        <option value="" disabled selected>Select branch</option>
-                                        <option value="lr">Logical Reasoning and Aptitude</option>
-                                        <option value="ai">Artificial Intelligence</option>
-                                        <option value="che">Chemical Engineering</option>
-                                        <option value="chm">Chemistry</option>
-                                        <option value="ce">Civil Engineering</option>
-                                        <option value="cse">Computer Science and Engineering</option>
-                                        <option value="ee">Electrical Engineering</option>
-                                        <option value="ece">Electronics Engineering</option>
-                                        <option value="hss">Humanities and Social Sciences</option>
-                                        <option value="ms">Management Studies</option>
-                                        <option value="math">Mathematics</option>
-                                        <option value="me">Mechanical Engineering</option>
-                                        <option value="phy">Physics</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="test_id" class="form-label">Select Test</label>
-                                    <select class="form-select form-select-lg" id="test_id" name="test_id" required>
-
-                                    </select>
-                                </div>
-                                <button type="submit" class="btn btn-success btn-md">
-                                    <i class="fa fa-download me-2"></i> Download Result
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-
-                    <div class="section">
-
-                        <div class="section-header">
-
-                            <h2 class="section-title">Create New Test</h2>
-                            <form method="GET" action="/test/new">
-                                <button class="btn btn-primary" id="newAnnouncementBtn">
-                                    <i class="fas fa-plus"></i> New Test
-                                </button>
-                            </form>
-                        </div>
-
-
-                        <!-- upload the questions -->
-
-                        <ul class="announcement-list">
-                            <% for(test of allTests){ %>
-
-                                <% const date = formatDate(test.startTime); 
-                                   const time = formatTime(test.startTime); %>
-
-                                    <li class="announcement-item">
-                                        <div class="position-relative">
-                                            <div class="card p-0">
-                                                <div class="card-header">
-                                                    <%= test.testName %>
-                                                </div>
-                                                <div class="card-body">
-                                                    <p class="card-text"><b>Scheduled date :&MediumSpace;</b>
-                                                        <%= date %>
-                                                    </p>
-                                                    <p class="card-text"><b>Scheduled time :&MediumSpace;</b>
-                                                        <%= time %>
-                                                    </p>
-                                                    <p class="card-text"><b>Total questions :&MediumSpace;</b>
-                                                        <%= test.numberOfQues %>
-                                                    </p>
-                                                    <p class="card-text"><b>Total marks :&MediumSpace;</b>
-                                                        <%= test.totalMarks %>
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div class="position-absolute bottom-0 end-0 p-3 d-flex gap-3">
-                                                <form action="/test/<%= test._id %>" method="GET">
-                                                    <button type="submit" class="btn btn-warning btn-sm">Edit</button>
-                                                </form>
-
-                                                <form action="/test/<%= test._id %>?_method=DELETE" method="POST">
-                                                    <button type="submit" class="btn btn-danger btn-sm"
-                                                        <%= hasStarted(test.startTime) ? "disabled" : "" %>>Delete</button>
-                                                </form>
-                                            </div>
-
-                                    </li>
-                                    <% } %>
-                        </ul>
-                        <hr>
-                        <div class="container mt-4">
-                            <form action="/upload" method="POST" enctype="multipart/form-data"
-                                class="card p-4 shadow-sm">
-
-                                <!-- Branch selection -->
-                                <div class="mb-3">
-                                    <label for="branch" class="form-label">Select Branch</label>
-                                    <select class="form-select form-select-lg" id="branch" name="branch" required>
-                                        <option value="" disabled selected>Select branch</option>
-                                        <option value="lr">Logical Reasoning and Aptitude</option>
-                                        <option value="ai">Artificial Intelligence</option>
-                                        <option value="che">Chemical Engineering</option>
-                                        <option value="chm">Chemistry</option>
-                                        <option value="ce">Civil Engineering</option>
-                                        <option value="cse">Computer Science and Engineering</option>
-                                        <option value="ee">Electrical Engineering</option>
-                                        <option value="ece">Electronics Engineering</option>
-                                        <option value="hss">Humanities and Social Sciences</option>
-                                        <option value="ms">Management Studies</option>
-                                        <option value="math">Mathematics</option>
-                                        <option value="me">Mechanical Engineering</option>
-                                        <option value="phy">Physics</option>
-                                    </select>
-                                </div>
-
-                                <!-- File upload + button in one row -->
-                                <div class="row g-3 align-items-center">
-                                    <div class="col-md-8">
-                                        <label for="file" class="form-label">Upload Excel File</label>
-                                        <input class="form-control" type="file" id="file" name="file"
-                                            accept=".xlsx,.xls" required>
-                                    </div>
-                                    <div class="col-md-4 d-grid">
-                                        <label class="form-label invisible">Upload</label>
-                                    </div>
-                                    <button type="submit" class="btn btn-success btn-md">
-                                        <i class="fa fa-upload me-2"></i> Upload Questions
-                                    </button>
-                                </div>
-
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="section leaderboard-section mb-3">
-                <div class="section-header">
-                    <h2 class="section-title">Leaderboard</h2>
-
-                    <div class="filter-container">
-                        <select id="branchSelect">
-                            <option value="lr" selected>Logical Reasoning</option>
-                            <option value="ai">Artificial Intelligence</option>
-                            <option value="che">Chemical Engineering</option>
-                            <option value="chm">Chemistry</option>
-                            <option value="ce">Civil Engineering</option>
-                            <option value="cse">Computer Science & Engineering</option>
-                            <option value="ee">Electrical Engineering</option>
-                            <option value="ece">Electronics & Communication</option>
-                            <option value="hss">Humanities & Social Sciences</option>
-                            <option value="ms">Management Studies</option>
-                            <option value="math">Mathematics</option>
-                            <option value="me">Mechanical Engineering</option>
-                            <option value="phy">Physics</option>
-                        </select>
-
-                        <select id="testSelect">
-                            <option value="">Select Test</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="table-container">
-                    <table class="leaderboard-table">
-                        <caption id="testCaption">Select a test to view leaderboard</caption>
-                        <thead>
-                            <tr>
-                                <th>Rank</th>
-                                <th>Name</th>
-                                <th>Score</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="leaderboardBody">
-                            <!-- Populated dynamically -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-3">
+        <div class="card border-0 text-center p-4" style="background: linear-gradient(135deg,#e0f2fe 0%,#e0e7ff 100%)">
+          <h6 class="text-muted mb-1">Total Students</h6>
+          <h3 class="fw-bold mb-0" id="totalStudents">--</h3>
+          <div class="text-muted small">Registered Users</div>
         </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card border-0 text-center p-4" style="background: linear-gradient(135deg,#d1fae5 0%,#bbf7d0 100%)">
+          <h6 class="text-muted mb-1">Active Tests</h6>
+          <h3 class="fw-bold mb-0" id="activeTests">--</h3>
+          <div class="text-muted small">Ongoing right now</div>
         </div>
-        <footer class="custom-footer py-3">
-            <div class="container text-center">
-                <h6 class="text-white mb-3">Developed By</h6>
+      </div>
+      <div class="col-md-3">
+        <div class="card border-0 text-center p-4" style="background: linear-gradient(135deg,#fff7ed 0%,#fde68a 100%)">
+          <h6 class="text-muted mb-1">Completed Tests</h6>
+          <h3 class="fw-bold mb-0" id="completedTests">--</h3>
+          <div class="text-muted small">Already finished</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card border-0 text-center p-4" style="background: linear-gradient(135deg,#fff1f2 0%,#fee2e2 100%)">
+          <h6 class="text-muted mb-1">Upcoming Tests</h6>
+          <h3 class="fw-bold mb-0" id="upcomingTests">--</h3>
+          <div class="text-muted small">Starting soon</div>
+        </div>
+      </div>
+    </div>
 
-                <div class="d-flex justify-content-center gap-5 flex-wrap">
-
-                    <!-- Jenil -->
-                    <div class="dev-profile">
-                        <span class="dev-name text-white">Jenil Prajapati</span>
-                        <span class="social-links ms-2">
-                            <a href="https://github.com/jenil1236" class="text-white mx-1"><i
-                                    class="fab fa-github"></i></a>
-                            <a href="https://www.linkedin.com/in/jenil-prajapati-b31505307/" class="text-white mx-1"><i
-                                    class="fab fa-linkedin"></i></a>
-                            <a href="#" class="text-white mx-1"><i class="fab fa-twitter"></i></a>
-                        </span>
-                    </div>
-
-                    <!-- Vineet -->
-                    <div class="dev-profile">
-                        <span class="dev-name text-white">Vineet Gupta</span>
-                        <span class="social-links ms-2">
-                            <a href="https://github.com/Vineet-svnit" class="text-white mx-1"><i
-                                    class="fab fa-github"></i></a>
-                            <a href="https://www.linkedin.com/in/vineet-gupta-431396272/" class="text-white mx-1"><i
-                                    class="fab fa-linkedin"></i></a>
-                            <a href="#" class="text-white mx-1"><i class="fab fa-twitter"></i></a>
-                        </span>
-                    </div>
-
+    <!-- Announcements & Tests -->
+    <div class="row mb-4">
+      <div class="col-lg-6 mb-4">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-white border-bottom d-flex align-items-center">
+            <h5 class="mb-0 fw-bold" style="color:#27496d">Announcements</h5>
+            <a href="/announcement/new" class="btn btn-primary btn-sm ms-auto">New Announcement</a>
+          </div>
+          <div class="card-body">
+            <% if (allAnnouncements && allAnnouncements.length > 0) { %>
+              <% for (let ai = 0; ai < allAnnouncements.length; ai++) { const announcement = allAnnouncements[ai]; %>
+                <div class="mb-3 announcement-item" data-index="<%= ai %>">
+                  <div class="fw-semibold"><%= announcement.title %></div>
+                  <div class="text-muted small">Date: <%= announcement.date %></div>
+                  <div class="mt-2"><%- announcement.body %></div>
+                  <div class="mt-2 text-end">
+                    <a href="/announcement/<%= announcement._id %>" class="btn btn-sm btn-warning">Edit</a>
+                    <form action="/announcement/<%= announcement._id %>?_method=DELETE" method="POST" style="display:inline">
+                      <button class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                  </div>
                 </div>
-
-                <p class="mt-3 mb-0 text-white-50 small">
-                    &copy; <%= getCurrentYear() %> Career Development Cell. All rights reserved.
-                </p>
+                <hr>
+              <% } %>
+            <% } else { %>
+              <p class="text-muted">No announcements yet</p>
+            <% } %>
+          </div>
+          <% if (allAnnouncements && allAnnouncements.length > 4) { %>
+            <div class="card-footer bg-white text-center">
+              <button id="toggleAnnouncementsBtn" class="btn btn-sm btn-outline-primary">Show All Announcements</button>
             </div>
-        </footer>
+          <% } %>
+          <div class="card-footer bg-white">
+            <form action="/download" method="POST" class="row g-3 align-items-center">
+              <div class="col-md-5">
+                <label for="branch_name" class="form-label">Select Branch</label>
+                <select class="form-select" id="branch_name" name="branch_name" required>
+                  <option value="" disabled selected>Select branch</option>
+                  <option value="lr">Logical Reasoning and Aptitude</option>
+                  <option value="ai">Artificial Intelligence</option>
+                  <option value="che">Chemical Engineering</option>
+                  <option value="chm">Chemistry</option>
+                  <option value="ce">Civil Engineering</option>
+                  <option value="cse">Computer Science and Engineering</option>
+                  <option value="ee">Electrical Engineering</option>
+                  <option value="ece">Electronics Engineering</option>
+                  <option value="hss">Humanities and Social Sciences</option>
+                  <option value="ms">Management Studies</option>
+                  <option value="math">Mathematics</option>
+                  <option value="me">Mechanical Engineering</option>
+                  <option value="phy">Physics</option>
+                </select>
+              </div>
+              <div class="col-md-5">
+                <label for="test_id" class="form-label">Select Test</label>
+                <select class="form-select" id="test_id" name="test_id" required>
+                </select>
+              </div>
+              <div class="col-12">
+                <div class="d-grid mt-2">
+                  <button type="submit" class="btn btn-success w-100">Download Result</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
 
-        <style>
-            .custom-footer {
-                background-color: #0d47a1;
-                /* dark bluish */
-                border-top: 2px solid rgba(255, 255, 255, 0.15);
-                box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.25);
-                width: 100%;
-            }
+      <div class="col-lg-6 mb-4">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-white border-bottom d-flex align-items-center">
+            <h5 class="mb-0 fw-bold" style="color:#27496d">Tests</h5>
+            <a href="/test/new" class="btn btn-primary btn-sm ms-auto">New Test</a>
+          </div>
+          <div class="card-body">
+            <div id="testsList">
+              <% if (allTests && allTests.length > 0) { %>
+                <% for (let ti = 0; ti < allTests.length; ti++) { const test = allTests[ti]; %>
+                  <div class="mb-3 test-item" data-index="<%= ti %>">
+                    <div class="fw-semibold"><%= test.testName %></div>
+                    <div class="text-muted small">Scheduled: <%= formatDate(test.startTime) %> <%= formatTime(test.startTime) %></div>
+                    <div class="mt-2">Questions: <%= test.numberOfQues %> • Marks: <%= test.totalMarks %></div>
+                    <div class="mt-2 text-end">
+                      <a href="/test/<%= test._id %>" class="btn btn-sm btn-warning">Edit</a>
+                      <form action="/test/<%= test._id %>?_method=DELETE" method="POST" style="display:inline">
+                        <button class="btn btn-danger btn-sm" <%= hasStarted(test.startTime) ? 'disabled' : '' %>>Delete</button>
+                      </form>
+                    </div>
+                  </div>
+                  <hr>
+                <% } %>
+              <% } else { %>
+                <p class="text-muted">No tests yet</p>
+              <% } %>
+            </div>
+            <% if (allTests && allTests.length > 5) { %>
+              <div class="text-center mt-2">
+                <button id="toggleTestsBtn" class="btn btn-sm btn-outline-primary">Show All Tests</button>
+              </div>
+            <% } %>
 
-            .custom-footer .dev-profile {
-                font-size: 0.95rem;
-            }
+            <div class="mt-3">
+              <form action="/upload" method="POST" enctype="multipart/form-data" class="row g-3 align-items-center">
+                <div class="col-md-5">
+                  <label for="branch" class="form-label">Select Branch</label>
+                  <select class="form-select" id="branch" name="branch" required>
+                    <option value="" disabled selected>Select branch</option>
+                    <option value="lr">Logical Reasoning and Aptitude</option>
+                    <option value="ai">Artificial Intelligence</option>
+                    <option value="che">Chemical Engineering</option>
+                    <option value="chm">Chemistry</option>
+                    <option value="ce">Civil Engineering</option>
+                    <option value="cse">Computer Science and Engineering</option>
+                    <option value="ee">Electrical Engineering</option>
+                    <option value="ece">Electronics Engineering</option>
+                    <option value="hss">Humanities and Social Sciences</option>
+                    <option value="ms">Management Studies</option>
+                    <option value="math">Mathematics</option>
+                    <option value="me">Mechanical Engineering</option>
+                    <option value="phy">Physics</option>
+                  </select>
+                </div>
+                <div class="col-md-5">
+                  <label for="file" class="form-label">Upload Excel File</label>
+                  <input class="form-control" type="file" id="file" name="file" accept=".xlsx,.xls" required>
+                </div>
+                <div class="col-12">
+                  <div class="d-grid mt-2">
+                    <button type="submit" class="btn btn-success w-100">Upload Questions</button>
+                  </div>
+                </div>
+              </form>
+            </div>
 
-            .custom-footer .social-links a:hover {
-                color: #90caf9;
-            }
-        </style>
-        <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
-        <script src="/js/dashboard.js"></script>
-</body>
+            
+          </div>
+        </div>
+      </div>
+    </div>
 
-</html>
+    <!-- Leaderboard -->
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h5 class="fw-bold mb-3">Leaderboard</h5>
+        <div class="d-flex gap-2 mb-3">
+          <select id="branchSelect" class="form-select w-auto">
+            <option value="lr" selected>Logical Reasoning</option>
+            <option value="ai">Artificial Intelligence</option>
+            <option value="che">Chemical Engineering</option>
+            <option value="chm">Chemistry</option>
+            <option value="ce">Civil Engineering</option>
+            <option value="cse">Computer Science & Engineering</option>
+            <option value="ee">Electrical Engineering</option>
+            <option value="ece">Electronics & Communication</option>
+            <option value="hss">Humanities & Social Sciences</option>
+            <option value="ms">Management Studies</option>
+            <option value="math">Mathematics</option>
+            <option value="me">Mechanical Engineering</option>
+            <option value="phy">Physics</option>
+          </select>
+          <select id="testSelect" class="form-select w-auto">
+            <option value="">Select Test</option>
+          </select>
+        </div>
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Score</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="/js/dashboard.js"></script>
+<script>
+  // show only top 5 test items initially, toggle to show all
+  (function(){
+    const list = document.getElementById('testsList');
+    const toggle = document.getElementById('toggleTestsBtn');
+    if (!list || !toggle) return;
+    const items = Array.from(list.querySelectorAll('.test-item'));
+    const limit = 5;
+    function updateVisibility(showAll){
+      items.forEach((it, idx) => {
+        if (idx >= limit) {
+          it.style.display = showAll ? '' : 'none';
+          // hide following hr as well
+          const hr = it.nextElementSibling;
+          if (hr && hr.tagName === 'HR') hr.style.display = showAll ? '' : 'none';
+        }
+      });
+      toggle.textContent = showAll ? 'Show Top 5' : 'Show All Tests';
+    }
+    // initial state: show top 5
+    updateVisibility(false);
+    toggle.addEventListener('click', ()=>{
+      const showingAll = toggle.textContent === 'Show Top 5';
+      updateVisibility(!showingAll);
+    });
+  })();
+
+  // announcements: show only top 5 initially, toggle to show all
+  (function(){
+    const list = document.querySelectorAll('.announcement-item');
+    const toggle = document.getElementById('toggleAnnouncementsBtn');
+    if (!list || !list.length || !toggle) return;
+    const limit = 4;
+    function updateAnnouncements(showAll){
+      list.forEach((el, idx) => {
+        if (idx >= limit) {
+          el.style.display = showAll ? '' : 'none';
+          const hr = el.nextElementSibling;
+          if (hr && hr.tagName === 'HR') hr.style.display = showAll ? '' : 'none';
+        }
+      });
+      toggle.textContent = showAll ? 'Show Top 5' : 'Show All Announcements';
+    }
+    updateAnnouncements(false);
+    toggle.addEventListener('click', ()=>{
+      const showingAll = toggle.textContent === 'Show Top 4';
+      updateAnnouncements(!showingAll);
+    });
+  })();
+</script>

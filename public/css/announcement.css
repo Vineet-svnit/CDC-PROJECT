@@ -49,6 +49,7 @@
 } */
 
 /* Announcement Page Styles */
+@import 'global.css';
 .announcements {
     padding: 20px 0;
 }
@@ -64,8 +65,8 @@
 
 .announcement-title {
     font-size: 1.5rem;
-    font-weight: bold;
-    color: #1976d2;
+    font-weight: 600;
+    color: var(--primary);
     margin-bottom: 10px;
     padding-bottom: 10px;
     border-bottom: 1px solid #e0e0e0;
@@ -78,7 +79,7 @@
 }
 
 .announcement-body {
-    color: #333;
+    color: var(--text);
     line-height: 1.6;
     margin-bottom: 15px;
 }

@@ -70,18 +70,11 @@
             margin-top: 50px;
         } */
 
+        @import 'global.css';
         /* History Page Styles */
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
+        .container { max-width:1200px; margin:0 auto; padding:20px }
 
-h1 {
-    color: #1976d2;
-    margin-bottom: 30px;
-    text-align: center;
-}
+        h1 { color:var(--primary); margin-bottom:30px; text-align:center }
 
 .no-submissions {
     text-align: center;
@@ -98,10 +91,7 @@ h1 {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
-.card h2 {
-    color: #1976d2;
-    margin-bottom: 15px;
-}
+.card h2 { color:var(--primary); margin-bottom:15px }
 
 .meta {
     display: flex;
@@ -110,25 +100,10 @@ h1 {
     margin-bottom: 15px;
 }
 
-.meta p {
-    margin: 0;
-    color: #333;
-}
+.meta p { margin:0; color:var(--text) }
 
-.history-btn {
-    display: inline-block;
-    padding: 8px 16px;
-    background-color: #1976d2;
-    color: white;
-    text-decoration: none;
-    border-radius: 4px;
-    transition: background-color 0.3s;
-}
-
-.history-btn:hover {
-    background-color: #1565c0;
-    color: white;
-}
+.history-btn { display:inline-block; padding:8px 16px; background-color:var(--primary); color:white; text-decoration:none; border-radius:4px; transition:background-color .18s }
+.history-btn:hover { background-color:var(--accent); color:white }
 
 .accuracy-green {
     color: #4caf50;

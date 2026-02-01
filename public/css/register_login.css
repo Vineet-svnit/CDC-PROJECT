@@ -1,52 +1,64 @@
+@import 'global.css';
+
 body {
     margin: 0;
     padding: 0;
-    background-color: #1A1A1A;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg);
+    font-family: 'Inter', 'Source Sans 3', system-ui, -apple-system, 'Segoe UI', Roboto, Arial;
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 100vh;
     overflow-x: hidden;
     position: relative;
+    color: var(--text);
 }
 
-/* Decorative Circles */
+body::before {
+    content: "";
+    position: fixed;
+    top: 55%;
+    /* Shifted up slightly from 60% */
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 115vw;
+    /* Slightly larger */
+    height: 115vh;
+    background-image: url('/images/CDC Logo.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    opacity: 0.12;
+    /* Slightly more visible than the default svnit watermark */
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* Subtle decorative background shapes — muted and low-contrast */
 .circle {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(60px);
-    z-index: 0;
+    display: none
 }
 
-.circle.orange {
-    background: radial-gradient(circle, #F25E1E, #f25e1ea6);
-    width: 300px;
-    height: 300px;
-    top: -100px;
-    left: -100px;
-}
-
-.circle.blue {
-    background: radial-gradient(circle, #2C52FE, #2c52feaa);
-    width: 300px;
-    height: 300px;
-    bottom: -100px;
-    right: -100px;
-}
-
-/* Glassmorphism Container */
+/* Simple card container */
 #container {
     position: relative;
     z-index: 1;
-    width: 400px;
-    padding: 20px 30px;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(12px);
-    border-radius: 20px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #fff;
+    width: 420px;
+    padding: 26px 28px;
+    background: rgba(255, 255, 255, 0.55);
+    /* Increased transparency */
+    backdrop-filter: blur(10px);
+    /* Refined glass effect */
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(16, 24, 40, 0.06);
+    border: 1px solid rgba(16, 24, 40, 0.04);
+    color: var(--text);
+    overflow: hidden;
+    /* Ensure watermark doesn't spill out of rounded corners */
+}
+
+#container::before {
+    display: none;
 }
 
 /* Heading */
@@ -57,25 +69,27 @@ body {
 }
 
 /* Input Fields */
-input, select {
+input,
+select {
     width: 100%;
     padding: 12px;
-    margin: 10px 0 20px;
-    border: none;
+    margin: 10px 0 16px;
+    border: 1px solid #e6e9ee;
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.15);
-    color: #fff;
+    background: #fff;
+    color: var(--text);
     outline: none;
-    font-size: 16px;
+    font-size: 15px;
 }
 
 input::placeholder {
-    color: #ccc;
+    color: var(--muted-2)
 }
 
-input:focus, select:focus {
-    background-color: #fff;
-    color: #000;
+input:focus,
+select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(39, 73, 109, 0.08);
 }
 
 /* Labels */
@@ -100,17 +114,17 @@ label {
 #register {
     width: 100%;
     padding: 12px;
-    background-color: #2C52FE;
+    background-color: var(--primary);
     border: none;
     border-radius: 8px;
     color: white;
-    font-weight: bold;
-    font-size: 16px;
-    transition: background 0.3s;
+    font-weight: 600;
+    font-size: 15px;
+    transition: background 0.18s ease;
 }
 
 #register:hover {
-    background-color: #1e3cc6;
+    background-color: var(--accent)
 }
 
 /* Login Link */
@@ -131,13 +145,8 @@ p a {
     top: 50%;
     right: 12px;
     transform: translateY(-50%);
-    background-color: #2C2C2C;
+    background: transparent;
     border: none;
-    border-radius: 50%;
-    padding: 6px 8px;
-    color: #fff;
-    cursor: pointer;
-    transition: background 0.3s ease;
-    z-index: 2;
+    color: var(--muted-1);
+    cursor: pointer
 }
-

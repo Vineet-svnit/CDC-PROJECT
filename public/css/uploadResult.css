@@ -1,71 +1,44 @@
+@import 'global.css';
+
 /* ===== Upload Result Page ===== */
+.upload-result-page { max-width:900px; margin:0 auto; padding:20px }
 
-/* Page background and text */
-body {
-    background-color: #f5f5f5;
-    /* match your main body bg */
-    color: #212121;
-    /* main text color */
-    font-family: Arial, sans-serif;
-    padding: 20px;
+h1 { color:var(--primary); margin-bottom:20px }
+
+.upload-stats { 
+  background:var(--bg);
+  padding:16px;
+  border-radius:8px;
+  margin-bottom:20px;
 }
 
-/* Heading */
-h1 {
-    color: #1976d2;
-    /* primary color */
-    margin-bottom: 20px;
+.stat-value { font-weight:600; color:var(--text) }
+
+.errors-section {
+  background:#fff3f3;
+  border:1px solid #d32f2f;
+  border-radius:8px;
+  padding:16px;
+  margin-top:20px;
 }
 
-/* Inserted count */
-p strong {
-    color: #1565c0;
-    /* darker shade for emphasis */
+.errors-section h3 { color:#d32f2f; margin-top:0 }
+
+ul { background-color:#fff3f3; border:1px solid #d32f2f; border-radius:5px; padding:15px 20px; list-style-type:disc; color:#d32f2f }
+
+ul li { margin-bottom:8px }
+
+.success-section { 
+  background:#f1f8e9;
+  border-left:4px solid #4caf50;
+  padding:16px;
+  border-radius:6px;
+  margin-top:20px;
 }
 
-/* Errors section */
-h3 {
-    color: #d32f2f;
-    /* red for errors */
-    margin-top: 20px;
-}
+.no-errors { color:#2e7d32; font-weight:600 }
 
-ul {
-    background-color: #fff3f3;
-    /* light red/pink background */
-    border: 1px solid #d32f2f;
-    border-radius: 5px;
-    padding: 15px 20px;
-    list-style-type: disc;
-    color: #d32f2f;
-}
+p strong { color:var(--accent) }
 
-/* Individual error item */
-ul li {
-    margin-bottom: 8px;
-}
-
-/* No errors message */
-p:has(> .no-errors) {
-    color: #388e3c;
-    /* green for success */
-    font-weight: bold;
-}
-
-/* Links or buttons (if any) */
-a,
-.btn {
-    color: white;
-    background-color: #1976d2;
-    padding: 8px 15px;
-    border-radius: 5px;
-    text-decoration: none;
-    display: inline-block;
-    margin-top: 15px;
-    transition: background-color 0.3s ease;
-}
-
-a:hover,
-.btn:hover {
-    background-color: #1565c0;
-}
+a, .btn { color:white; background-color:var(--primary); padding:8px 15px; border-radius:5px; text-decoration:none; display:inline-block; margin-top:15px; transition:background-color .18s }
+a:hover, .btn:hover { background-color:var(--accent) }

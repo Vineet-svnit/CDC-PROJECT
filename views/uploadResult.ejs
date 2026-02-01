@@ -1,23 +1,23 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Upload Result</title>
-  <link rel="stylesheet" href="./css/uploadResult.css">
-</head>
-<body>
-  <h1>Upload Summary</h1>
+<% layout('/layouts/adminBoilerplate') %>
 
-  <p><strong>Inserted:</strong> <%= inserted %></p>
+<div class="card shadow-sm">
+  <div class="card-body">
+    <h4 class="fw-bold mb-3">Upload Summary</h4>
+    <div class="mb-3">
+      <strong>Inserted:</strong> <span class="ms-2"><%= inserted %></span>
+    </div>
 
-  <% if (errors.length > 0) { %>
-    <h3>Errors:</h3>
-    <ul>
-      <% errors.forEach(function(err) { %>
-        <li><%= err %></li>
-      <% }) %>
-    </ul>
-  <% } else { %>
-    <p>No errors 🎉</p>
-  <% } %>
-</body>
-</html>
+    <% if (errors && errors.length > 0) { %>
+      <div class="alert alert-danger">
+        <h6 class="mb-2">Errors</h6>
+        <ul class="mb-0">
+          <% errors.forEach(function(err) { %>
+            <li><%= err %></li>
+          <% }) %>
+        </ul>
+      </div>
+    <% } else { %>
+      <div class="alert alert-success">✓ No errors found</div>
+    <% } %>
+  </div>
+</div>

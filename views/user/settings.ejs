@@ -1,0 +1,118 @@
+<% layout("/layouts/userBoilerplate") %>
+
+<main class="py-5">
+  <div class="container-lg">
+    <div class="row">
+      <div class="col-lg-6 mx-auto">
+        <div class="d-flex align-items-center gap-3 mb-5">
+          <div style="width: 4px; height: 40px; background: #27496d; border-radius: 2px;"></div>
+          <h1 class="h3 mb-0 fw-bold" style="color: #27496d;">Account Settings</h1>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-4">
+            
+            <!-- Profile Header -->
+            <div class="text-center mb-4 pb-4 border-bottom">
+              <div class="avatar mb-3" style="width: 80px; height: 80px; margin: 0 auto; background: linear-gradient(135deg, #27496d 0%, #2b6cb0 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <i class="fas fa-user fa-2x text-white"></i>
+              </div>
+              <h4 class="fw-bold" style="color: #27496d;"><%= user.username %></h4>
+              <p class="text-muted mb-0"><%= user.email %></p>
+            </div>
+
+            <!-- View-Only Details -->
+            <div class="mb-4">
+              <h6 class="fw-bold mb-3" style="color: #27496d;">Account Information</h6>
+              
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <small class="text-muted d-block mb-1">Username</small>
+                  <p class="mb-0 fw-500"><%= user.username %></p>
+                </div>
+                <div class="col-md-6">
+                  <small class="text-muted d-block mb-1">Email</small>
+                  <p class="mb-0 fw-500"><%= user.email %></p>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <small class="text-muted d-block mb-1">Branch</small>
+                  <p class="mb-0 fw-500"><%= user.branch.toUpperCase() %></p>
+                </div>
+                <div class="col-md-6">
+                  <small class="text-muted d-block mb-1">Year</small>
+                  <p class="mb-0 fw-500"><%= user.year %></p>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <small class="text-muted d-block mb-1">Phone</small>
+                  <p class="mb-0 fw-500"><%= user.phone %></p>
+                </div>
+                <div class="col-md-6">
+                  <small class="text-muted d-block mb-1">Name</small>
+                  <p class="mb-0 fw-500"><%= user.name %></p>
+                </div>
+              </div>
+            </div>
+
+            <hr class="my-4">
+
+            <!-- Editable Form -->
+            <div>
+              <h6 class="fw-bold mb-3" style="color: #27496d;">Edit Profile</h6>
+              
+              <form action="/settings/update" method="POST" id="settingsForm">
+                <div class="mb-3">
+                  <label for="name" class="form-label fw-500">Full Name</label>
+                  <input type="text" class="form-control" id="name" name="name" value="<%= user.name %>" required>
+                </div>
+
+                <div class="mb-4">
+                  <label for="phone" class="form-label fw-500">Phone Number</label>
+                  <input type="tel" class="form-control" id="phone" name="phone" value="<%= user.phone %>" pattern="[0-9]{10}" required>
+                  <small class="text-muted">10 digits only</small>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 fw-bold">
+                  <i class="fas fa-save me-2"></i>Save Changes
+                </button>
+              </form>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Additional Section -->
+        <div class="card border-0 shadow-sm mt-4">
+          <div class="card-body p-4">
+            <h6 class="fw-bold mb-3" style="color: #27496d;">Security</h6>
+            <p class="text-muted mb-3">Need to change your password? Contact the administrator for security assistance.</p>
+            <a href="#" class="btn btn-outline-secondary btn-sm" disabled>
+              <i class="fas fa-lock me-2"></i>Change Password (Coming Soon)
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</main>
+
+<style>
+  .form-control:focus {
+    border-color: #27496d;
+    box-shadow: 0 0 0 0.2rem rgba(39, 73, 109, 0.15);
+  }
+  .btn-primary {
+    background-color: #27496d;
+    border-color: #27496d;
+  }
+  .btn-primary:hover {
+    background-color: #2b6cb0;
+    border-color: #2b6cb0;
+  }
+</style>

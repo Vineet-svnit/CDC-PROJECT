@@ -1,28 +1,94 @@
 <% layout("/layouts/userBoilerplate") %>
-    <div class="container">
-        <h1>Your Test History</h1>
 
-        <% if (submissions.length === 0) { %>
-            <p class="no-submissions">You have not submitted any tests yet.</p>
+  <main class="py-5">
+    <div class="container-lg">
+      <div class="d-flex align-items-center gap-3 mb-4">
+        <div style="width: 4px; height: 40px; background: #27496d; border-radius: 2px;"></div>
+        <h1 class="h3 mb-0 fw-bold" style="color: #27496d;">Your Test History</h1>
+      </div>
+
+      <% if (submissions.length===0) { %>
+        <div class="text-center py-5">
+          <i class="fas fa-inbox fa-4x text-muted mb-3" style="opacity: 0.5;"></i>
+          <h5 class="text-muted">No test submissions yet</h5>
+          <p class="text-muted mb-4">Complete a test to see your history here.</p>
+          <a href="/" class="btn btn-primary"><i class="fas fa-play me-2"></i>Go to Tests</a>
+        </div>
         <% } else { %>
-            <% submissions.forEach(sub => { 
-                const test = sub.test_id;
-                // console.log(test);
-                const accuracyNum = test.totalMarks > 0 ? Math.max(((sub.score / test.totalMarks) * 100), 0) : 0;
-                const accuracy = accuracyNum.toFixed(2);
-                let accuracyClass = "accuracy-red";
-                if (accuracyNum >= 75) accuracyClass = "accuracy-green";
-                else if (accuracyNum >= 30) accuracyClass = "accuracy-orange";
-            %>
-                <div class="card">
-                    <h2><%= test.testName %></h2>
-                    <div class="meta">
-                        <p><strong>Score:</strong> <%= sub.score %></p>
-                        <p><strong>Accuracy:</strong> <span class="<%= accuracyClass %>"><%= accuracy %></span></p>
-                        <p><strong>Start Time:</strong> <%= formatDateTime(test.startTime) %></p>
+          <div class="row g-4">
+            <% submissions.forEach(sub=> {
+              const test = sub.test_id;
+              const accuracyNum = test.totalMarks > 0 ? Math.max(((sub.score / test.totalMarks) * 100), 0) : 0;
+              const accuracy = accuracyNum.toFixed(2);
+              let accuracyClass = "text-danger";
+              let accuracyBadge = "bg-danger";
+              if (accuracyNum >= 75) {
+              accuracyClass = "text-success";
+              accuracyBadge = "bg-success";
+              } else if (accuracyNum >= 30) {
+              accuracyClass = "text-warning";
+              accuracyBadge = "bg-warning";
+              }
+              %>
+              <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100 hover-card transition">
+                  <div class="card-body d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                      <h5 class="card-title fw-bold mb-0" style="color: #27496d;">
+                        <%= test.testName %>
+                      </h5>
+                      <span class="badge <%= accuracyBadge %>">
+                        <%= accuracy %>%
+                      </span>
                     </div>
-                    <a class="history-btn" href="/submission/<%= test._id %>">View Submission</a>
+
+                    <div class="mb-4">
+                      <div class="progress mb-2" style="height: 6px;">
+                        <div class="progress-bar"
+                          style="width: <%= accuracy %>%; background-color: <%= accuracyNum >= 75 ? '#22c55e' : (accuracyNum >= 30 ? '#f59e0b' : '#ef4444') %>">
+                        </div>
+                      </div>
+                      <small class="text-muted">Accuracy Score</small>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                      <div class="col-6">
+                        <div class="p-3 rounded" style="background: #f5f7fa;">
+                          <small class="text-muted d-block">Score</small>
+                          <h6 class="mb-0 fw-bold" style="color: #27496d;">
+                            <%= sub.score %> / <%= test.totalMarks %>
+                          </h6>
+                        </div>
+                      </div>
+                      <div class="col-6">
+                        <div class="p-3 rounded" style="background: #f5f7fa;">
+                          <small class="text-muted d-block">Date</small>
+                          <h6 class="mb-0 fw-bold" style="color: #27496d;">
+                            <%= formatDate(test.startTime) %>
+                          </h6>
+                        </div>
+                      </div>
+                    </div>
+
+                    <a href="/submission/<%= test._id %>" class="btn btn-outline-primary mt-auto">
+                      <i class="fas fa-eye me-2"></i>View Details
+                    </a>
+                  </div>
                 </div>
-            <% }); %>
-        <% } %>
+              </div>
+              <% }); %>
+          </div>
+          <% } %>
     </div>
+  </main>
+
+  <style>
+    .hover-card {
+      transition: all 0.3s ease;
+    }
+
+    .hover-card:hover {
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12) !important;
+      transform: translateY(-2px);
+    }
+  </style>

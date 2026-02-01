@@ -5,6 +5,8 @@
       font-size: 1.25rem;
     }
 
+@import 'global.css';
+
     .card-body {
       background-color: #f8f9fa; /* light grey background */
     }
