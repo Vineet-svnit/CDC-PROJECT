@@ -1,23 +1,65 @@
 <% layout('/layouts/adminBoilerplate') %>
 
-<div class="card shadow-sm">
-  <div class="card-body">
-    <h4 class="fw-bold mb-3">Upload Summary</h4>
-    <div class="mb-3">
-      <strong>Inserted:</strong> <span class="ms-2"><%= inserted %></span>
+<div class="admin-form-container">
+  <div class="admin-form-card">
+    <div class="admin-form-header" style="background: linear-gradient(135deg, #059669 0%, #047857 100%);">
+      <h4>
+        <i class="fas fa-upload"></i> Upload Summary
+      </h4>
     </div>
-
-    <% if (errors && errors.length > 0) { %>
-      <div class="alert alert-danger">
-        <h6 class="mb-2">Errors</h6>
-        <ul class="mb-0">
-          <% errors.forEach(function(err) { %>
-            <li><%= err %></li>
-          <% }) %>
-        </ul>
+    <div class="admin-form-body">
+      <div class="row g-4 mb-4">
+        <div class="col-md-6">
+          <div class="stats-card" style="--card-accent: #059669; --card-accent-light: #10b981;">
+            <div class="card-icon">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <h6>Questions Inserted</h6>
+            <h3><%= inserted %></h3>
+            <div class="text-muted">Successfully uploaded</div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="stats-card" style="--card-accent: <%= errors && errors.length > 0 ? '#dc2626' : '#059669' %>; --card-accent-light: <%= errors && errors.length > 0 ? '#ef4444' : '#10b981' %>;">
+            <div class="card-icon">
+              <i class="fas fa-<%= errors && errors.length > 0 ? 'exclamation-triangle' : 'shield-check' %>"></i>
+            </div>
+            <h6>Errors Found</h6>
+            <h3><%= errors ? errors.length : 0 %></h3>
+            <div class="text-muted"><%= errors && errors.length > 0 ? 'Issues detected' : 'Clean upload' %></div>
+          </div>
+        </div>
       </div>
-    <% } else { %>
-      <div class="alert alert-success">✓ No errors found</div>
-    <% } %>
+
+      <% if (errors && errors.length > 0) { %>
+        <div class="alert alert-danger d-flex align-items-start">
+          <i class="fas fa-exclamation-triangle me-3 mt-1"></i>
+          <div>
+            <h6 class="mb-2 fw-bold">Upload Errors</h6>
+            <ul class="mb-0">
+              <% errors.forEach(function(err) { %>
+                <li><%= err %></li>
+              <% }) %>
+            </ul>
+          </div>
+        </div>
+      <% } else { %>
+        <div class="alert alert-success d-flex align-items-center">
+          <i class="fas fa-check-circle me-3"></i>
+          <div>
+            <strong>Success!</strong> All questions were uploaded without any errors.
+          </div>
+        </div>
+      <% } %>
+
+      <div class="text-center mt-4">
+        <a href="/test/new" class="btn btn-primary me-3">
+          <i class="fas fa-plus"></i> Create New Test
+        </a>
+        <a href="/" class="btn btn-outline-primary">
+          <i class="fas fa-home"></i> Back to Dashboard
+        </a>
+      </div>
+    </div>
   </div>
 </div>

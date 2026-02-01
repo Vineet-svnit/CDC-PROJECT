@@ -485,8 +485,27 @@ app.get("/api/categories/:branch", isAdmin, async (req, res) => {
         default: return res.status(400).json({ error: "Invalid branch" });
     }
     try {
-        const categories = await model.distinct("category");
-        res.json(categories);
+        // Get categories with their question counts
+        const categoriesWithCounts = await model.aggregate([
+            {
+                $group: {
+                    _id: "$category",
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    category: "$_id",
+                    count: 1
+                }
+            },
+            {
+                $sort: { category: 1 }
+            }
+        ]);
+        
+        res.json(categoriesWithCounts);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -660,6 +679,20 @@ app.post("/test/questions/new", isAdmin, async (req, res) => {
     if (!Model || categories.length === 0) {
         req.flash('error', 'Invalid branch or no categories selected!');
         return res.redirect("/dashboard");
+    }
+
+    // Validate question availability for each category
+    const validationErrors = [];
+    for (let cat of categories) {
+        const availableCount = await Model.countDocuments({ category: cat.category_name });
+        if (availableCount < cat.numberOfQues) {
+            validationErrors.push(`Category "${cat.category_name}" has only ${availableCount} questions available, but ${cat.numberOfQues} requested.`);
+        }
+    }
+
+    if (validationErrors.length > 0) {
+        req.flash('error', validationErrors.join(' '));
+        return res.redirect("/test/new");
     }
 
     let allQuestions = [];

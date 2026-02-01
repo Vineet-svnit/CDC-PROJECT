@@ -1,8 +1,29 @@
+const dotenv = require("dotenv");
+dotenv.config();
 const mongoose = require('mongoose');
-const Question = require('../models/question'); // Replace with your actual model path
+const { connectDB } = require("../config/db.js")
+const {Question} = require('../models/question'); // Replace with your actual model path
 
+const generateMockTests = async () => {
+  try {
+    await Question.deleteMany();
+    await Question.insertMany(sampleQuestions);
+    console.log('Mock questions generated successfully');
+  } catch (err) {
+    console.error('Error generating mock questions:', err);
+  }
+};
+
+// Run the generator
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/CDCproject');
+connectDB()
+    .then(() => {
+        console.log("Database connected successfully");
+        generateMockTests();
+    })
+    .catch((error) => {
+        console.error("Database connection failed:", error);
+    });
 
 // Sample questions data
 const sampleQuestions = [
@@ -14,7 +35,9 @@ const sampleQuestions = [
     option2: "20",
     option3: "32",
     option4: "24",
-    answer: "C"
+    answer: "C",
+    category: "Mathematics",
+    category: "Mathematics"
   },
   {
     question: "If a shirt costs $40 after a 20% discount, what was the original price?",
@@ -23,7 +46,8 @@ const sampleQuestions = [
     option2: "$50",
     option3: "$60",
     option4: "$80",
-    answer: "C"
+    answer: "C",
+    category: "Mathematics"
   },
   {
     question: "Which number is the smallest prime?",
@@ -32,7 +56,8 @@ const sampleQuestions = [
     option2: "1",
     option3: "2",
     option4: "3",
-    answer: "C"
+    answer: "C",
+    category: "Mathematics"
   },
   {
     question: "What is the average of the first five even numbers?",
@@ -41,7 +66,8 @@ const sampleQuestions = [
     option2: "3",
     option3: "4",
     option4: "6",
-    answer: "D"
+    answer: "D",
+    category: "Mathematics"
   },
   {
     question: "Ravi is older than Amit but younger than Suresh. Who is the oldest?",
@@ -50,7 +76,8 @@ const sampleQuestions = [
     option2: "Amit",
     option3: "Suresh",
     option4: "Cannot determine",
-    answer: "C"
+    answer: "C",
+    category: "Logical Reasoning"
   },
   {
     question: "If SELL is coded as 1233, what is LESS?",
@@ -59,7 +86,8 @@ const sampleQuestions = [
     option2: "3211",
     option3: "2331",
     option4: "3213",
-    answer: "D"
+    answer: "D",
+    category: "Logical Reasoning"
   },
   {
     question: "Find the odd one out: Apple, Orange, Banana, Carrot",
@@ -68,7 +96,8 @@ const sampleQuestions = [
     option2: "Orange",
     option3: "Banana",
     option4: "Carrot",
-    answer: "D"
+    answer: "D",
+    category: "Logical Reasoning"
   },
   {
     question: "Which of the following is a square number?",
@@ -77,7 +106,8 @@ const sampleQuestions = [
     option2: "24",
     option3: "28",
     option4: "30",
-    answer: "A"
+    answer: "A",
+    category: "Mathematics"
   },
   {
     question: "Which day follows two days after Monday?",
@@ -86,7 +116,8 @@ const sampleQuestions = [
     option2: "Tuesday",
     option3: "Friday",
     option4: "Thursday",
-    answer: "A"
+    answer: "A",
+    category: "Logical Reasoning"
   },
   {
     question: "If 5x = 20, what is x?",
@@ -95,7 +126,8 @@ const sampleQuestions = [
     option2: "3",
     option3: "4",
     option4: "5",
-    answer: "C"
+    answer: "C",
+    category: "General Knowledge"
   },
   {
     question: "Which shape has 4 equal sides and 4 right angles?",
@@ -104,7 +136,8 @@ const sampleQuestions = [
     option2: "Triangle",
     option3: "Square",
     option4: "Circle",
-    answer: "C"
+    answer: "C",
+    category: "Mathematics"
   },
   {
     question: "Which is not a multiple of 3?",
@@ -113,7 +146,8 @@ const sampleQuestions = [
     option2: "18",
     option3: "15",
     option4: "22",
-    answer: "D"
+    answer: "D",
+    category: "Mathematics"
   },
   {
     question: "If all cats are animals and some animals are wild, then some cats are:",
@@ -122,7 +156,8 @@ const sampleQuestions = [
     option2: "Not animals",
     option3: "Domesticated",
     option4: "None of these",
-    answer: "D"
+    answer: "D",
+    category: "General Knowledge"
   },
   {
     question: "A train travels at 60 km/h. How far will it go in 45 minutes?",
@@ -131,7 +166,8 @@ const sampleQuestions = [
     option2: "45 km",
     option3: "60 km",
     option4: "15 km",
-    answer: "A"
+    answer: "A",
+    category: "General Knowledge"
   },
   {
     question: "What is the value of 7 × 6 – 5?",
@@ -140,7 +176,8 @@ const sampleQuestions = [
     option2: "32",
     option3: "42",
     option4: "29",
-    answer: "A"
+    answer: "A",
+    category: "Mathematics"
   },
   {
     question: "Which is the next term in the series: 3, 6, 12, 24, ...?",
@@ -149,7 +186,8 @@ const sampleQuestions = [
     option2: "48",
     option3: "50",
     option4: "30",
-    answer: "B"
+    answer: "B",
+    category: "General Knowledge"
   },
   {
     question: "What is the perimeter of a rectangle with length 8 cm and breadth 6 cm?",
@@ -158,7 +196,8 @@ const sampleQuestions = [
     option2: "24 cm",
     option3: "26 cm",
     option4: "28 cm",
-    answer: "B"
+    answer: "B",
+    category: "Mathematics"
   },
   {
     question: "Rahul ranks 5th from top and 38th from the bottom. How many students are in the class?",
@@ -167,7 +206,8 @@ const sampleQuestions = [
     option2: "42",
     option3: "43",
     option4: "44",
-    answer: "B"
+    answer: "B",
+    category: "Logical Reasoning"
   },
   {
     question: "If ‘EARTH’ is coded as ‘GCTKV’, how is ‘MOON’ coded?",
@@ -176,7 +216,8 @@ const sampleQuestions = [
     option2: "OQPP",
     option3: "OORQ",
     option4: "QSQP",
-    answer: "A"
+    answer: "A",
+    category: "Logical Reasoning"
   },
   {
     question: "Which number is formed by the product of its digits: 36, 24, 12, 10?",
@@ -185,7 +226,8 @@ const sampleQuestions = [
     option2: "24",
     option3: "12",
     option4: "10",
-    answer: "C"
+    answer: "C",
+    category: "Mathematics"
   },
   // (Keep going here ... covering all topics as requested)
   {
@@ -195,7 +237,8 @@ const sampleQuestions = [
     option2: "0.707, 0.7, 0.77, 0.777",
     option3: "0.777, 0.77, 0.707, 0.7",
     option4: "0.7, 0.77, 0.707, 0.777",
-    answer: "A"
+    answer: "A",
+    category: "Logical Reasoning"
   },
   {
     question: "If the sum of two consecutive numbers is 41, what are the numbers?",
@@ -204,7 +247,8 @@ const sampleQuestions = [
     option2: "21, 22",
     option3: "22, 23",
     option4: "19, 20",
-    answer: "A"
+    answer: "A",
+    category: "Mathematics"
   },
   {
     question: "Find the odd one out: 2, 6, 12, 20, 28, 35, 42",
@@ -213,7 +257,8 @@ const sampleQuestions = [
     option2: "20",
     option3: "35",
     option4: "28",
-    answer: "C"
+    answer: "C",
+    category: "Logical Reasoning"
   },
   {
     question: "If a pen costs Rs. 10 and a notebook costs Rs. 15, what is the total cost of 2 pens and 3 notebooks?",
@@ -222,7 +267,8 @@ const sampleQuestions = [
     option2: "65",
     option3: "60",
     option4: "45",
-    answer: "C"
+    answer: "C",
+    category: "Mathematics"
   },
   {
     question: "What is the sum of angles in a triangle?",
@@ -231,7 +277,8 @@ const sampleQuestions = [
     option2: "180°",
     option3: "270°",
     option4: "360°",
-    answer: "B"
+    answer: "B",
+    category: "Mathematics"
   },
   {
     question: "Find X: 14, 28, X, 112, 224",
@@ -240,7 +287,8 @@ const sampleQuestions = [
     option2: "56",
     option3: "84",
     option4: "72",
-    answer: "B"
+    answer: "B",
+    category: "General Knowledge"
   },
   {
     question: "Which shape does not have parallel sides?",
@@ -249,7 +297,8 @@ const sampleQuestions = [
     option2: "Trapezium",
     option3: "Triangle",
     option4: "Square",
-    answer: "C"
+    answer: "C",
+    category: "General Knowledge"
   },
   {
     question: "If 6x + 1 = 19, what is x?",
@@ -258,7 +307,8 @@ const sampleQuestions = [
     option2: "3",
     option3: "4",
     option4: "5",
-    answer: "D"
+    answer: "D",
+    category: "General Knowledge"
   },
   {
     question: "If a:b = 2:5 and b:c = 3:4, find a:b:c",
@@ -267,7 +317,8 @@ const sampleQuestions = [
     option2: "2:3:4",
     option3: "4:5:6",
     option4: "3:4:5",
-    answer: "A"
+    answer: "A",
+    category: "General Knowledge"
   },
   {
     question: "The average of 4, 8, 12, 16 is:",
@@ -276,7 +327,8 @@ const sampleQuestions = [
     option2: "10",
     option3: "12",
     option4: "14",
-    answer: "B"
+    answer: "B",
+    category: "Mathematics"
   },
   {
     question: "Which of the following is divisible by 11?",
@@ -285,7 +337,8 @@ const sampleQuestions = [
     option2: "550",
     option3: "671",
     option4: "154",
-    answer: "B"
+    answer: "B",
+    category: "Mathematics"
   },
   {
     question: "How many diagonals does a pentagon have?",
@@ -294,7 +347,8 @@ const sampleQuestions = [
     option2: "7",
     option3: "10",
     option4: "8",
-    answer: "A"
+    answer: "A",
+    category: "Mathematics"
   },
   {
     question: "The value of (9+6) × (4–2) = ?",
@@ -303,7 +357,8 @@ const sampleQuestions = [
     option2: "32",
     option3: "36",
     option4: "40",
-    answer: "C"
+    answer: "C",
+    category: "Mathematics"
   },
   {
     question: "If P = 2Q and Q = 3R, then P:R is:",
@@ -312,7 +367,8 @@ const sampleQuestions = [
     option2: "3:2",
     option3: "6:1",
     option4: "1:6",
-    answer: "C"
+    answer: "C",
+    category: "General Knowledge"
   },
   {
     question: "If an article is sold at Rs. 242 with a loss of 15%, what is the cost price?",
@@ -321,7 +377,8 @@ const sampleQuestions = [
     option2: "285",
     option3: "242",
     option4: "258",
-    answer: "A"
+    answer: "A",
+    category: "Mathematics"
   },
   {
     question: "Which of these is an even number?",
@@ -330,7 +387,8 @@ const sampleQuestions = [
     option2: "23",
     option3: "36",
     option4: "35",
-    answer: "C"
+    answer: "C",
+    category: "Mathematics"
   },
   {
     question: "Rita bought a book for Rs.80 and sold it for Rs.100. What is her profit percent?",
@@ -339,7 +397,8 @@ const sampleQuestions = [
     option2: "25%",
     option3: "30%",
     option4: "12.5%",
-    answer: "B"
+    answer: "B",
+    category: "Mathematics"
   },
   {
     question: "Which is the odd one out? Rose, Lily, Lotus, Mango",
@@ -348,7 +407,8 @@ const sampleQuestions = [
     option2: "Lily",
     option3: "Lotus",
     option4: "Mango",
-    answer: "D"
+    answer: "D",
+    category: "Logical Reasoning"
   },
   {
     question: "Which of the following statements is true?",
@@ -357,7 +417,8 @@ const sampleQuestions = [
     option2: "Only odd numbers can be prime",
     option3: "75 is divisible by 5",
     option4: "Squares and cubes are always equal",
-    answer: "C"
+    answer: "C",
+    category: "Logical Reasoning"
   },
   {
     question: "If 15 pencils cost Rs.45, what is the cost of 25 pencils?",
@@ -366,7 +427,8 @@ const sampleQuestions = [
     option2: "70",
     option3: "75",
     option4: "80",
-    answer: "C"
+    answer: "C",
+    category: "Mathematics"
   },
   {
     question: "42 ÷ 7 x 3 = ?",
@@ -375,7 +437,8 @@ const sampleQuestions = [
     option2: "12",
     option3: "15",
     option4: "21",
-    answer: "C"
+    answer: "C",
+    category: "General Knowledge"
   },
   // MCQ - Multiple Choice Questions 
   {
@@ -385,7 +448,8 @@ const sampleQuestions = [
     option2: "22",
     option3: "13",
     option4: "18",
-    answer: "AC"
+    answer: "AC",
+    category: "Mathematics"
   },
   {
     question: "Which of the following are fruits?",
@@ -394,7 +458,8 @@ const sampleQuestions = [
     option2: "Potato",
     option3: "Mango",
     option4: "Carrot",
-    answer: "AC"
+    answer: "AC",
+    category: "General Knowledge"
   },
   {
     question: "Pick the prime numbers",
@@ -403,7 +468,8 @@ const sampleQuestions = [
     option2: "4",
     option3: "5",
     option4: "6",
-    answer: "AC"
+    answer: "AC",
+    category: "Mathematics"
   },
   {
     question: "Select all multiples of 4",
@@ -412,7 +478,8 @@ const sampleQuestions = [
     option2: "10",
     option3: "12",
     option4: "13",
-    answer: "AC"
+    answer: "AC",
+    category: "Mathematics"
   },
   {
     question: "Which of the following are squares of integers?",
@@ -421,7 +488,8 @@ const sampleQuestions = [
     option2: "16",
     option3: "36",
     option4: "30",
-    answer: "ABC"
+    answer: "ABC",
+    category: "Mathematics"
   },
   {
     question: "Choose all vowels",
@@ -430,7 +498,8 @@ const sampleQuestions = [
     option2: "B",
     option3: "E",
     option4: "F",
-    answer: "AC"
+    answer: "AC",
+    category: "General Knowledge"
   },
   {
     question: "Select the correct statements:",
@@ -439,7 +508,8 @@ const sampleQuestions = [
     option2: "Some birds are mammals.",
     option3: "All fish can fly.",
     option4: "All snakes are reptiles.",
-    answer: "AD"
+    answer: "AD",
+    category: "Logical Reasoning"
   },
   {
     question: "Which of the following have a right angle?",
@@ -448,7 +518,8 @@ const sampleQuestions = [
     option2: "Rectangle",
     option3: "Triangle",
     option4: "Parallelogram",
-    answer: "AB"
+    answer: "AB",
+    category: "Mathematics"
   },
   {
     question: "Pick the correct spelling(s):",
@@ -457,7 +528,8 @@ const sampleQuestions = [
     option2: "Accommodate",
     option3: "Receive",
     option4: "Recieve",
-    answer: "BC"
+    answer: "BC",
+    category: "General Knowledge"
   },
   {
     question: "Water boils at which temperatures?",
@@ -466,7 +538,8 @@ const sampleQuestions = [
     option2: "212°F",
     option3: "0°C",
     option4: "0°F",
-    answer: "AB"
+    answer: "AB",
+    category: "General Knowledge"
   },
   {
     question: "Find the mammals:",
@@ -475,7 +548,8 @@ const sampleQuestions = [
     option2: "Cow",
     option3: "Sparrow",
     option4: "Dog",
-    answer: "ABD"
+    answer: "ABD",
+    category: "General Knowledge"
   },
   {
     question: "Which objects are transparent?",
@@ -484,7 +558,8 @@ const sampleQuestions = [
     option2: "Wood",
     option3: "Plastic bag",
     option4: "Air",
-    answer: "ACD"
+    answer: "ACD",
+    category: "General Knowledge"
   },
   {
     question: "Which are Indian rivers?",
@@ -493,7 +568,8 @@ const sampleQuestions = [
     option2: "Nile",
     option3: "Yamuna",
     option4: "Amazon",
-    answer: "AC"
+    answer: "AC",
+    category: "General Knowledge"
   },
   {
     question: "Find the geometric shapes:",
@@ -502,7 +578,8 @@ const sampleQuestions = [
     option2: "Rectangle",
     option3: "Hexagon",
     option4: "Polygon",
-    answer: "ABCD"
+    answer: "ABCD",
+    category: "General Knowledge"
   },
   {
     question: "Which of these are programming languages?",
@@ -511,7 +588,8 @@ const sampleQuestions = [
     option2: "Ruby",
     option3: "Apple",
     option4: "Go",
-    answer: "ABD"
+    answer: "ABD",
+    category: "General Knowledge"
   },
   {
     question: "Which statements are correct about humans?",
@@ -520,7 +598,8 @@ const sampleQuestions = [
     option2: "Can fly naturally",
     option3: "Have a brain",
     option4: "Live on Earth",
-    answer: "ACD"
+    answer: "ACD",
+    category: "Logical Reasoning"
   },
   {
     question: "Choose all cube numbers",
@@ -529,7 +608,8 @@ const sampleQuestions = [
     option2: "9",
     option3: "27",
     option4: "64",
-    answer: "ACD"
+    answer: "ACD",
+    category: "Mathematics"
   },
   {
     question: "Pick leap years",
@@ -538,7 +618,8 @@ const sampleQuestions = [
     option2: "2018",
     option3: "2020",
     option4: "2100",
-    answer: "AC"
+    answer: "AC",
+    category: "General Knowledge"
   },
   {
     question: "Find the correct pairs for countries and capitals",
@@ -547,7 +628,8 @@ const sampleQuestions = [
     option2: "India - Delhi",
     option3: "USA - New York",
     option4: "Japan - Tokyo",
-    answer: "ABD"
+    answer: "ABD",
+    category: "General Knowledge"
   },
   {
     question: "Which of these are odd numbers?",
@@ -556,7 +638,8 @@ const sampleQuestions = [
     option2: "52",
     option3: "47",
     option4: "88",
-    answer: "AC"
+    answer: "AC",
+    category: "Mathematics"
   },
   {
     question: "Pick healthy habits",
@@ -565,7 +648,8 @@ const sampleQuestions = [
     option2: "Smoking",
     option3: "Regular exercise",
     option4: "Overeating",
-    answer: "AC"
+    answer: "AC",
+    category: "General Knowledge"
   },
   {
     question: "Choose all instruments used for measuring",
@@ -574,7 +658,8 @@ const sampleQuestions = [
     option2: "Barometer",
     option3: "Stethoscope",
     option4: "Speedometer",
-    answer: "ABD"
+    answer: "ABD",
+    category: "General Knowledge"
   },
   {
     question: "Which are types of triangles?",
@@ -583,7 +668,8 @@ const sampleQuestions = [
     option2: "Equilateral",
     option3: "Scalene",
     option4: "Pentagon",
-    answer: "ABC"
+    answer: "ABC",
+    category: "Mathematics"
   },
   {
     question: "Pick the odd numbers",
@@ -592,7 +678,8 @@ const sampleQuestions = [
     option2: "18",
     option3: "23",
     option4: "20",
-    answer: "AC"
+    answer: "AC",
+    category: "Mathematics"
   },
   {
     question: "Which of these are Indian states?",
@@ -601,7 +688,8 @@ const sampleQuestions = [
     option2: "Queensland",
     option3: "Punjab",
     option4: "California",
-    answer: "AC"
+    answer: "AC",
+    category: "General Knowledge"
   },
   {
     question: "Find the mammals from the list",
@@ -610,7 +698,8 @@ const sampleQuestions = [
     option2: "Crocodile",
     option3: "Dog",
     option4: "Parrot",
-    answer: "AC"
+    answer: "AC",
+    category: "General Knowledge"
   },
   {
     question: "Which of the following are parts of a plant?",
@@ -619,7 +708,8 @@ const sampleQuestions = [
     option2: "Leaf",
     option3: "Stem",
     option4: "Stone",
-    answer: "ABC"
+    answer: "ABC",
+    category: "General Knowledge"
   },
   {
     question: "Pick the colors in the Indian flag",
@@ -628,7 +718,8 @@ const sampleQuestions = [
     option2: "Green",
     option3: "Blue",
     option4: "Black",
-    answer: "ABC"
+    answer: "ABC",
+    category: "General Knowledge"
   },
   {
     question: "Select all prime numbers",
@@ -637,7 +728,8 @@ const sampleQuestions = [
     option2: "9",
     option3: "11",
     option4: "12",
-    answer: "AC"
+    answer: "AC",
+    category: "Mathematics"
   },
   {
     question: "Find vegetables from the following",
@@ -646,7 +738,8 @@ const sampleQuestions = [
     option2: "Banana",
     option3: "Potato",
     option4: "Mango",
-    answer: "AC"
+    answer: "AC",
+    category: "General Knowledge"
   },
   {
     question: "Choose the basic operations in arithmetic",
@@ -655,7 +748,8 @@ const sampleQuestions = [
     option2: "Division",
     option3: "Multiplication",
     option4: "Exponentiation",
-    answer: "ABC"
+    answer: "ABC",
+    category: "Mathematics"
   },
   {
     question: "What is the next number in the sequence: 2, 4, 8, 16, ...?",
@@ -664,7 +758,8 @@ const sampleQuestions = [
     option2: "20",
     option3: "32",
     option4: "24",
-    answer: "C"
+    answer: "C",
+    category: "Mathematics"
   },
   {
     question: "If a shirt costs $40 after a 20% discount, what was the original price?",
@@ -673,7 +768,8 @@ const sampleQuestions = [
     option2: "$50",
     option3: "$60",
     option4: "$80",
-    answer: "C"
+    answer: "C",
+    category: "Mathematics"
   },
   {
     question: "Which number is the smallest prime?",
@@ -682,7 +778,8 @@ const sampleQuestions = [
     option2: "1",
     option3: "2",
     option4: "3",
-    answer: "C"
+    answer: "C",
+    category: "Mathematics"
   },
   {
     question: "What is the average of the first five even numbers?",
@@ -691,7 +788,8 @@ const sampleQuestions = [
     option2: "3",
     option3: "4",
     option4: "6",
-    answer: "D"
+    answer: "D",
+    category: "Mathematics"
   },
   {
     question: "Ravi is older than Amit but younger than Suresh. Who is the oldest?",
@@ -700,7 +798,8 @@ const sampleQuestions = [
     option2: "Amit",
     option3: "Suresh",
     option4: "Cannot determine",
-    answer: "C"
+    answer: "C",
+    category: "Logical Reasoning"
   },
   {
     question: "If SELL is coded as 1233, what is LESS?",
@@ -709,7 +808,8 @@ const sampleQuestions = [
     option2: "3211",
     option3: "2331",
     option4: "3213",
-    answer: "D"
+    answer: "D",
+    category: "Logical Reasoning"
   },
   {
     question: "Find the odd one out: Apple, Orange, Banana, Carrot",
@@ -718,7 +818,8 @@ const sampleQuestions = [
     option2: "Orange",
     option3: "Banana",
     option4: "Carrot",
-    answer: "D"
+    answer: "D",
+    category: "Logical Reasoning"
   },
   {
     question: "Which of the following is a square number?",
@@ -727,7 +828,8 @@ const sampleQuestions = [
     option2: "24",
     option3: "28",
     option4: "30",
-    answer: "A"
+    answer: "A",
+    category: "Mathematics"
   },
   {
     question: "Which day follows two days after Monday?",
@@ -736,7 +838,8 @@ const sampleQuestions = [
     option2: "Tuesday",
     option3: "Friday",
     option4: "Thursday",
-    answer: "A"
+    answer: "A",
+    category: "Logical Reasoning"
   },
   {
     question: "If 5x = 20, what is x?",
@@ -745,7 +848,8 @@ const sampleQuestions = [
     option2: "3",
     option3: "4",
     option4: "5",
-    answer: "C"
+    answer: "C",
+    category: "General Knowledge"
   },
   {
     question: "Which shape has 4 equal sides and 4 right angles?",
@@ -754,7 +858,8 @@ const sampleQuestions = [
     option2: "Triangle",
     option3: "Square",
     option4: "Circle",
-    answer: "C"
+    answer: "C",
+    category: "Mathematics"
   },
   {
     question: "Which is not a multiple of 3?",
@@ -763,7 +868,8 @@ const sampleQuestions = [
     option2: "18",
     option3: "15",
     option4: "22",
-    answer: "D"
+    answer: "D",
+    category: "Mathematics"
   },
   {
     question: "If all cats are animals and some animals are wild, then some cats are:",
@@ -772,7 +878,8 @@ const sampleQuestions = [
     option2: "Not animals",
     option3: "Domesticated",
     option4: "None of these",
-    answer: "D"
+    answer: "D",
+    category: "General Knowledge"
   },
   {
     question: "A train travels at 60 km/h. How far will it go in 45 minutes?",
@@ -781,7 +888,8 @@ const sampleQuestions = [
     option2: "45 km",
     option3: "60 km",
     option4: "15 km",
-    answer: "A"
+    answer: "A",
+    category: "General Knowledge"
   },
   {
     question: "What is the value of 7 × 6 – 5?",
@@ -790,7 +898,8 @@ const sampleQuestions = [
     option2: "32",
     option3: "42",
     option4: "29",
-    answer: "A"
+    answer: "A",
+    category: "Mathematics"
   },
   {
     question: "Which is the next term in the series: 3, 6, 12, 24, ...?",
@@ -799,7 +908,8 @@ const sampleQuestions = [
     option2: "48",
     option3: "50",
     option4: "30",
-    answer: "B"
+    answer: "B",
+    category: "General Knowledge"
   },
   {
     question: "What is the perimeter of a rectangle with length 8 cm and breadth 6 cm?",
@@ -808,7 +918,8 @@ const sampleQuestions = [
     option2: "24 cm",
     option3: "26 cm",
     option4: "28 cm",
-    answer: "B"
+    answer: "B",
+    category: "Mathematics"
   },
   {
     question: "Rahul ranks 5th from top and 38th from the bottom. How many students are in the class?",
@@ -817,7 +928,8 @@ const sampleQuestions = [
     option2: "42",
     option3: "43",
     option4: "44",
-    answer: "B"
+    answer: "B",
+    category: "Logical Reasoning"
   },
   {
     question: "If ‘EARTH’ is coded as ‘GCTKV’, how is ‘MOON’ coded?",
@@ -826,7 +938,8 @@ const sampleQuestions = [
     option2: "OQPP",
     option3: "OORQ",
     option4: "QSQP",
-    answer: "A"
+    answer: "A",
+    category: "Logical Reasoning"
   },
   {
     question: "Which number is formed by the product of its digits: 36, 24, 12, 10?",
@@ -835,7 +948,8 @@ const sampleQuestions = [
     option2: "24",
     option3: "12",
     option4: "10",
-    answer: "C"
+    answer: "C",
+    category: "Mathematics"
   },
   // (Keep going here ... covering all topics as requested)
   {
@@ -845,7 +959,8 @@ const sampleQuestions = [
     option2: "0.707, 0.7, 0.77, 0.777",
     option3: "0.777, 0.77, 0.707, 0.7",
     option4: "0.7, 0.77, 0.707, 0.777",
-    answer: "A"
+    answer: "A",
+    category: "Logical Reasoning"
   },
   {
     question: "If the sum of two consecutive numbers is 41, what are the numbers?",
@@ -854,7 +969,8 @@ const sampleQuestions = [
     option2: "21, 22",
     option3: "22, 23",
     option4: "19, 20",
-    answer: "A"
+    answer: "A",
+    category: "Mathematics"
   },
   {
     question: "Find the odd one out: 2, 6, 12, 20, 28, 35, 42",
@@ -863,7 +979,8 @@ const sampleQuestions = [
     option2: "20",
     option3: "35",
     option4: "28",
-    answer: "C"
+    answer: "C",
+    category: "Logical Reasoning"
   },
   {
     question: "If a pen costs Rs. 10 and a notebook costs Rs. 15, what is the total cost of 2 pens and 3 notebooks?",
@@ -872,7 +989,8 @@ const sampleQuestions = [
     option2: "65",
     option3: "60",
     option4: "45",
-    answer: "C"
+    answer: "C",
+    category: "Mathematics"
   },
   {
     question: "What is the sum of angles in a triangle?",
@@ -881,7 +999,8 @@ const sampleQuestions = [
     option2: "180°",
     option3: "270°",
     option4: "360°",
-    answer: "B"
+    answer: "B",
+    category: "Mathematics"
   },
   {
     question: "Find X: 14, 28, X, 112, 224",
@@ -890,7 +1009,8 @@ const sampleQuestions = [
     option2: "56",
     option3: "84",
     option4: "72",
-    answer: "B"
+    answer: "B",
+    category: "General Knowledge"
   },
   {
     question: "Which shape does not have parallel sides?",
@@ -899,7 +1019,8 @@ const sampleQuestions = [
     option2: "Trapezium",
     option3: "Triangle",
     option4: "Square",
-    answer: "C"
+    answer: "C",
+    category: "General Knowledge"
   },
   {
     question: "If 6x + 1 = 19, what is x?",
@@ -908,7 +1029,8 @@ const sampleQuestions = [
     option2: "3",
     option3: "4",
     option4: "5",
-    answer: "D"
+    answer: "D",
+    category: "General Knowledge"
   },
   {
     question: "If a:b = 2:5 and b:c = 3:4, find a:b:c",
@@ -917,7 +1039,8 @@ const sampleQuestions = [
     option2: "2:3:4",
     option3: "4:5:6",
     option4: "3:4:5",
-    answer: "A"
+    answer: "A",
+    category: "General Knowledge"
   },
   {
     question: "The average of 4, 8, 12, 16 is:",
@@ -926,7 +1049,8 @@ const sampleQuestions = [
     option2: "10",
     option3: "12",
     option4: "14",
-    answer: "B"
+    answer: "B",
+    category: "Mathematics"
   },
   {
     question: "Which of the following is divisible by 11?",
@@ -935,7 +1059,8 @@ const sampleQuestions = [
     option2: "550",
     option3: "671",
     option4: "154",
-    answer: "B"
+    answer: "B",
+    category: "Mathematics"
   },
   {
     question: "How many diagonals does a pentagon have?",
@@ -944,7 +1069,8 @@ const sampleQuestions = [
     option2: "7",
     option3: "10",
     option4: "8",
-    answer: "A"
+    answer: "A",
+    category: "Mathematics"
   },
   {
     question: "The value of (9+6) × (4–2) = ?",
@@ -953,7 +1079,8 @@ const sampleQuestions = [
     option2: "32",
     option3: "36",
     option4: "40",
-    answer: "C"
+    answer: "C",
+    category: "Mathematics"
   },
   {
     question: "If P = 2Q and Q = 3R, then P:R is:",
@@ -962,7 +1089,8 @@ const sampleQuestions = [
     option2: "3:2",
     option3: "6:1",
     option4: "1:6",
-    answer: "C"
+    answer: "C",
+    category: "General Knowledge"
   },
   {
     question: "If an article is sold at Rs. 242 with a loss of 15%, what is the cost price?",
@@ -971,7 +1099,8 @@ const sampleQuestions = [
     option2: "285",
     option3: "242",
     option4: "258",
-    answer: "A"
+    answer: "A",
+    category: "Mathematics"
   },
   {
     question: "Which of these is an even number?",
@@ -980,7 +1109,8 @@ const sampleQuestions = [
     option2: "23",
     option3: "36",
     option4: "35",
-    answer: "C"
+    answer: "C",
+    category: "Mathematics"
   },
   {
     question: "Rita bought a book for Rs.80 and sold it for Rs.100. What is her profit percent?",
@@ -989,7 +1119,8 @@ const sampleQuestions = [
     option2: "25%",
     option3: "30%",
     option4: "12.5%",
-    answer: "B"
+    answer: "B",
+    category: "Mathematics"
   },
   {
     question: "Which is the odd one out? Rose, Lily, Lotus, Mango",
@@ -998,7 +1129,8 @@ const sampleQuestions = [
     option2: "Lily",
     option3: "Lotus",
     option4: "Mango",
-    answer: "D"
+    answer: "D",
+    category: "Logical Reasoning"
   },
   {
     question: "Which of the following statements is true?",
@@ -1007,7 +1139,8 @@ const sampleQuestions = [
     option2: "Only odd numbers can be prime",
     option3: "75 is divisible by 5",
     option4: "Squares and cubes are always equal",
-    answer: "C"
+    answer: "C",
+    category: "Logical Reasoning"
   },
   {
     question: "If 15 pencils cost Rs.45, what is the cost of 25 pencils?",
@@ -1016,7 +1149,8 @@ const sampleQuestions = [
     option2: "70",
     option3: "75",
     option4: "80",
-    answer: "C"
+    answer: "C",
+    category: "Mathematics"
   },
   {
     question: "42 ÷ 7 x 3 = ?",
@@ -1025,7 +1159,8 @@ const sampleQuestions = [
     option2: "12",
     option3: "15",
     option4: "21",
-    answer: "C"
+    answer: "C",
+    category: "General Knowledge"
   },
   // MCQ - Multiple Choice Questions 
   {
@@ -1035,7 +1170,8 @@ const sampleQuestions = [
     option2: "22",
     option3: "13",
     option4: "18",
-    answer: "AC"
+    answer: "AC",
+    category: "Mathematics"
   },
   {
     question: "Which of the following are fruits?",
@@ -1044,7 +1180,8 @@ const sampleQuestions = [
     option2: "Potato",
     option3: "Mango",
     option4: "Carrot",
-    answer: "AC"
+    answer: "AC",
+    category: "General Knowledge"
   },
   {
     question: "Pick the prime numbers",
@@ -1053,7 +1190,8 @@ const sampleQuestions = [
     option2: "4",
     option3: "5",
     option4: "6",
-    answer: "AC"
+    answer: "AC",
+    category: "Mathematics"
   },
   {
     question: "Select all multiples of 4",
@@ -1062,7 +1200,8 @@ const sampleQuestions = [
     option2: "10",
     option3: "12",
     option4: "13",
-    answer: "AC"
+    answer: "AC",
+    category: "Mathematics"
   },
   {
     question: "Which of the following are squares of integers?",
@@ -1071,7 +1210,8 @@ const sampleQuestions = [
     option2: "16",
     option3: "36",
     option4: "30",
-    answer: "ABC"
+    answer: "ABC",
+    category: "Mathematics"
   },
   {
     question: "Choose all vowels",
@@ -1080,7 +1220,8 @@ const sampleQuestions = [
     option2: "B",
     option3: "E",
     option4: "F",
-    answer: "AC"
+    answer: "AC",
+    category: "General Knowledge"
   },
   {
     question: "Select the correct statements:",
@@ -1089,7 +1230,8 @@ const sampleQuestions = [
     option2: "Some birds are mammals.",
     option3: "All fish can fly.",
     option4: "All snakes are reptiles.",
-    answer: "AD"
+    answer: "AD",
+    category: "Logical Reasoning"
   },
   {
     question: "Which of the following have a right angle?",
@@ -1098,7 +1240,8 @@ const sampleQuestions = [
     option2: "Rectangle",
     option3: "Triangle",
     option4: "Parallelogram",
-    answer: "AB"
+    answer: "AB",
+    category: "Mathematics"
   },
   {
     question: "Pick the correct spelling(s):",
@@ -1107,7 +1250,8 @@ const sampleQuestions = [
     option2: "Accommodate",
     option3: "Receive",
     option4: "Recieve",
-    answer: "BC"
+    answer: "BC",
+    category: "General Knowledge"
   },
   {
     question: "Water boils at which temperatures?",
@@ -1116,7 +1260,8 @@ const sampleQuestions = [
     option2: "212°F",
     option3: "0°C",
     option4: "0°F",
-    answer: "AB"
+    answer: "AB",
+    category: "General Knowledge"
   },
   {
     question: "Find the mammals:",
@@ -1125,7 +1270,8 @@ const sampleQuestions = [
     option2: "Cow",
     option3: "Sparrow",
     option4: "Dog",
-    answer: "ABD"
+    answer: "ABD",
+    category: "General Knowledge"
   },
   {
     question: "Which objects are transparent?",
@@ -1134,7 +1280,8 @@ const sampleQuestions = [
     option2: "Wood",
     option3: "Plastic bag",
     option4: "Air",
-    answer: "ACD"
+    answer: "ACD",
+    category: "General Knowledge"
   },
   {
     question: "Which are Indian rivers?",
@@ -1143,7 +1290,8 @@ const sampleQuestions = [
     option2: "Nile",
     option3: "Yamuna",
     option4: "Amazon",
-    answer: "AC"
+    answer: "AC",
+    category: "General Knowledge"
   },
   {
     question: "Find the geometric shapes:",
@@ -1152,7 +1300,8 @@ const sampleQuestions = [
     option2: "Rectangle",
     option3: "Hexagon",
     option4: "Polygon",
-    answer: "ABCD"
+    answer: "ABCD",
+    category: "General Knowledge"
   },
   {
     question: "Which of these are programming languages?",
@@ -1161,7 +1310,8 @@ const sampleQuestions = [
     option2: "Ruby",
     option3: "Apple",
     option4: "Go",
-    answer: "ABD"
+    answer: "ABD",
+    category: "General Knowledge"
   },
   {
     question: "Which statements are correct about humans?",
@@ -1170,7 +1320,8 @@ const sampleQuestions = [
     option2: "Can fly naturally",
     option3: "Have a brain",
     option4: "Live on Earth",
-    answer: "ACD"
+    answer: "ACD",
+    category: "Logical Reasoning"
   },
   {
     question: "Choose all cube numbers",
@@ -1179,7 +1330,8 @@ const sampleQuestions = [
     option2: "9",
     option3: "27",
     option4: "64",
-    answer: "ACD"
+    answer: "ACD",
+    category: "Mathematics"
   },
   {
     question: "Pick leap years",
@@ -1188,7 +1340,8 @@ const sampleQuestions = [
     option2: "2018",
     option3: "2020",
     option4: "2100",
-    answer: "AC"
+    answer: "AC",
+    category: "General Knowledge"
   },
   {
     question: "Find the correct pairs for countries and capitals",
@@ -1197,7 +1350,8 @@ const sampleQuestions = [
     option2: "India - Delhi",
     option3: "USA - New York",
     option4: "Japan - Tokyo",
-    answer: "ABD"
+    answer: "ABD",
+    category: "General Knowledge"
   },
   {
     question: "Which of these are odd numbers?",
@@ -1206,7 +1360,8 @@ const sampleQuestions = [
     option2: "52",
     option3: "47",
     option4: "88",
-    answer: "AC"
+    answer: "AC",
+    category: "Mathematics"
   },
   {
     question: "Pick healthy habits",
@@ -1215,7 +1370,8 @@ const sampleQuestions = [
     option2: "Smoking",
     option3: "Regular exercise",
     option4: "Overeating",
-    answer: "AC"
+    answer: "AC",
+    category: "General Knowledge"
   },
   {
     question: "Choose all instruments used for measuring",
@@ -1224,7 +1380,8 @@ const sampleQuestions = [
     option2: "Barometer",
     option3: "Stethoscope",
     option4: "Speedometer",
-    answer: "ABD"
+    answer: "ABD",
+    category: "General Knowledge"
   },
   {
     question: "Which are types of triangles?",
@@ -1233,7 +1390,8 @@ const sampleQuestions = [
     option2: "Equilateral",
     option3: "Scalene",
     option4: "Pentagon",
-    answer: "ABC"
+    answer: "ABC",
+    category: "Mathematics"
   },
   {
     question: "Pick the odd numbers",
@@ -1242,7 +1400,8 @@ const sampleQuestions = [
     option2: "18",
     option3: "23",
     option4: "20",
-    answer: "AC"
+    answer: "AC",
+    category: "Mathematics"
   },
   {
     question: "Which of these are Indian states?",
@@ -1251,7 +1410,8 @@ const sampleQuestions = [
     option2: "Queensland",
     option3: "Punjab",
     option4: "California",
-    answer: "AC"
+    answer: "AC",
+    category: "General Knowledge"
   },
   {
     question: "Find the mammals from the list",
@@ -1260,7 +1420,8 @@ const sampleQuestions = [
     option2: "Crocodile",
     option3: "Dog",
     option4: "Parrot",
-    answer: "AC"
+    answer: "AC",
+    category: "General Knowledge"
   },
   {
     question: "Which of the following are parts of a plant?",
@@ -1269,7 +1430,8 @@ const sampleQuestions = [
     option2: "Leaf",
     option3: "Stem",
     option4: "Stone",
-    answer: "ABC"
+    answer: "ABC",
+    category: "General Knowledge"
   },
   {
     question: "Pick the colors in the Indian flag",
@@ -1278,7 +1440,8 @@ const sampleQuestions = [
     option2: "Green",
     option3: "Blue",
     option4: "Black",
-    answer: "ABC"
+    answer: "ABC",
+    category: "General Knowledge"
   },
   {
     question: "Select all prime numbers",
@@ -1287,7 +1450,8 @@ const sampleQuestions = [
     option2: "9",
     option3: "11",
     option4: "12",
-    answer: "AC"
+    answer: "AC",
+    category: "Mathematics"
   },
   {
     question: "Find vegetables from the following",
@@ -1296,7 +1460,8 @@ const sampleQuestions = [
     option2: "Banana",
     option3: "Potato",
     option4: "Mango",
-    answer: "AC"
+    answer: "AC",
+    category: "General Knowledge"
   },
   {
     question: "Choose the basic operations in arithmetic",
@@ -1305,7 +1470,8 @@ const sampleQuestions = [
     option2: "Division",
     option3: "Multiplication",
     option4: "Exponentiation",
-    answer: "ABC"
+    answer: "ABC",
+    category: "Mathematics"
   },
   // Sampling up to 100 questions, include more similarly...
 ];
@@ -1351,15 +1517,3 @@ const sampleQuestions = [
 //   }
 // };
 
-const generateMockTests = async () => {
-  try {
-    await Question.deleteMany();
-    await Question.insertMany(sampleQuestions);
-    console.log('Mock questions generated successfully');
-  } catch (err) {
-    console.error('Error generating mock questions:', err);
-  }
-};
-
-// Run the generator
-generateMockTests();

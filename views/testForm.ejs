@@ -1,57 +1,67 @@
 <% layout('/layouts/adminBoilerplate') %>
 
-<div class="card shadow-sm">
-    <div class="card-body">
-        <h4 class="fw-bold mb-3">Create Test</h4>
-        <form method="POST" action="/test/questions/new" class="needs-validation" novalidate>
-            <div class="mb-3">
-                <label for="testName" class="form-label">Test Name</label>
-                <input name="testName" placeholder="Enter name of the test" type="text" id="testName" class="form-control" required />
-            </div>
-            <div class="row gx-3">
-                <div class="col-md-4 mb-3">
-                    <label for="date" class="form-label">Test Date</label>
-                    <input name="date" placeholder="Enter date of test" type="date" id="date" class="form-control" required />
+<div class="admin-form-container">
+    <div class="admin-form-card">
+        <div class="admin-form-header test-form">
+            <h4>Create Test</h4>
+        </div>
+        <div class="admin-form-body">
+            <form method="POST" action="/test/questions/new" class="needs-validation" novalidate>
+                <div class="mb-4">
+                    <label for="testName" class="form-label">Test Name</label>
+                    <input name="testName" placeholder="Enter name of the test" type="text" id="testName" class="form-control" required />
                 </div>
-                <div class="col-md-4 mb-3">
-                    <label for="time" class="form-label">Test Timing</label>
-                    <input name="time" placeholder="Enter time for the test" type="time" id="time" class="form-control" required />
+                
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label for="date" class="form-label">Test Date</label>
+                        <input name="date" placeholder="Enter date of test" type="date" id="date" class="form-control" required />
+                    </div>
+                    <div class="col-md-4">
+                        <label for="time" class="form-label">Test Timing</label>
+                        <input name="time" placeholder="Enter time for the test" type="time" id="time" class="form-control" required />
+                    </div>
+                    <div class="col-md-4">
+                        <label for="duration" class="form-label">Duration (minutes)</label>
+                        <input name="duration" placeholder="Enter duration" type="number" id="duration" class="form-control" required />
+                    </div>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <label for="duration" class="form-label">Duration (minutes)</label>
-                    <input name="duration" placeholder="Enter duration" type="number" id="duration" class="form-control" required />
+                
+                <div class="mb-4">
+                    <label for="branch" class="form-label">Select Branch</label>
+                    <select class="form-select" id="branch" name="branch" required>
+                        <option value="" disabled selected>Select branch</option>
+                        <option value="lr">Logical Reasoning and Aptitude</option>
+                        <option value="ai">Artificial Intelligence</option>
+                        <option value="che">Chemical Engineering</option>
+                        <option value="chm">Chemistry</option>
+                        <option value="ce">Civil Engineering</option>
+                        <option value="cse">Computer Science and Engineering</option>
+                        <option value="ee">Electrical Engineering</option>
+                        <option value="ece">Electronics Engineering</option>
+                        <option value="hss">Humanities and Social Sciences</option>
+                        <option value="ms">Management Studies</option>
+                        <option value="math">Mathematics</option>
+                        <option value="me">Mechanical Engineering</option>
+                        <option value="phy">Physics</option>
+                    </select>
                 </div>
-            </div>
-            <div class="mb-3">
-                <label for="branch" class="form-label">Select Branch</label>
-                <select class="form-select form-select-lg" id="branch" name="branch" required>
-                    <option value="" disabled selected>Select branch</option>
-                    <option value="lr">Logical Reasoning and Aptitude</option>
-                    <option value="ai">Artificial Intelligence</option>
-                    <option value="che">Chemical Engineering</option>
-                    <option value="chm">Chemistry</option>
-                    <option value="ce">Civil Engineering</option>
-                    <option value="cse">Computer Science and Engineering</option>
-                    <option value="ee">Electrical Engineering</option>
-                    <option value="ece">Electronics Engineering</option>
-                    <option value="hss">Humanities and Social Sciences</option>
-                    <option value="ms">Management Studies</option>
-                    <option value="math">Mathematics</option>
-                    <option value="me">Mechanical Engineering</option>
-                    <option value="phy">Physics</option>
-                </select>
-            </div>
 
-            <div id="categories-section" style="display:none;">
-                <h5>Categories</h5>
-                <div id="categories-container" class="mb-3"></div>
-                <button type="button" class="btn btn-outline-primary btn-sm mb-3" id="add-category-btn"><i class="fas fa-plus"></i> Add Category</button>
-            </div>
+                <div id="categories-section" style="display:none;">
+                    <h5>Categories</h5>
+                    <div id="categories-container" class="mb-3"></div>
+                    <button type="button" class="btn btn-outline-primary" id="add-category-btn">
+                        <i class="fas fa-plus"></i> Add Category
+                    </button>
+                </div>
 
-            <div class="d-grid">
-                <button class="btn btn-primary">Submit</button>
-            </div>
-        </form>
+                <div class="text-center mt-4">
+                    <button class="btn btn-primary btn-lg px-5">
+                        <i class="fas fa-save"></i> Create Test
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -66,27 +76,90 @@
         document.getElementById('categories-container').innerHTML = '';
         addCategoryRow();
     });
-    const addBtn = document.getElementById('add-category-btn'); if (addBtn) addBtn.addEventListener('click', addCategoryRow);
+    const addBtn = document.getElementById('add-category-btn'); 
+    if (addBtn) addBtn.addEventListener('click', addCategoryRow);
+    
     function addCategoryRow() {
         const container = document.getElementById('categories-container');
-        const row = document.createElement('div'); row.className='row mb-2 align-items-end category-row';
-        let options = availableCategories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+        const row = document.createElement('div'); 
+        row.className='row category-row align-items-end';
+        let options = availableCategories.map(cat => `<option value="${cat.category}" data-count="${cat.count}">${cat.category} (${cat.count} questions)</option>`).join('');
         row.innerHTML = `
-            <div class="col-8 text-start">
+            <div class="col-md-7">
                 <label class="form-label">Category</label>
-                <select name="category_name" class="form-select" required>
+                <select name="category_name" class="form-select category-select" required>
                     <option value="" disabled selected>Select category</option>
                     ${options}
                 </select>
             </div>
-            <div class="col-3 text-start">
-                <label class="form-label">Count</label>
-                <input name="catNumberOfQues" type="number" class="form-control" min="1" required />
+            <div class="col-md-4">
+                <label class="form-label">Question Count</label>
+                <input name="catNumberOfQues" type="number" class="form-control question-count" min="1" required />
+                <div class="invalid-feedback"></div>
             </div>
-            <div class="col-1 d-flex align-items-end justify-content-center">
-                <button type="button" class="btn btn-outline-danger border-0 remove-row"><i class="fas fa-trash"></i></button>
+            <div class="col-md-1 text-center">
+                <button type="button" class="remove-row">
+                    <i class="fas fa-trash"></i>
+                </button>
             </div>`;
         container.appendChild(row);
+        
+        // Add event listeners
         row.querySelector('.remove-row').addEventListener('click', () => row.remove());
+        
+        const categorySelect = row.querySelector('.category-select');
+        const countInput = row.querySelector('.question-count');
+        const feedback = row.querySelector('.invalid-feedback');
+        
+        // Validate question count when category changes or count is entered
+        function validateCount() {
+            const selectedOption = categorySelect.selectedOptions[0];
+            if (selectedOption && countInput.value) {
+                const availableCount = parseInt(selectedOption.dataset.count);
+                const requestedCount = parseInt(countInput.value);
+                
+                if (requestedCount > availableCount) {
+                    countInput.classList.add('is-invalid');
+                    feedback.textContent = `Only ${availableCount} questions available in this category`;
+                    return false;
+                } else {
+                    countInput.classList.remove('is-invalid');
+                    feedback.textContent = '';
+                    return true;
+                }
+            }
+            return true;
+        }
+        
+        categorySelect.addEventListener('change', validateCount);
+        countInput.addEventListener('input', validateCount);
     }
+    
+    // Form validation before submission
+    document.querySelector('form').addEventListener('submit', function(e) {
+        let isValid = true;
+        const categoryRows = document.querySelectorAll('.category-row');
+        
+        categoryRows.forEach(row => {
+            const categorySelect = row.querySelector('.category-select');
+            const countInput = row.querySelector('.question-count');
+            const selectedOption = categorySelect.selectedOptions[0];
+            
+            if (selectedOption && countInput.value) {
+                const availableCount = parseInt(selectedOption.dataset.count);
+                const requestedCount = parseInt(countInput.value);
+                
+                if (requestedCount > availableCount) {
+                    isValid = false;
+                    countInput.classList.add('is-invalid');
+                    row.querySelector('.invalid-feedback').textContent = `Only ${availableCount} questions available in this category`;
+                }
+            }
+        });
+        
+        if (!isValid) {
+            e.preventDefault();
+            alert('Please fix the validation errors before submitting.');
+        }
+    });
 </script>

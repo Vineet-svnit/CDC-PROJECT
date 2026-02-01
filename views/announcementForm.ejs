@@ -1,27 +1,36 @@
 <% layout('/layouts/adminBoilerplate') %>
 
-<div class="card shadow-sm">
-  <div class="card-body">
-    <h4 class="fw-bold mb-3">Create Announcement</h4>
-    <form method="POST" action="/announcement/new" class="needs-validation" novalidate>
-      <div class="mb-3">
-        <label for="title" class="form-label">Title</label>
-        <input name="title" placeholder="Enter title" type="text" id="title" class="form-control" required />
-      </div>
-      <div class="mb-3">
-        <label for="body" class="form-label">Message</label>
-        <div id="editor" style="height: 200px;"></div>
-        <input type="hidden" name="body" id="body" class="form-control" required>
-        <div class="invalid-feedback">Message is required.</div>
-      </div>
-      <div class="mb-3">
-        <label for="issued_by" class="form-label">Issued by</label>
-        <input name="issued_by" placeholder="Enter the issuer" type="text" id="issued_by" class="form-control" required />
-      </div>
-      <div class="d-grid">
-        <button class="btn btn-primary">Create</button>
-      </div>
-    </form>
+<div class="admin-form-container">
+  <div class="admin-form-card">
+    <div class="admin-form-header announcement-form">
+      <h4>Create Announcement</h4>
+    </div>
+    <div class="admin-form-body">
+      <form method="POST" action="/announcement/new" class="needs-validation" novalidate>
+        <div class="mb-4">
+          <label for="title" class="form-label">Title</label>
+          <input name="title" placeholder="Enter announcement title" type="text" id="title" class="form-control" required />
+        </div>
+        
+        <div class="mb-4">
+          <label for="body" class="form-label">Message</label>
+          <div id="editor" style="height: 200px;"></div>
+          <input type="hidden" name="body" id="body" class="form-control" required>
+          <div class="invalid-feedback">Message is required.</div>
+        </div>
+        
+        <div class="mb-4">
+          <label for="issued_by" class="form-label">Issued by</label>
+          <input name="issued_by" placeholder="Enter the issuer name" type="text" id="issued_by" class="form-control" required />
+        </div>
+        
+        <div class="text-center">
+          <button class="btn btn-primary btn-lg px-5">
+            <i class="fas fa-bullhorn"></i> Create Announcement
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 
@@ -31,13 +40,26 @@
   const quill = new Quill('#editor', {
     theme: 'snow',
     placeholder: 'Write your announcement here...',
-    modules: { toolbar: [['bold','italic','underline'], [{ 'list': 'ordered' }, { 'list': 'bullet' }], ['link']] }
+    modules: { 
+      toolbar: [
+        ['bold','italic','underline'], 
+        [{ 'list': 'ordered' }, { 'list': 'bullet' }], 
+        ['link']
+      ] 
+    }
   });
+  
   document.querySelector('form').addEventListener('submit', function (event) {
     const content = quill.root.innerHTML.trim();
     const isEmpty = content === '' || content === '<p><br></p>';
     document.querySelector('#body').value = content;
-    if (isEmpty) { event.preventDefault(); event.stopPropagation(); document.querySelector('#body').classList.add('is-invalid'); }
-    else { document.querySelector('#body').classList.remove('is-invalid'); }
+    
+    if (isEmpty) { 
+      event.preventDefault(); 
+      event.stopPropagation(); 
+      document.querySelector('#body').classList.add('is-invalid'); 
+    } else { 
+      document.querySelector('#body').classList.remove('is-invalid'); 
+    }
   });
 </script>

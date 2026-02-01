@@ -6,154 +6,166 @@
   const disableSelect = started ? 'disabled' : '';
 %>
 
-<form method="POST" action="/test/<%= test._id %>?_method=PUT" class="needs-validation" novalidate>
+<div class="admin-form-container">
+  <form method="POST" action="/test/<%= test._id %>?_method=PUT" class="needs-validation" novalidate>
 
-  <!-- ================= Test Meta ================= -->
-  <div class="card shadow-sm mb-4">
-    <div class="card-body">
-      <h4 class="fw-bold mb-3">Edit Test</h4>
-
-      <div class="mb-3">
-        <label class="form-label">Test Name</label>
-        <input
-          name="testName"
-          value="<%= test.testName %>"
-          type="text"
-          class="form-control"
-          required
-          <%= readOnlyEdit %>
-        />
+    <!-- ================= Test Meta ================= -->
+    <div class="admin-form-card mb-4">
+      <div class="admin-form-header edit-form">
+        <h4>Edit Test</h4>
       </div>
-
-      <div class="row gx-3 mb-3">
-        <div class="col">
-          <label class="form-label">Test Date</label>
+      <div class="admin-form-body">
+        <div class="mb-4">
+          <label class="form-label">Test Name</label>
           <input
-            name="date"
-            value="<%= getDateInput(test.startTime) %>"
-            type="date"
+            name="testName"
+            value="<%= test.testName %>"
+            type="text"
             class="form-control"
             required
             <%= readOnlyEdit %>
           />
         </div>
 
-        <div class="col">
-          <label class="form-label">Test Time</label>
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label class="form-label">Test Date</label>
+            <input
+              name="date"
+              value="<%= getDateInput(test.startTime) %>"
+              type="date"
+              class="form-control"
+              required
+              <%= readOnlyEdit %>
+            />
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Test Time</label>
+            <input
+              name="time"
+              value="<%= getTimeInput(test.startTime) %>"
+              type="time"
+              class="form-control"
+              required
+              <%= readOnlyEdit %>
+            />
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label">Duration (minutes)</label>
           <input
-            name="time"
-            value="<%= getTimeInput(test.startTime) %>"
-            type="time"
+            name="duration"
+            value="<%= test.duration %>"
+            type="number"
+            min="1"
             class="form-control"
             required
             <%= readOnlyEdit %>
           />
         </div>
-      </div>
 
-      <div class="mb-3">
-        <label class="form-label">Duration (minutes)</label>
-        <input
-          name="duration"
-          value="<%= test.duration %>"
-          type="number"
-          min="1"
-          class="form-control"
-          required
-          <%= readOnlyEdit %>
-        />
-      </div>
+        <div class="mb-4">
+          <label class="form-label">Branch</label>
+          <select class="form-select" <%= disableSelect %>>
+            <option value="lr" <%= test.branch=='lr' ? 'selected' : '' %>>Logical Reasoning</option>
+            <option value="ai" <%= test.branch=='ai' ? 'selected' : '' %>>Artificial Intelligence</option>
+            <option value="cse" <%= test.branch=='cse' ? 'selected' : '' %>>Computer Science</option>
+            <option value="me" <%= test.branch=='me' ? 'selected' : '' %>>Mechanical</option>
+          </select>
+          <!-- IMPORTANT: disabled select does not submit -->
+          <input type="hidden" name="branch" value="<%= test.branch %>">
+        </div>
 
-      <div class="mb-3">
-        <label class="form-label">Branch</label>
-        <select class="form-select" <%= disableSelect %>>
-          <option value="lr" <%= test.branch=='lr' ? 'selected' : '' %>>Logical Reasoning</option>
-          <option value="ai" <%= test.branch=='ai' ? 'selected' : '' %>>Artificial Intelligence</option>
-          <option value="cse" <%= test.branch=='cse' ? 'selected' : '' %>>Computer Science</option>
-          <option value="me" <%= test.branch=='me' ? 'selected' : '' %>>Mechanical</option>
-        </select>
-        <!-- IMPORTANT: disabled select does not submit -->
-        <input type="hidden" name="branch" value="<%= test.branch %>">
-      </div>
-
-      <div class="mb-3">
-        <h5>Categories</h5>
-        <ul class="list-group list-group-flush">
-          <% test.category.forEach(cat => { %>
-            <li class="list-group-item d-flex justify-content-between px-0">
-              <%= cat.category_name %>
-              <span class="badge bg-primary"><%= cat.numberOfQues %></span>
-            </li>
-          <% }) %>
-        </ul>
+        <div class="mb-4">
+          <h6 class="fw-bold mb-3">
+            <i class="fas fa-tags text-primary"></i> Categories
+          </h6>
+          <div class="list-group">
+            <% test.category.forEach(cat => { %>
+              <div class="list-group-item d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-folder text-muted me-2"></i><%= cat.category_name %></span>
+                <span class="badge bg-primary">
+                  <i class="fas fa-question-circle"></i> <%= cat.numberOfQues %>
+                </span>
+              </div>
+            <% }) %>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- ================= Questions ================= -->
-  <% for (let i = 0; i < test.numberOfQues; i++) { %>
-    <div class="card mb-3">
-      <div class="card-body">
-
-        <strong>Question <%= i + 1 %></strong>
-
-        <div class="mb-3">
-          <label class="form-label">Question</label>
-          <input
-            name="questions[<%= i %>][question]"
-            value="<%= test.questions[i].question %>"
-            class="form-control"
-            <%= readOnlyEdit %>
-          />
+    <!-- ================= Questions ================= -->
+    <% for (let i = 0; i < test.numberOfQues; i++) { %>
+      <div class="question-card">
+        <div class="question-card-header">
+          Question <%= i + 1 %>
         </div>
+        <div class="question-card-body">
 
-        <div class="mb-3">
-          <label class="form-label">Type</label>
-          <select
-            name="questions[<%= i %>][_type]"
-            class="form-select"
-            <%= disableSelect %>
-          >
-            <option value="SCQ" <%= test.questions[i]._type==='SCQ' ? 'selected' : '' %>>Single Correct</option>
-            <option value="MCQ" <%= test.questions[i]._type==='MCQ' ? 'selected' : '' %>>Multiple Correct</option>
-          </select>
-        </div>
-
-        <% for (let opt = 1; opt <= 4; opt++) { %>
-          <div class="mb-2">
-            <label class="form-label">Option <%= opt %></label>
+          <div class="mb-3">
+            <label class="form-label">Question</label>
             <input
-              name="questions[<%= i %>][option<%= opt %>]"
-              value="<%= test.questions[i]['option'+opt] %>"
+              name="questions[<%= i %>][question]"
+              value="<%= test.questions[i].question %>"
               class="form-control"
               <%= readOnlyEdit %>
             />
           </div>
-        <% } %>
 
-        <div class="mb-3">
-          <label class="form-label">Answer</label>
+          <div class="mb-3">
+            <label class="form-label">Type</label>
+            <select
+              name="questions[<%= i %>][_type]"
+              class="form-select"
+              <%= disableSelect %>
+            >
+              <option value="SCQ" <%= test.questions[i]._type==='SCQ' ? 'selected' : '' %>>Single Correct</option>
+              <option value="MCQ" <%= test.questions[i]._type==='MCQ' ? 'selected' : '' %>>Multiple Correct</option>
+            </select>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <% for (let opt = 1; opt <= 4; opt++) { %>
+              <div class="col-md-6">
+                <label class="form-label">Option <%= opt %></label>
+                <input
+                  name="questions[<%= i %>][option<%= opt %>]"
+                  value="<%= test.questions[i]['option'+opt] %>"
+                  class="form-control"
+                  <%= readOnlyEdit %>
+                />
+              </div>
+            <% } %>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Answer</label>
+            <input
+              name="questions[<%= i %>][answer]"
+              value="<%= test.questions[i].answer %>"
+              class="form-control"
+              required
+            />
+          </div>
+
           <input
-            name="questions[<%= i %>][answer]"
-            value="<%= test.questions[i].answer %>"
-            class="form-control"
-            required
+            type="hidden"
+            name="questions[<%= i %>][_id]"
+            value="<%= test.questions[i]._id %>"
           />
         </div>
-
-        <input
-          type="hidden"
-          name="questions[<%= i %>][_id]"
-          value="<%= test.questions[i]._id %>"
-        />
       </div>
+    <% } %>
+
+    <div class="text-center mb-5">
+      <button class="btn btn-success btn-lg px-5">
+        <i class="fas fa-save"></i> Update Test
+      </button>
     </div>
-  <% } %>
 
-  <div class="text-center mb-5">
-    <button class="btn btn-success btn-lg px-5">Update Test</button>
-  </div>
-
-</form>
+  </form>
+</div>
 
 <script src="/js/script.js"></script>
