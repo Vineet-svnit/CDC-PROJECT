@@ -5,7 +5,7 @@
     <key>originatorVersion</key>
     <string>SEB_Win_2.1.1</string>
     <key>startURL</key>
-    <string>http://localhost:5000/</string>
+    <string>https://cdc-project-w2zb.onrender.com/</string>
     <key>startResource</key>
     <string />
     <key>sebServerURL</key>
@@ -201,7 +201,7 @@
     <key>allowUploads</key>
     <false />
     <key>examKeySalt</key>
-    <data>sw3oN3UYZFQM5e5pGGbPZ3PQNXEHNDKYikeCWfff1ZA=</data>
+    <data>9fbPcOm/FNBYx5sTLjLPG7LCBy7/aLCMpevl+NQs02I=</data>
     <key>examSessionClearCookiesOnEnd</key>
     <false />
     <key>examSessionClearCookiesOnStart</key>
@@ -213,9 +213,9 @@
     <key>sendBrowserExamKey</key>
     <true />
     <key>quitURL</key>
-    <string>http://localhost:5000/submission</string>
+    <string>https://cdc-project-w2zb.onrender.com/submission</string>
     <key>quitURLConfirm</key>
-    <false />
+    <true />
     <key>restartExamURL</key>
     <string />
     <key>restartExamUseStartURL</key>
