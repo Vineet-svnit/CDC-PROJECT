@@ -121,7 +121,7 @@ const sessionOptions = {
     name: "exam.sid", // custom name (good practice)
     secret: process.env.SECRET,
     resave: false,
-    saveUninitialized: false, // VERY IMPORTANT
+    saveUninitialized: true, // !!!!!! LOGIN ERR CAUSER
     cookie: {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production", // HTTPS only in prod
