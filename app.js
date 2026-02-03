@@ -118,7 +118,7 @@ const store = MongoStore.create({
 
 const sessionOptions = {
     store,
-    name: "exam.sid", // custom name (good practice)
+    // name: "exam.sid", // custom name (good practice)
     secret: process.env.SECRET,
     resave: false,
     saveUninitialized: true, // !!!!!! LOGIN ERR CAUSER
