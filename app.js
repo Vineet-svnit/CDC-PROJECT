@@ -126,7 +126,8 @@ const sessionOptions = {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production", // HTTPS only in prod
         // sameSite: "lax", // REQUIRED for Chrome → SEB
-        maxAge: 1000 * 60 * 60 * 24 * 1 // 1 day
+        expires: Date.now() + 60 * 60 * 24 * 1000 * 7,
+        maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
     }
 };
 
