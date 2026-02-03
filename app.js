@@ -125,7 +125,7 @@ const sessionOptions = {
     cookie: {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production", // HTTPS only in prod
-        sameSite: "lax", // REQUIRED for Chrome → SEB
+        // sameSite: "lax", // REQUIRED for Chrome → SEB
         maxAge: 1000 * 60 * 60 * 24 * 1 // 1 day
     }
 };
