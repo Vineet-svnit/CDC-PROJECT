@@ -121,11 +121,11 @@ const sessionOptions = {
     // name: "exam.sid", // custom name (good practice)
     secret: process.env.SECRET,
     resave: false,
-    saveUninitialized: true, // !!!!!! LOGIN ERR CAUSER
+    saveUninitialized: false, // !!!!!! LOGIN ERR CAUSER
     cookie: {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production", // HTTPS only in prod
-        // sameSite: "lax", // REQUIRED for Chrome → SEB
+        // secure: process.env.NODE_ENV === "production", // HTTPS only in prod
+        sameSite: "lax", // REQUIRED for Chrome → SEB
         expires: Date.now() + 60 * 60 * 24 * 1000 * 7,
         maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
     }
