@@ -493,20 +493,6 @@ body {
     100% { background-position: -200% 0; }
 }
 
-/* ===== DARK MODE SUPPORT ===== */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --admin-bg: #0f172a;
-        --admin-surface: #1e293b;
-        --admin-surface-hover: #334155;
-        --admin-border: #334155;
-        --admin-border-light: #475569;
-        --admin-text: #f1f5f9;
-        --admin-text-muted: #94a3b8;
-        --admin-text-light: #64748b;
-    }
-}
-
 @media (max-width: 768px) {
   .section-header {
     flex-direction: column;
