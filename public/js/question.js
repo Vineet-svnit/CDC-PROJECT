@@ -69,82 +69,103 @@ function display(index) {
 
     //Show instructions
     instructionElement.innerHTML = "";
-    let instructionHTML = `<h3><u>Instructions</u></h3><ul>`;
     if (q._type === "SCQ") {
-        instructionElement.innerHTML += `
-                        <li>
-                            <strong>SCQ (Single Correct Question)</strong>: 
-                            <em>Below is a single correct question with <b>4</b> options — select only one.</em><br>
-                            <span style="color:green;">+3 marks</span> for correct, 
-                            <span style="color:gray;">0 marks</span> for wrong or unattempted.
-                        </li>
-                    `;
+        instructionElement.innerHTML = `
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <i class="fas fa-info-circle"></i>
+                <strong class="text-uppercase small fw-bold">Single Correct Question</strong>
+            </div>
+            <p class="mb-2">Choose the best answer from the 4 options below.</p>
+            <div class="d-flex gap-3 small">
+                <span class="text-success"><i class="fas fa-plus-circle me-1"></i>+3 Marks</span>
+                <span class="text-muted"><i class="fas fa-minus-circle me-1"></i>0 Negative</span>
+            </div>
+        `;
+    } else if (q._type === "MCQ") {
+        instructionElement.innerHTML = `
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <i class="fas fa-info-circle"></i>
+                <strong class="text-uppercase small fw-bold">Multiple Correct Question</strong>
+            </div>
+            <p class="mb-2">Select all correct options. Partial marks awarded if none are wrong.</p>
+            <div class="d-flex gap-3 small">
+                <span class="text-success"><i class="fas fa-plus-circle me-1"></i>+4 Marks</span>
+                <span class="text-muted"><i class="fas fa-dot-circle me-1"></i>Partial Available</span>
+            </div>
+        `;
     }
-    else if (q._type === "MCQ") {
-        instructionElement.innerHTML += `
-<li>
-    <strong>MCQ (Multiple Correct Question)</strong>: 
-    <em>Below is a multiple correct question with <b>4</b> options — select all that apply.</em><br>
-    <span style="color:green;">+4 marks</span> for all correct selections,<br>
-    <span style="color:red;">0 marks</span> for any wrong selection.<br>
-    Partial marking: if only some correct options are selected (and none wrong), marks awarded will be proportional to the number of correct options chosen.<br>
-    <span style="color:gray;">0 marks</span> for unattempted.
-</li>
-                        
-                    `;
-    }
-    instructionElement.innerHTML += `</ul>`;
+
+    instructionElement.style.display = "block";
+
     // Show question
     ques.innerHTML = `
-        ${q.questionImage ? `<img src="${q.questionImage}" alt="Question">` : ""}
-        ${q.question ? `<p>${q.question}</p>` : ""}
+        <div class="question-text">
+            ${q.question ? `<p>${q.question}</p>` : ""}
+            ${q.questionImage ? `<img src="${q.questionImage}" alt="Question" class="img-fluid rounded shadow-sm">` : ""}
+        </div>
     `;
 
     // Generate options HTML
     const inputType = q._type === "SCQ" ? "radio" : "checkbox";
-    options.innerHTML = `
-        <div style="display:flex; justify-content: space-between; gap: 15px; align-items: center;">
-        <input type="${inputType}" name="options" id="opt1">
-        <label for="opt1" style="width: 100%">
-            ${q.image1 ? `<img src="${q.image1}" alt="Option 1">` : ""}
-            ${q.option1 ? `<p>${q.option1}</p>` : ""}
-        </label></div><br>
+    options.innerHTML = "";
 
-        <div style="display:flex; justify-content: space-between; gap: 15px; align-items: center;">
-        <input type="${inputType}" name="options" id="opt2">
-        <label for="opt2" style="width: 100%">
-            ${q.image2 ? `<img src="${q.image2}" alt="Option 2">` : ""}
-            ${q.option2 ? `<p>${q.option2}</p>` : ""}
-        </label></div><br>
+    for (let i = 1; i <= 4; i++) {
+        const optText = q[`option${i}`];
+        const optImg = q[`image${i}`];
+        if (!optText && !optImg) continue;
 
-        <div style="display:flex; justify-content: space-between; gap: 15px; align-items: center;">
-        <input type="${inputType}" name="options" id="opt3">
-        <label for="opt3" style="width: 100%">
-            ${q.image3 ? `<img src="${q.image3}" alt="Option 3">` : ""}
-            ${q.option3 ? `<p>${q.option3}</p>` : ""}
-        </label></div><br>
+        const div = document.createElement("div");
+        div.className = "option-item";
+        div.id = `wrap-opt${i}`;
 
-        <div style="display:flex; justify-content: space-between; gap: 15px; align-items: center;">
-        <input type="${inputType}" name="options" id="opt4">
-        <label for="opt4" style="width: 100%">
-            ${q.image4 ? `<img src="${q.image4}" alt="Option 4">` : ""}
-            ${q.option4 ? `<p>${q.option4}</p>` : ""}
-        </label></div><br>
-    `;
+        div.innerHTML = `
+            <input type="${inputType}" name="options" id="opt${i}">
+            <label for="opt${i}">
+                <div class="d-flex align-items-center gap-3">
+                    ${optImg ? `<img src="${optImg}" alt="Option ${i}" style="max-height: 120px; border-radius: 8px;">` : ""}
+                    ${optText ? `<span>${optText}</span>` : ""}
+                </div>
+            </label>
+        `;
 
-    // Restore checked state from submissions
+        div.addEventListener("click", (e) => {
+            if (e.target.tagName !== "INPUT") {
+                const input = div.querySelector("input");
+                input.checked = inputType === "radio" ? true : !input.checked;
+                input.dispatchEvent(new Event("change"));
+            }
+        });
+
+        options.appendChild(div);
+    }
+
+    // Restore checked state and highlight
     if (sub.answer) {
         const answers = sub.answer.split('');
         answers.forEach(ans => {
             const optNum = ans.charCodeAt(0) - 64; // A->1, B->2, etc.
             const input = document.querySelector(`#opt${optNum}`);
-            if (input) input.checked = true;
+            const wrap = document.querySelector(`#wrap-opt${optNum}`);
+            if (input) {
+                input.checked = true;
+                if (wrap) wrap.classList.add("selected");
+            }
         });
     }
 
-    // Attach event listeners to new inputs
+    // Attach event listeners for highlight and data update
     document.querySelectorAll("input[name='options']").forEach(input => {
-        input.addEventListener("change", () => updateData(input.id, index));
+        input.addEventListener("change", () => {
+            // Update highlights
+            if (inputType === "radio") {
+                document.querySelectorAll(".option-item").forEach(oi => oi.classList.remove("selected"));
+            }
+            const wrap = input.closest(".option-item");
+            if (input.checked) wrap.classList.add("selected");
+            else wrap.classList.remove("selected");
+
+            updateData(input.id, index);
+        });
     });
 }
 
@@ -180,12 +201,16 @@ function count_atm_unatm_mark() {
 
     navdivs.forEach((div, i) => {
         // Reset all classes first
-        div.classList.remove("atm", "unatm", "mfr");
+        div.classList.remove("atm", "unatm", "mfr", "current");
+
+        if (i === index) {
+            div.classList.add("current");
+        }
 
         if (submissions[i].isMarked) {
             mfr++;
             div.classList.add("mfr");
-        } 
+        }
         if (submissions[i].answer) {
             at++;
             div.classList.add("atm");
@@ -198,5 +223,5 @@ function count_atm_unatm_mark() {
     // Update counters
     document.querySelector(".at").textContent = at;
     document.querySelector(".unat").textContent = unat;
-    document.querySelector(".mark").textContent = mfr;
+    document.querySelector(".marked-val").textContent = mfr;
 }

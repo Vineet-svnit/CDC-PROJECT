@@ -465,20 +465,19 @@ app.get("/", isLoggedIn, async (req, res) => {
         }
     });
     // console.log(req.session.testExists);
-    // const ua = req.headers["user-agent"] || "";
-    // const sebKey = req.headers["x-safeexambrowser-requesthash"];
+    const ua = req.headers["user-agent"] || "";
+    const sebKey = req.headers["x-safeexambrowser-requesthash"];
 
-    // const isSEB =
-    //     ua.includes("SEB") ||
-    //     ua.includes("SafeExamBrowser");
-    //     console.log('not-worked ', isSEB, sebKey, req.session.testExists);
-    // const doesTestExist = req.session.testExists;
-    // if (isSEB && sebKey && typeof doesTestExist !== "undefined") {
-    //     console.log('worked ', isSEB, sebKey, doesTestExist);
-    //     delete req.session.testExists;
-    //     res.redirect(`/tests/${doesTestExist}`);
-    //     return;
-    // }
+    const isSEB =
+        ua.includes("SEB") ||
+        ua.includes("SafeExamBrowser");
+
+    if (isSEB && sebKey && req.user.pendingTestId) {
+        const pendingId = req.user.pendingTestId;
+        req.user.pendingTestId = undefined;
+        await req.user.save();
+        return res.redirect(`/tests/${pendingId}`);
+    }
     res.render("user/home.ejs", { allTests, user: req.user, page: "home" });
 });
 
@@ -596,7 +595,7 @@ app.get("/submission/:id", isLoggedIn, async (req, res) => {
     const user = await User.findById(req.user._id);
     const submission = user.submissions.find(s => s.test_id.equals(testId));
     // console.log(submission);
-    res.render("submission", { test, submission, page: "submission" });
+    res.render("submission", { test, submission, page: "submission", isProd: process.env.NODE_ENV === 'production' });
 })
 
 app.post("/submission/:id", isLoggedIn, checkSubmit, async (req, res) => {

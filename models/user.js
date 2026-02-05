@@ -33,11 +33,15 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
+    pendingTestId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Test'
+    },
     submissions: [
         {
-            test_id:{
-                type:Schema.Types.ObjectId,
-                ref:"Test"
+            test_id: {
+                type: Schema.Types.ObjectId,
+                ref: "Test"
             },
             // questions: [{
             //     questionImage: {

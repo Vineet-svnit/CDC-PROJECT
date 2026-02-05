@@ -10,7 +10,7 @@
 //   next();
 // }
 
-function sebOnly(req, res, next) {
+async function sebOnly(req, res, next) {
   const ua = req.headers["user-agent"] || "";
   const sebKey = req.headers["x-safeexambrowser-requesthash"];
 
@@ -18,9 +18,12 @@ function sebOnly(req, res, next) {
     ua.includes("SEB") ||
     ua.includes("SafeExamBrowser");
 
-    if (!isSEB || !sebKey) {
-      // req.session.testExists = req.params.id;
-      return res.status(403).render("sebRequired", { page: "sebRequired", isProd: process.env.NODE_ENV === "production" });
+  if (!isSEB || !sebKey) {
+    if (req.user) {
+      req.user.pendingTestId = req.params.id;
+      await req.user.save();
+    }
+    return res.status(403).render("sebRequired", { page: "sebRequired", isProd: process.env.NODE_ENV === "production" });
   }
   next();
 }
