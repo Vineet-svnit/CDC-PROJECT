@@ -104,17 +104,33 @@ const store = MongoStore.create({
     }
 })
 
+// const sessionOptions = {
+//     store,
+//     secret: process.env.SECRET,
+//     resave: false,
+//     saveUninitialized: true,
+//     cookie: {
+//         expires: Date.now() + 60 * 60 * 24 * 1000 * 7,
+//         maxAge: 60 * 60 * 24 * 1000 * 7,
+//         httpOnly: true
+//     }
+// };
+
 const sessionOptions = {
     store,
+    // name: "exam.sid", // custom name (good practice)
     secret: process.env.SECRET,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false, // !!!!!! LOGIN ERR CAUSER
     cookie: {
+        httpOnly: true,
+        // secure: process.env.NODE_ENV === "production", // HTTPS only in prod
+        sameSite: "lax", // REQUIRED for Chrome → SEB
         expires: Date.now() + 60 * 60 * 24 * 1000 * 7,
-        maxAge: 60 * 60 * 24 * 1000 * 7,
-        httpOnly: true
+        maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
     }
 };
+
 app.use(session(sessionOptions));
 app.use(flash());
 app.use(cookieParser())
