@@ -508,15 +508,3 @@
     }
 }
 
-/* ===== DARK MODE SUPPORT ===== */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --form-bg: #0f172a;
-        --form-surface: #1e293b;
-        --form-surface-hover: #334155;
-        --form-border: #334155;
-        --form-text: #f1f5f9;
-        --form-text-muted: #94a3b8;
-        --form-text-light: #64748b;
-    }
-}
