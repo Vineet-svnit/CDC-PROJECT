@@ -18,11 +18,10 @@ function sebOnly(req, res, next) {
     ua.includes("SEB") ||
     ua.includes("SafeExamBrowser");
 
-  if (!isSEB || !sebKey) {
-    return res.status(403).render("sebRequired", { page: "sebRequired" });
+    if (!isSEB || !sebKey) {
+      // req.session.testExists = req.params.id;
+      return res.status(403).render("sebRequired", { page: "sebRequired", isProd: process.env.NODE_ENV === "production" });
   }
-
-
   next();
 }
 

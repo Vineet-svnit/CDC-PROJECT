@@ -121,7 +121,7 @@ const sessionOptions = {
     // name: "exam.sid", // custom name (good practice)
     secret: process.env.SECRET,
     resave: false,
-    saveUninitialized: false, // !!!!!! LOGIN ERR CAUSER
+    saveUninitialized: true,
     cookie: {
         httpOnly: true,
         // secure: process.env.NODE_ENV === "production", // HTTPS only in prod
@@ -148,17 +148,17 @@ app.use((req, res, next) => {
     res.locals.error = req.flash("error");
     res.locals.success = req.flash("success");
     req.isAdmin = req.session.isAdmin || false;
-    
+    console.log(req.session);
     // Make time helpers available to all templates
     Object.assign(res.locals, templateHelpers);
-    
+
     next();
 });
 
 const checkValidity = async (req, res, next) => {
     let { id } = req.params;
     let test = await Test.findById(id);
-    
+
     if (hasTestEnded(test.endTime)) {
         req.flash("error", "The test is completed!");
         return res.redirect("/");
@@ -230,6 +230,13 @@ const storeReturnTo = (req, res, next) => {
     next();
 }
 
+// app.get("/session-test", (req, res) => {
+//   res.send({
+//     sessionID: req.sessionID,
+//     property: req.session.testExists
+//   });
+// });
+
 app.get("/register", (req, res) => {
     res.render("register_login/register.ejs");
 });
@@ -292,7 +299,7 @@ app.get('/admin/logout', (req, res, next) => {
 app.post('/register', async (req, res) => {
     try {
         const { username, password, email, name, phone, branch, year } = req.body;
-        
+
         // Check if user already exists
         const existingUser = await User.findOne({ $or: [{ username }, { email }] });
         if (existingUser) {
@@ -302,7 +309,7 @@ app.post('/register', async (req, res) => {
 
         // Generate OTP
         const otp = generateOTP();
-        
+
         // Store user data and OTP temporarily
         await OtpVerification.findOneAndUpdate(
             { email },
@@ -316,7 +323,7 @@ app.post('/register', async (req, res) => {
 
         // Send OTP email
         const emailResult = await sendOTPEmail(email, otp, name);
-        
+
         if (!emailResult.success) {
             req.flash('error', 'Failed to send verification email. Please try again.');
             return res.redirect('/register');
@@ -324,7 +331,7 @@ app.post('/register', async (req, res) => {
 
         req.flash('success', 'Verification code sent to your email. Please check your inbox.');
         res.render('register_login/otpVerification.ejs', { email });
-        
+
     } catch (e) {
         console.error('Registration error:', e);
         req.flash('error', e.message || 'Registration Failed!!');
@@ -336,29 +343,29 @@ app.post('/register', async (req, res) => {
 app.post('/verify-otp', async (req, res) => {
     try {
         const { email, otp } = req.body;
-        
+
         // Find OTP verification record
         const otpRecord = await OtpVerification.findOne({ email });
-        
+
         if (!otpRecord) {
             req.flash('error', 'OTP expired or invalid. Please register again.');
             return res.redirect('/register');
         }
-        
+
         // Verify OTP
         if (otpRecord.otp !== otp) {
             req.flash('error', 'Invalid OTP. Please try again.');
             return res.render('register_login/otpVerification.ejs', { email });
         }
-        
+
         // OTP is correct, create user account
         const { username, password, name, phone, branch, year } = otpRecord.userData;
         const user = new User({ username, email, name, phone, branch, year });
         const registeredUser = await User.register(user, password);
-        
+
         // Delete OTP record
         await OtpVerification.deleteOne({ email });
-        
+
         // Log in the user
         req.login(registeredUser, err => {
             if (err) {
@@ -369,7 +376,7 @@ app.post('/verify-otp', async (req, res) => {
             req.flash('success', 'Registration successful! Welcome to CDC.');
             res.redirect('/');
         });
-        
+
     } catch (e) {
         console.error('OTP verification error:', e);
         req.flash('error', 'Verification failed. Please try again.');
@@ -381,31 +388,31 @@ app.post('/verify-otp', async (req, res) => {
 app.post('/resend-otp', async (req, res) => {
     try {
         const { email } = req.body;
-        
+
         // Find existing OTP record
         const otpRecord = await OtpVerification.findOne({ email });
-        
+
         if (!otpRecord) {
             return res.status(400).json({ success: false, message: 'No pending verification found' });
         }
-        
+
         // Generate new OTP
         const newOtp = generateOTP();
-        
+
         // Update OTP record
         otpRecord.otp = newOtp;
         otpRecord.createdAt = new Date(); // Reset expiration timer
         await otpRecord.save();
-        
+
         // Send new OTP email
         const emailResult = await sendOTPEmail(email, newOtp, otpRecord.userData.name);
-        
+
         if (!emailResult.success) {
             return res.status(500).json({ success: false, message: 'Failed to send email' });
         }
-        
+
         res.json({ success: true, message: 'OTP resent successfully' });
-        
+
     } catch (e) {
         console.error('Resend OTP error:', e);
         res.status(500).json({ success: false, message: 'Failed to resend OTP' });
@@ -441,7 +448,8 @@ app.post('/admin/login', async (req, res) => {
 
 
 app.get("/", isLoggedIn, async (req, res) => {
-    const branch = req.user.branch;
+    // const branch = req.user.branch;
+    // let user_id = req.user._id;
     let allTests = await Test.find({ branch: "lr" });
     allTests.reverse();
     allTests.forEach((test) => {
@@ -456,6 +464,21 @@ app.get("/", isLoggedIn, async (req, res) => {
             scheduledJobs.add(test._id.toString()); // mark as scheduled
         }
     });
+    // console.log(req.session.testExists);
+    // const ua = req.headers["user-agent"] || "";
+    // const sebKey = req.headers["x-safeexambrowser-requesthash"];
+
+    // const isSEB =
+    //     ua.includes("SEB") ||
+    //     ua.includes("SafeExamBrowser");
+    //     console.log('not-worked ', isSEB, sebKey, req.session.testExists);
+    // const doesTestExist = req.session.testExists;
+    // if (isSEB && sebKey && typeof doesTestExist !== "undefined") {
+    //     console.log('worked ', isSEB, sebKey, doesTestExist);
+    //     delete req.session.testExists;
+    //     res.redirect(`/tests/${doesTestExist}`);
+    //     return;
+    // }
     res.render("user/home.ejs", { allTests, user: req.user, page: "home" });
 });
 
@@ -520,7 +543,7 @@ app.get("/api/categories/:branch", isAdmin, async (req, res) => {
                 $sort: { category: 1 }
             }
         ]);
-        
+
         res.json(categoriesWithCounts);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -530,6 +553,7 @@ app.get("/api/categories/:branch", isAdmin, async (req, res) => {
 app.get("/core", isLoggedIn, async (req, res) => {
     let branch = req.user.branch;
     let allTests = await Test.find({ branch: branch });
+    // req.session.check = 'abc';
     allTests.reverse();
     allTests.forEach((test) => {
         if (!scheduledJobs.has(test._id.toString())) {
@@ -548,10 +572,11 @@ app.get("/core", isLoggedIn, async (req, res) => {
 });
 
 //Show test 
-app.get("/tests/:id/:user_id", isLoggedIn, checkValidity, checkSubmit, sebOnly, async (req, res) => {
+app.get("/tests/:id", isLoggedIn, checkValidity, checkSubmit, sebOnly, async (req, res) => {
     try {
-        let { id, user_id } = req.params;
-
+        let { id } = req.params;
+        let user_id = req.user._id;
+        // delete req.session.testExists;
         // Populate the 'questions' field (which should be an array of ObjectIds)
         let test = await Test.findById(id).populate("questions");
 
@@ -1281,7 +1306,7 @@ app.get("/stats", isAdmin, async (req, res) => {
 
         tests.forEach(test => {
             const status = getTestStatus(test.startTime, test.endTime);
-            
+
             if (status === 'active') {
                 activeTests++;
             } else if (status === 'completed') {

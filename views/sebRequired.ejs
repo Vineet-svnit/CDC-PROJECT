@@ -25,7 +25,7 @@
                                         1: Get Configuration</h6>
                                     <p class="small text-muted mb-3">Download and open this file to launch the exam in
                                         SEB.</p>
-                                    <a href="/SEB/CDC.seb" class="btn btn-primary w-100 py-2 fw-semibold" download>
+                                    <a href="<%= isProd ? '/SEB/CDC.seb' : '/SEB/CDC_LOCAL.seb' %>" class="btn btn-primary w-100 py-2 fw-semibold" download>
                                         Download CDC Config File
                                     </a>
                                 </div>
