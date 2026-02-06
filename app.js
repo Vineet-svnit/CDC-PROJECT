@@ -17,7 +17,10 @@ const { connectDB } = require("./config/db.js")
 const MongoStore = require("connect-mongo");
 const multer = require('multer');
 const xlsx = require('xlsx');
-const sebOnly = require("./middleware/sebOnly");
+const crypto = require("crypto")
+// const sebOnly = require("./middleware/sebOnly");
+const { sebOnly, sha256Hex, getAbsoluteUrl } = require("./middleware/sebOnly");
+
 
 //node-schedule can schedule the task, but cant iteract with the front-end by itself. So we use socket.io
 const schedule = require("node-schedule");
@@ -465,19 +468,76 @@ app.get("/", isLoggedIn, async (req, res) => {
         }
     });
     // console.log(req.session.testExists);
+    // const ua = req.headers["user-agent"] || "";
+    // const receivedHash =
+    //     req.headers["x-safeexambrowser-configkeyhash"];
+
+    // const configKey =
+    //     process.env.NODE_ENV === "production"
+    //         ? process.env.SEB_CONFIG_KEY
+    //         : process.env.SEB_CONFIG_KEY_LOCAL;
+
+    // const isSEB = ua.includes("SafeExamBrowser") || ua.includes("SEB");
+
+    // let isValidSEB = false;
+
+    // console.log(isSEB, receivedHash, configKey);
+
+
+    // if (isSEB && receivedHash && configKey) {
+    //     const absoluteUrl = getAbsoluteUrl(req);
+    //     const expectedHash = sha256Hex(absoluteUrl + configKey);
+    //     isValidSEB = (expectedHash === receivedHash);
+    // }
+
+    /* ------------------ REDIRECT LOGIC ------------------ */
+
+    // if (isValidSEB && req.user.pendingTestId) {
+    //     const pendingId = req.user.pendingTestId;
+    //     req.user.pendingTestId = undefined;
+    //     await req.user.save();
+    //     return res.redirect(`/tests/${pendingId}`);
+    // }
+
     const ua = req.headers["user-agent"] || "";
-    const sebKey = req.headers["x-safeexambrowser-requesthash"];
+    const receivedHash =
+        req.headers["x-safeexambrowser-configkeyhash"];
 
-    const isSEB =
-        ua.includes("SEB") ||
-        ua.includes("SafeExamBrowser");
+    const isSEB = ua.includes("SafeExamBrowser") || ua.includes("SEB");
 
-    if (isSEB && sebKey && req.user.pendingTestId) {
+    const isProd = process.env.NODE_ENV === "production";
+
+    const configKey = isProd
+        ? process.env.SEB_CONFIG_KEY
+        : process.env.SEB_CONFIG_KEY_LOCAL;
+
+    const BASE_URL = isProd
+        ? "https://cdc-project-w2zb.onrender.com"
+        : "http://localhost:5000";
+
+    let path = req.originalUrl.split("?")[0].split("#")[0];
+
+    const absoluteUrl = BASE_URL + path;
+    // console.log("eeeeeeeeeeeeeeeeeeeeeee", absoluteUrl);
+    
+    const expectedHash = sha256Hex(absoluteUrl + configKey);
+
+    // console.log("aaaaaaaaaaaaaaaaaaa", isSEB, receivedHash, configKey, expectedHash);
+    
+
+    const isValid = isSEB && receivedHash && configKey && (expectedHash === receivedHash)
+
+    if (isValid && req.user.pendingTestId) {
         const pendingId = req.user.pendingTestId;
         req.user.pendingTestId = undefined;
         await req.user.save();
         return res.redirect(`/tests/${pendingId}`);
     }
+
+    if (path.startsWith("/")) {
+        path = path.slice(1);
+    }
+
     res.render("user/home.ejs", { allTests, user: req.user, page: "home" });
 });
 

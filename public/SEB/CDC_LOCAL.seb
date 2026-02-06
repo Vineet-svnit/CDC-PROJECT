@@ -13,11 +13,11 @@
     <key>hashedAdminPassword</key>
     <string>A3D9488354374AA29ADAD15B490BBFAB11A17B2F5304AFDD9628EDCEC6BE8D94</string>
     <key>allowQuit</key>
-    <true />
+    <false />
     <key>ignoreExitKeys</key>
     <true />
     <key>hashedQuitPassword</key>
-    <string />
+    <string>41F314F7152CF29CD0BBD6E4BF17A7AAE03285ED12FF29B7F4FEC4D208983CC5</string>
     <key>exitKey1</key>
     <integer>2</integer>
     <key>exitKey2</key>
@@ -213,7 +213,7 @@
     <key>sendBrowserExamKey</key>
     <true />
     <key>quitURL</key>
-    <string>http://localhost:5000/submission</string>
+    <string>http://localhost:5000/randomquit</string>
     <key>quitURLConfirm</key>
     <true />
     <key>restartExamURL</key>

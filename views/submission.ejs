@@ -167,7 +167,7 @@
           </div>
         </div>
         <div class="d-flex justify-content-center mt-5">
-          <a href="<%= isProd ? 'https://cdc-project-w2zb.onrender.com/submission' : 'http://localhost:5000/submission' %>" id="exitExamBtn" class="btn btn-danger mt-5"
+          <a href="<%= isProd ? 'https://cdc-project-w2zb.onrender.com/randomquit' : 'http://localhost:5000/randomquit' %>" id="exitExamBtn" class="btn btn-danger mt-5"
             style="display: none;">
             Exit Exam Mode
           </a>
@@ -284,7 +284,7 @@
 
       if (isSEB) {
         setTimeout(() => {
-          window.location.href = "<%= isProd ? 'https://cdc-project-w2zb.onrender.com/submission' : 'http://localhost:5000/submission' %>";
+          window.location.href = "<%= isProd ? 'https://cdc-project-w2zb.onrender.com/randomquit' : 'http://localhost:5000/randomquit' %>";
         }, 5000); // delay in ms
       }
     })();
