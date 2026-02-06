@@ -507,18 +507,16 @@ app.get("/", isLoggedIn, async (req, res) => {
 
     const isProd = process.env.NODE_ENV === "production";
 
-    const configKey = isProd
-        ? process.env.SEB_CONFIG_KEY
-        : process.env.SEB_CONFIG_KEY_LOCAL;
+    const configKey = process.env.SEB_CONFIG_KEY;
 
     const BASE_URL = isProd
-        ? "https://cdc-project-w2zb.onrender.com"
+        ? "https://cdc-project-w2zb.onrender.com/"
         : "http://localhost:5000";
 
     let path = req.originalUrl.split("?")[0].split("#")[0];
 
     const absoluteUrl = BASE_URL + path;
-    // console.log("eeeeeeeeeeeeeeeeeeeeeee", absoluteUrl);
+    console.log("eeeeeeeeeeeeeeeeeeeeeee", absoluteUrl);
     
     const expectedHash = sha256Hex(absoluteUrl + configKey);
 

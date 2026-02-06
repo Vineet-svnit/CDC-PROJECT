@@ -83,9 +83,7 @@ async function sebOnly(req, res, next) {
 
   const isProd = process.env.NODE_ENV === "production";
 
-  const configKey = isProd
-    ? process.env.SEB_CONFIG_KEY
-    : process.env.SEB_CONFIG_KEY_LOCAL;
+  const configKey = process.env.SEB_CONFIG_KEY;
   // console.log("bbbbbbbbbbbbbbbbbbb", isSEB, receivedHash, configKey);
 
   if (!isSEB || !receivedHash || !configKey) {
