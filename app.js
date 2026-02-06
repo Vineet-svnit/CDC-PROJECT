@@ -510,7 +510,7 @@ app.get("/", isLoggedIn, async (req, res) => {
     const configKey = process.env.SEB_CONFIG_KEY;
 
     const BASE_URL = isProd
-        ? "https://cdc-project-w2zb.onrender.com/"
+        ? "https://cdc-project-w2zb.onrender.com"
         : "http://localhost:5000";
 
     let path = req.originalUrl.split("?")[0].split("#")[0];
@@ -520,7 +520,7 @@ app.get("/", isLoggedIn, async (req, res) => {
     
     const expectedHash = sha256Hex(absoluteUrl + configKey);
 
-    // console.log("aaaaaaaaaaaaaaaaaaa", isSEB, receivedHash, configKey, expectedHash);
+    console.log("aaaaaaaaaaaaaaaaaaa", isSEB, receivedHash, configKey, expectedHash);
     
 
     const isValid = isSEB && receivedHash && configKey && (expectedHash === receivedHash)
