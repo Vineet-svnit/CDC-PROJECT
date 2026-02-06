@@ -151,7 +151,7 @@ app.use((req, res, next) => {
     res.locals.error = req.flash("error");
     res.locals.success = req.flash("success");
     req.isAdmin = req.session.isAdmin || false;
-    console.log(req.session);
+    // console.log(req.session);
     // Make time helpers available to all templates
     Object.assign(res.locals, templateHelpers);
 
@@ -532,9 +532,9 @@ app.get("/", isLoggedIn, async (req, res) => {
         return res.redirect(`/tests/${pendingId}`);
     }
 
-    if (path.startsWith("/")) {
-        path = path.slice(1);
-    }
+    // if (path.startsWith("/")) {
+    //     path = path.slice(1);
+    // }
 
     res.render("user/home.ejs", { allTests, user: req.user, page: "home" });
 });

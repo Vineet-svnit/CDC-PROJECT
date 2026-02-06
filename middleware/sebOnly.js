@@ -87,6 +87,10 @@ async function sebOnly(req, res, next) {
   console.log("bbbbbbbbbbbbbbbbbbb", isSEB, receivedHash, configKey);
 
   if (!isSEB || !receivedHash || !configKey) {
+    if (req.user) {
+      req.user.pendingTestId = req.params.id;
+      await req.user.save();
+    }
     return res
       .status(403)
       .render("sebRequired", {
@@ -117,6 +121,10 @@ async function sebOnly(req, res, next) {
   console.log("zzzzzzzzzzzzzzzzzzzzzz", isSEB, receivedHash, configKey, expectedHash);
 
   if (expectedHash !== receivedHash) {
+    if (req.user) {
+      req.user.pendingTestId = req.params.id;
+      await req.user.save();
+    }
     return res
       .status(403)
       .render("sebRequired", {
