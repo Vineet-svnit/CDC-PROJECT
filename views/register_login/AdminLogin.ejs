@@ -38,6 +38,11 @@
             backdrop-filter: blur(10px);
             border: none;
         }
+
+        /* Hide validation tick for password fields to avoid overlap with eye icon */
+        input[type="password"].form-control {
+            background-image: none !important;
+        }
     </style>
 
     <div class="row justify-content-center align-items-center m-0" style="min-height: 100vh;">

@@ -84,7 +84,7 @@ async function sebOnly(req, res, next) {
   const isProd = process.env.NODE_ENV === "production";
 
   const configKey = process.env.SEB_CONFIG_KEY;
-  console.log("bbbbbbbbbbbbbbbbbbb", isSEB, receivedHash, configKey);
+  // console.log("bbbbbbbbbbbbbbbbbbb", isSEB, receivedHash, configKey);
 
   if (!isSEB || !receivedHash || !configKey) {
     if (req.user) {
@@ -113,12 +113,12 @@ async function sebOnly(req, res, next) {
   }
 
   const absoluteUrl = BASE_URL + path;
-  console.log('fffffffffffffffffffffffffffff', absoluteUrl);
+  // console.log('fffffffffffffffffffffffffffff', absoluteUrl);
   
 
   const expectedHash = sha256Hex(absoluteUrl + configKey);
 
-  console.log("zzzzzzzzzzzzzzzzzzzzzz", isSEB, receivedHash, configKey, expectedHash);
+  // console.log("zzzzzzzzzzzzzzzzzzzzzz", isSEB, receivedHash, configKey, expectedHash);
 
   if (expectedHash !== receivedHash) {
     if (req.user) {

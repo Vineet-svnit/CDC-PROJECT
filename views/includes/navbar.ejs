@@ -54,6 +54,12 @@
             </li>
             <li><a class="dropdown-item text-danger" href="/logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
             </li>
+            <li>
+              <a class="dropdown-item text-danger" href="/randomquit" id="exitExamBtn" style="display: none;">
+                <i class="fas fa-door-open me-2"></i>Exit Exam Mode
+              </a>
+            </li>
+
           </ul>
         </li>
       </ul>
@@ -75,3 +81,20 @@
     font-weight: 600;
   }
 </style>
+
+<script>
+  (function () {
+    const btn = document.getElementById("exitExamBtn");
+    if (!btn) return;
+
+    const ua = navigator.userAgent || "";
+
+    const isSEB =
+      ua.includes("SEB") ||
+      ua.includes("SafeExamBrowser");
+
+    if (isSEB) {
+      btn.style.display = "inline-block";
+    }
+  })();
+</script>

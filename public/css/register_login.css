@@ -150,3 +150,10 @@ p a {
     color: var(--muted-1);
     cursor: pointer
 }
+
+/* Hide validation tick for password fields to avoid overlap with eye icon */
+input[type="password"].form-control {
+    background-image: none !important;
+    padding-right: 40px !important;
+    /* Ensure enough space for eye icon */
+}

@@ -166,12 +166,6 @@
             </div>
           </div>
         </div>
-        <div class="d-flex justify-content-center mt-5">
-          <a href="<%= isProd ? 'https://cdc-project-w2zb.onrender.com/randomquit' : 'http://localhost:5000/randomquit' %>" id="exitExamBtn" class="btn btn-danger mt-5"
-            style="display: none;">
-            Exit Exam Mode
-          </a>
-        </div>
 
     </div>
   </main>
@@ -290,19 +284,4 @@
     })();
   </script>
 
-  <script>
-    (function () {
-      const btn = document.getElementById("exitExamBtn");
-      if (!btn) return;
-
-      const ua = navigator.userAgent || "";
-
-      const isSEB =
-        ua.includes("SEB") ||
-        ua.includes("SafeExamBrowser");
-
-      if (isSEB) {
-        btn.style.display = "inline-block";
-      }
-    })();
-  </script>
+  
