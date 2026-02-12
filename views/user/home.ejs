@@ -2,7 +2,7 @@
 
   <% const now=getCurrentUTC(); const upcomingTests=[]; const activeTests=[]; const inactiveTests=[]; for(let test of
     allTests) { const status=getTestStatus(test.startTime, test.endTime); if(status==='upcoming' ) {
-    upcomingTests.push(test); } else if(status==='active' ) { activeTests.push(test); } else { inactiveTests.push(test);
+    upcomingTests.push(test); } else if(status==='active' || status==='buffer' ) { activeTests.push(test); } else { inactiveTests.push(test);
     } } %>
 
     <main class="py-5">
@@ -76,7 +76,7 @@
                       </div>
                       <a href="/tests/<%= test._id %>" class="btn btn-warning mt-auto"
                         id="<%= test._id %>">
-                        <i class="fas fa-play me-2"></i>Continue Test
+                        <i class="fas fa-play me-2"></i><%= getTestStatus(test.startTime, test.endTime) === 'Start Test' ? 'Setup & Start Test' : 'Continue Test' %>
                       </a>
                     </div>
                   </div>

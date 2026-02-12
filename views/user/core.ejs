@@ -10,7 +10,7 @@
         const status = getTestStatus(test.startTime, test.endTime);
         if(status === 'upcoming'){
             upcomingTests.push(test);
-        } else if(status === 'active'){
+        } else if(status === 'active' || status === 'buffer'){
             activeTests.push(test);
         } else {
             inactiveTests.push(test);
@@ -67,7 +67,7 @@
                   <p><i class="fas fa-star me-2"></i><small class="text-muted"><%= test.totalMarks %> marks</small></p>
                 </div>
                 <a href="/tests/<%= test._id %>" class="btn btn-warning mt-auto">
-                  <i class="fas fa-play me-2"></i>Continue Test
+                  <i class="fas fa-play me-2"></i><%= getTestStatus(test.startTime, test.endTime) === 'Satrt Test' ? 'Setup & Start Test' : 'Continue Test' %>
                 </a>
               </div>
             </div>

@@ -156,6 +156,29 @@ const hasTestStarted = (startTime) => {
 };
 
 /**
+ * Check if test is in buffer period (5 minutes before start time)
+ * @param {Date} startTime - Test start time (UTC)
+ * @returns {boolean} True if in buffer period
+ */
+const isInBufferPeriod = (startTime) => {
+    const now = getCurrentUTC();
+    const bufferStart = new Date(startTime.getTime() - (5 * 60 * 1000)); // 5 minutes before
+    return now >= bufferStart && now < startTime;
+};
+
+/**
+ * Check if test can be accessed (buffer period or after start time, but before end time)
+ * @param {Date} startTime - Test start time (UTC)
+ * @param {Date} endTime - Test end time (UTC)
+ * @returns {boolean} True if test can be accessed
+ */
+const canAccessTest = (startTime, endTime) => {
+    const now = getCurrentUTC();
+    const bufferStart = new Date(startTime.getTime() - (5 * 60 * 1000)); // 5 minutes before
+    return now >= bufferStart && now <= endTime;
+};
+
+/**
  * Check if a test has ended
  * @param {Date} endTime - Test end time (UTC)
  * @returns {boolean} True if test has ended
@@ -169,12 +192,14 @@ const hasTestEnded = (endTime) => {
  * Get test status
  * @param {Date} startTime - Test start time (UTC)
  * @param {Date} endTime - Test end time (UTC)
- * @returns {string} 'upcoming', 'active', or 'completed'
+ * @returns {string} 'upcoming', 'buffer', 'active', or 'completed'
  */
 const getTestStatus = (startTime, endTime) => {
     const now = getCurrentUTC();
+    const bufferStart = new Date(startTime.getTime() - (5 * 60 * 1000)); // 5 minutes before
     
-    if (now < startTime) return 'upcoming';
+    if (now < bufferStart) return 'upcoming';
+    if (now >= bufferStart && now < startTime) return 'buffer';
     if (now >= startTime && now <= endTime) return 'active';
     return 'completed';
 };
@@ -205,6 +230,8 @@ module.exports = {
     isTestActive,
     hasTestStarted,
     hasTestEnded,
+    isInBufferPeriod,
+    canAccessTest,
     getTestStatus,
     getAnnouncementDate,
     IST_TIMEZONE

@@ -67,6 +67,8 @@ const {
     hasTestStarted,
     hasTestEnded,
     isTestActive,
+    isInBufferPeriod,
+    canAccessTest,
     getTestStatus,
     getAnnouncementDate
 } = require('./utils/timeUtils.js');
@@ -166,8 +168,8 @@ const checkValidity = async (req, res, next) => {
         req.flash("error", "The test is completed!");
         return res.redirect("/");
     }
-    else if (!hasTestStarted(test.startTime)) {
-        req.flash("error", "The test cannot be started!");
+    else if (!canAccessTest(test.startTime, test.endTime)) {
+        req.flash("error", "The test cannot be started yet!");
         return res.redirect("/");
     }
     else {
@@ -1400,7 +1402,7 @@ app.get("/stats", isAdmin, async (req, res) => {
         tests.forEach(test => {
             const status = getTestStatus(test.startTime, test.endTime);
 
-            if (status === 'active') {
+            if (status === 'active' || status === 'buffer') {
                 activeTests++;
             } else if (status === 'completed') {
                 completedTests++;
