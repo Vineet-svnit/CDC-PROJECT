@@ -88,7 +88,7 @@
             </div>
           <% } %>
         </div>
-        <% if (allAnnouncements && allAnnouncements.length > 4) { %>
+        <% if (allAnnouncements && allAnnouncements.length > 5) { %>
           <div class="card-footer bg-white text-center">
             <button id="toggleAnnouncementsBtn" class="btn btn-sm btn-outline-primary">
               <i class="fas fa-eye"></i> Show All Announcements
@@ -318,7 +318,7 @@
     const list = document.querySelectorAll('.announcement-item');
     const toggle = document.getElementById('toggleAnnouncementsBtn');
     if (!list || !list.length || !toggle) return;
-    const limit = 4;
+    const limit = 5;
     function updateAnnouncements(showAll){
       list.forEach((el, idx) => {
         if (idx >= limit) {
@@ -326,14 +326,14 @@
         }
       });
       if (showAll) {
-        toggle.innerHTML = '<i class="fas fa-eye-slash"></i> Show Top 4';
+        toggle.innerHTML = '<i class="fas fa-eye-slash"></i> Show Top 5';
       } else {
         toggle.innerHTML = '<i class="fas fa-eye"></i> Show All Announcements';
       }
     }
     updateAnnouncements(false);
     toggle.addEventListener('click', ()=>{
-      const showingAll = toggle.textContent.includes('Show Top 4');
+      const showingAll = toggle.textContent.includes('Show Top 5');
       updateAnnouncements(!showingAll);
     });
   })();

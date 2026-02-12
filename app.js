@@ -124,13 +124,13 @@ const sessionOptions = {
     // name: "exam.sid", // custom name (good practice)
     secret: process.env.SECRET,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
+    rolling: true,
     cookie: {
         httpOnly: true,
-        // secure: process.env.NODE_ENV === "production", // HTTPS only in prod
         sameSite: "lax", // REQUIRED for Chrome → SEB
-        expires: Date.now() + 60 * 60 * 24 * 1000 * 7,
-        maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
+        // expires: Date.now() + 60 * 60 * 24 * 1000 * 7,
+        maxAge: 1000 * 60 * 60 * 3 // 3 hours
     }
 };
 
@@ -552,12 +552,12 @@ app.get("/", isLoggedIn, async (req, res) => {
     let path = req.originalUrl.split("?")[0].split("#")[0];
 
     const absoluteUrl = BASE_URL + path;
-    console.log("eeeeeeeeeeeeeeeeeeeeeee", absoluteUrl);
-
+    // console.log("eeeeeeeeeeeeeeeeeeeeeee", absoluteUrl);
+    
     const expectedHash = sha256Hex(absoluteUrl + configKey);
 
-    console.log("aaaaaaaaaaaaaaaaaaa", isSEB, receivedHash, configKey, expectedHash);
-
+    // console.log("aaaaaaaaaaaaaaaaaaa", isSEB, receivedHash, configKey, expectedHash);
+    
 
     const isValid = isSEB && receivedHash && configKey && (expectedHash === receivedHash)
 
