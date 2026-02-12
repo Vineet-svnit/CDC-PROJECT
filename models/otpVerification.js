@@ -22,9 +22,21 @@ const otpVerificationSchema = new Schema({
     },
     createdAt: {
         type: Date,
-        default: Date.now,
-        expires: 600 // Document expires after 10 minutes (600 seconds)
+        default: Date.now
+    },
+    expiresAt: {
+        type: Date,
+        required: true
     }
 });
+
+// Method to check if OTP is expired
+otpVerificationSchema.methods.isExpired = function() {
+    return Date.now() > this.expiresAt.getTime();
+};
+
+// Create index for automatic cleanup of old documents (after 10 minutes of creation)
+// This gives users time to resend OTP even after the 3-minute expiration
+otpVerificationSchema.index({ createdAt: 1 }, { expireAfterSeconds: 600 });
 
 module.exports = mongoose.model('OtpVerification', otpVerificationSchema);

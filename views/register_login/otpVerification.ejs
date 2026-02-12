@@ -27,7 +27,7 @@
             <h5><i class="fas fa-info-circle"></i> Verification Instructions</h5>
             <ul>
                 <li>Enter the 4-digit code sent to your email</li>
-                <li>The code is valid for 10 minutes</li>
+                <li>The code is valid for 3 minutes</li>
                 <li>Check your spam folder if you don't see the email</li>
             </ul>
         </div>
@@ -49,7 +49,7 @@
         
         <div class="text-center">
             <p class="timer" id="timer">
-                <i class="fas fa-clock"></i> Resend OTP in <span id="countdown">10:00</span>
+                <i class="fas fa-clock"></i> Resend OTP in <span id="countdown">3:00</span>
             </p>
             <p class="d-none" id="resendSection">
                 Didn't receive the code? 
@@ -109,24 +109,39 @@
             verifyBtn.disabled = otp.length !== 4;
         }
 
-        // Timer countdown
-        let timeLeft = 600; // 10 minutes in seconds
+        // Timer countdown - Calculate from server-provided expiration time
+        window.expiresAt = <%= typeof expiresAt !== 'undefined' ? expiresAt : 'Date.now() + 180000' %>;
         const countdownElement = document.getElementById('countdown');
         const timerElement = document.getElementById('timer');
         const resendSection = document.getElementById('resendSection');
 
-        const timer = setInterval(() => {
+        function updateTimer() {
+            const now = Date.now();
+            const timeLeft = Math.max(0, Math.floor((window.expiresAt - now) / 1000));
+            
             const minutes = Math.floor(timeLeft / 60);
             const seconds = timeLeft % 60;
             countdownElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
             
             if (timeLeft <= 0) {
-                clearInterval(timer);
+                clearInterval(window.timer);
                 timerElement.classList.add('d-none');
                 resendSection.classList.remove('d-none');
+                
+                // Show expiration alert
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-warning alert-dismissible fade show';
+                alertDiv.innerHTML = `
+                    <i class="fas fa-exclamation-triangle"></i> Your OTP has expired. Please resend to get a new code.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                document.getElementById('container').insertBefore(alertDiv, document.getElementById('container').firstChild);
             }
-            timeLeft--;
-        }, 1000);
+        }
+
+        // Update timer immediately and then every second
+        updateTimer();
+        window.timer = setInterval(updateTimer, 1000);
 
         // Resend OTP function
         async function resendOTP() {
@@ -154,12 +169,41 @@
                         <i class="fas fa-check-circle"></i> OTP has been resent to your email!
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     `;
+                    
+                    // Remove any existing alerts
+                    const existingAlerts = document.querySelectorAll('.alert');
+                    existingAlerts.forEach(alert => alert.remove());
+                    
                     document.getElementById('container').insertBefore(alertDiv, document.getElementById('container').firstChild);
                     
-                    // Reset timer
-                    timeLeft = 600;
-                    timerElement.classList.remove('d-none');
-                    resendSection.classList.add('d-none');
+                    // Update expiration time and restart timer without page reload
+                    if (result.expiresAt) {
+                        // Update the global expiresAt variable
+                        window.expiresAt = result.expiresAt;
+                        
+                        // Clear the old timer
+                        clearInterval(timer);
+                        
+                        // Show timer, hide resend section
+                        timerElement.classList.remove('d-none');
+                        resendSection.classList.add('d-none');
+                        
+                        // Restart the timer with new expiration time
+                        window.timer = setInterval(() => {
+                            const now = Date.now();
+                            const timeLeft = Math.max(0, Math.floor((window.expiresAt - now) / 1000));
+                            
+                            const minutes = Math.floor(timeLeft / 60);
+                            const seconds = timeLeft % 60;
+                            countdownElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                            
+                            if (timeLeft <= 0) {
+                                clearInterval(window.timer);
+                                timerElement.classList.add('d-none');
+                                resendSection.classList.remove('d-none');
+                            }
+                        }, 1000);
+                    }
                     
                     // Clear OTP inputs
                     otpInputs.forEach(input => input.value = '');
@@ -194,6 +238,21 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 `;
                 document.getElementById('container').insertBefore(alertDiv, document.getElementById('container').firstChild);
+                return;
+            }
+            
+            // Check if OTP has expired
+            if (Date.now() > window.expiresAt) {
+                e.preventDefault();
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+                alertDiv.innerHTML = `
+                    <i class="fas fa-exclamation-circle"></i> Your OTP has expired. Please resend to get a new code.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                document.getElementById('container').insertBefore(alertDiv, document.getElementById('container').firstChild);
+                timerElement.classList.add('d-none');
+                resendSection.classList.remove('d-none');
                 return;
             }
             

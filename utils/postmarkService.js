@@ -11,18 +11,18 @@ const generateOTP = () => {
 // Send OTP email using Postmark
 const sendOTPEmail = async (email, otp, name) => {
     try {
-        console.log('🚀 Starting Postmark email send...');
-        console.log('📧 To Email:', email);
-        console.log('👤 Name:', name);
-        console.log('🔢 OTP:', otp);
+        // console.log('🚀 Starting Postmark email send...');
+        // console.log('📧 To Email:', email);
+        // console.log('👤 Name:', name);
+        // console.log('🔢 OTP:', otp);
         
         // Check if API token is set
         if (!process.env.POSTMARK_API_TOKEN) {
             throw new Error('POSTMARK_API_TOKEN is missing in environment variables');
         }
         
-        console.log('🔑 API Token:', process.env.POSTMARK_API_TOKEN ? 'Set' : 'Missing');
-        console.log('📤 From Email:', process.env.POSTMARK_FROM_EMAIL || 'Not set');
+        // console.log('🔑 API Token:', process.env.POSTMARK_API_TOKEN ? 'Set' : 'Missing');
+        // console.log('📤 From Email:', process.env.POSTMARK_FROM_EMAIL || 'Not set');
 
         const emailData = {
             From: process.env.POSTMARK_FROM_EMAIL || 'noreply@example.com',
@@ -51,7 +51,7 @@ const sendOTPEmail = async (email, otp, name) => {
                         
                         <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; padding: 15px; margin: 20px 0;">
                             <p style="color: #856404; margin: 0; font-size: 14px;">
-                                <strong>⏰ Important:</strong> This OTP is valid for <strong>10 minutes</strong> only. Please do not share this code with anyone.
+                                <strong>⏰ Important:</strong> This OTP is valid for <strong>3 minutes</strong> only. Please do not share this code with anyone.
                             </p>
                         </div>
                         
@@ -77,7 +77,7 @@ Thank you for registering with CDC. To complete your registration, please use th
 
 ${otp}
 
-This OTP is valid for 10 minutes. Please do not share this code with anyone.
+This OTP is valid for 3 minutes. Please do not share this code with anyone.
 
 If you didn't request this registration, please ignore this email.
 
@@ -90,20 +90,20 @@ This is an automated email. Please do not reply to this message.
             MessageStream: 'outbound'
         };
 
-        console.log('📝 Email data prepared:', {
-            From: emailData.From,
-            To: emailData.To,
-            Subject: emailData.Subject
-        });
+        // console.log('📝 Email data prepared:', {
+        //     From: emailData.From,
+        //     To: emailData.To,
+        //     Subject: emailData.Subject
+        // });
 
         const response = await client.sendEmail(emailData);
 
-        console.log('✅ Postmark: Email sent successfully');
-        console.log('📊 Response:', {
-            MessageID: response.MessageID,
-            SubmittedAt: response.SubmittedAt,
-            To: response.To
-        });
+        // console.log('✅ Postmark: Email sent successfully');
+        // console.log('📊 Response:', {
+        //     MessageID: response.MessageID,
+        //     SubmittedAt: response.SubmittedAt,
+        //     To: response.To
+        // });
 
         return { 
             success: true, 

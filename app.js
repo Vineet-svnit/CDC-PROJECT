@@ -313,12 +313,16 @@ app.post('/register', async (req, res) => {
         // Generate OTP
         const otp = generateOTP();
 
+        // Calculate expiration time (3 minutes from now)
+        const expiresAt = new Date(Date.now() + 3 * 60 * 1000); // 3 minutes
+
         // Store user data and OTP temporarily
         await OtpVerification.findOneAndUpdate(
             { email },
             {
                 email,
                 otp,
+                expiresAt,
                 userData: { username, password, email, name, phone, branch, year }
             },
             { upsert: true, new: true }
@@ -333,7 +337,7 @@ app.post('/register', async (req, res) => {
         }
 
         req.flash('success', 'Verification code sent to your email. Please check your inbox.');
-        res.render('register_login/otpVerification.ejs', { email });
+        res.render('register_login/otpVerification.ejs', { email, expiresAt: expiresAt.getTime() });
 
     } catch (e) {
         console.error('Registration error:', e);
@@ -351,14 +355,26 @@ app.post('/verify-otp', async (req, res) => {
         const otpRecord = await OtpVerification.findOne({ email });
 
         if (!otpRecord) {
-            req.flash('error', 'OTP expired or invalid. Please register again.');
+            req.flash('error', 'Verification session not found. Please register again.');
             return res.redirect('/register');
+        }
+
+        // Check if OTP has expired (backend validation)
+        if (otpRecord.isExpired()) {
+            req.flash('error', 'OTP has expired. Please click "Resend OTP" to get a new code.');
+            return res.render('register_login/otpVerification.ejs', {
+                email,
+                expiresAt: otpRecord.expiresAt.getTime()
+            });
         }
 
         // Verify OTP
         if (otpRecord.otp !== otp) {
             req.flash('error', 'Invalid OTP. Please try again.');
-            return res.render('register_login/otpVerification.ejs', { email });
+            return res.render('register_login/otpVerification.ejs', {
+                email,
+                expiresAt: otpRecord.expiresAt.getTime()
+            });
         }
 
         // OTP is correct, create user account
@@ -366,7 +382,7 @@ app.post('/verify-otp', async (req, res) => {
         const user = new User({ username, email, name, phone, branch, year });
         const registeredUser = await User.register(user, password);
 
-        // Delete OTP record
+        // Delete OTP record after successful registration
         await OtpVerification.deleteOne({ email });
 
         // Log in the user
@@ -383,7 +399,7 @@ app.post('/verify-otp', async (req, res) => {
     } catch (e) {
         console.error('OTP verification error:', e);
         req.flash('error', 'Verification failed. Please try again.');
-        res.render('register_login/otpVerification.ejs', { email: req.body.email });
+        res.redirect('/register');
     }
 });
 
@@ -396,31 +412,51 @@ app.post('/resend-otp', async (req, res) => {
         const otpRecord = await OtpVerification.findOne({ email });
 
         if (!otpRecord) {
-            return res.status(400).json({ success: false, message: 'No pending verification found' });
+            return res.status(400).json({
+                success: false,
+                message: 'No pending verification found. Please register again.'
+            });
         }
 
-        // Generate new OTP
+        // Generate new OTP (works even if old OTP expired)
         const newOtp = generateOTP();
 
-        // Update OTP record
+        // Calculate new expiration time (3 minutes from now)
+        const expiresAt = new Date(Date.now() + 3 * 60 * 1000); // 3 minutes
+
+        // Update OTP record with new OTP and expiration time
         otpRecord.otp = newOtp;
-        otpRecord.createdAt = new Date(); // Reset expiration timer
+        otpRecord.createdAt = new Date(); // Reset creation time for TTL
+        otpRecord.expiresAt = expiresAt;
         await otpRecord.save();
 
         // Send new OTP email
         const emailResult = await sendOTPEmail(email, newOtp, otpRecord.userData.name);
 
         if (!emailResult.success) {
-            return res.status(500).json({ success: false, message: 'Failed to send email' });
+            return res.status(500).json({
+                success: false,
+                message: 'Failed to send email. Please try again.'
+            });
         }
 
-        res.json({ success: true, message: 'OTP resent successfully' });
+        res.json({
+            success: true,
+            message: 'OTP resent successfully',
+            expiresAt: expiresAt.getTime()
+        });
 
     } catch (e) {
         console.error('Resend OTP error:', e);
-        res.status(500).json({ success: false, message: 'Failed to resend OTP' });
+        res.status(500).json({
+            success: false,
+            message: 'Failed to resend OTP. Please try again.'
+        });
     }
 });
+// res.status(500).json({ success: false, message: 'Failed to resend OTP' });
+//     }
+// });
 
 app.post('/login', storeReturnTo, passport.authenticate('local', {
     failureFlash: true,
@@ -517,11 +553,11 @@ app.get("/", isLoggedIn, async (req, res) => {
 
     const absoluteUrl = BASE_URL + path;
     console.log("eeeeeeeeeeeeeeeeeeeeeee", absoluteUrl);
-    
+
     const expectedHash = sha256Hex(absoluteUrl + configKey);
 
     console.log("aaaaaaaaaaaaaaaaaaa", isSEB, receivedHash, configKey, expectedHash);
-    
+
 
     const isValid = isSEB && receivedHash && configKey && (expectedHash === receivedHash)
 
@@ -1391,6 +1427,12 @@ app.use((err, req, res, next) => {
     let { status = 500, message = "Sorry! Some error occurred." } = err;
     err.status = status;
     err.message = message;
+    
+    // Ensure currentPath is set for error template
+    if (typeof res.locals.currentPath === 'undefined') {
+        res.locals.currentPath = req.path || '/';
+    }
+    
     res.status(status).render("error", { err });
 });
 //.......

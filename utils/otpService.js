@@ -86,7 +86,7 @@ const sendOTPWithResend = async (email, otp, name) => {
                     <div style="background-color: #f4f4f4; padding: 20px; text-align: center; margin: 20px 0; border-radius: 5px;">
                         <h1 style="color: #007bff; font-size: 32px; margin: 0; letter-spacing: 5px;">${otp}</h1>
                     </div>
-                    <p>This OTP is valid for 10 minutes. Please do not share this code with anyone.</p>
+                    <p>This OTP is valid for 3 minutes. Please do not share this code with anyone.</p>
                     <p>If you didn't request this registration, please ignore this email.</p>
                     <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
                     <p style="color: #666; font-size: 12px; text-align: center;">
