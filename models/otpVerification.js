@@ -15,7 +15,7 @@ const otpVerificationSchema = new Schema({
         username: String,
         email: String,
         name: String,
-        phone: String,
+        program: String,
         branch: String,
         year: String,
         password: String

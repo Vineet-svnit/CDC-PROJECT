@@ -49,8 +49,8 @@
 
               <div class="row">
                 <div class="col-md-6">
-                  <small class="text-muted d-block mb-1">Phone</small>
-                  <p class="mb-0 fw-500"><%= user.phone %></p>
+                  <small class="text-muted d-block mb-1">Program</small>
+                  <p class="mb-0 fw-500"><%= user.program.toUpperCase() %></p>
                 </div>
                 <div class="col-md-6">
                   <small class="text-muted d-block mb-1">Name</small>
@@ -69,12 +69,6 @@
                 <div class="mb-3">
                   <label for="name" class="form-label fw-500">Full Name</label>
                   <input type="text" class="form-control" id="name" name="name" value="<%= user.name %>" required>
-                </div>
-
-                <div class="mb-4">
-                  <label for="phone" class="form-label fw-500">Phone Number</label>
-                  <input type="tel" class="form-control" id="phone" name="phone" value="<%= user.phone %>" pattern="[0-9]{10}" required>
-                  <small class="text-muted">10 digits only</small>
                 </div>
 
                 <button type="submit" class="btn btn-primary w-100 fw-bold">

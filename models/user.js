@@ -19,14 +19,14 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
-    phone: {
+    program: {
         type: String,
-        required: true,
-        match: /^[0-9]{10}$/
+        enum: ['btech', 'mtech', 'mba', 'msc'],
+        required: true
     },
     branch: {
         type: String,
-        enum: ['ai', 'che', 'chm', 'ce', 'cse', 'ee', 'ece', 'hss', 'ms', 'math', 'me', 'phy'],
+        enum: ['ai', 'che', 'chm', 'ce', 'cse', 'ee', 'ece', 'hss', 'ms', 'math', 'me', 'phy', 'physics', 'chemistry', ''],
         required: true
     },
     year: {

@@ -32,6 +32,10 @@
         let correctMarksTotal = 0;
         let incorrectMarksTotal = 0;
         let unattemptedMarksTotal = 0;
+        
+        let correctQuestionsTotal = 0;
+        let incorrectQuestionsTotal = 0;
+        let unattemptedQuestionsTotal = 0;
 
         questions.forEach((q, i) => {
         const ans = answers[i] || {};
@@ -41,11 +45,46 @@
 
         if (!attempted) {
         unattemptedMarksTotal += maxMarks;
-        } else {
+        unattemptedQuestionsTotal++;
+        } else if (score > 0) {
         correctMarksTotal += score;
+        correctQuestionsTotal++;
+        } else {
         incorrectMarksTotal += Math.max(0, maxMarks - score);
+        incorrectQuestionsTotal++;
         }
         });
+
+        // Category-wise analysis
+        const categoryStats = {};
+        questions.forEach((q, i) => {
+          const category = q.category || 'Uncategorized';
+          if (!categoryStats[category]) {
+            categoryStats[category] = {
+              correct: 0,
+              incorrect: 0,
+              unattempted: 0,
+              total: 0
+            };
+          }
+          
+          const ans = answers[i] || {};
+          const score = ans.score || 0;
+          const attempted = (ans.answer || "").toString().trim().length > 0;
+          const maxMarks = (q._type === 'MCQ') ? 4 : 3;
+          
+          categoryStats[category].total++;
+          
+          if (!attempted) {
+            categoryStats[category].unattempted++;
+          } else if (score > 0) {
+            categoryStats[category].correct++;
+          } else {
+            categoryStats[category].incorrect++;
+          }
+        });
+
+        const categories = Object.keys(categoryStats);
         %>
 
         <div class="row mb-5">
@@ -90,30 +129,109 @@
               </div>
             </div>
 
-            <div class="row justify-content-center">
+            <div class="row justify-content-center mb-5">
               <div class="col-lg-6">
                 <div class="card border-0 shadow-sm p-4 text-center">
-                  <h5 class="fw-bold mb-4" style="color:#27496d">Marks Distribution</h5>
+                  <h5 class="fw-bold mb-4" style="color:#27496d">Overall Performance</h5>
                   <div style="height: 300px; position: relative;">
                     <canvas id="performanceChart"></canvas>
                   </div>
                   <div class="mt-3 d-flex justify-content-center gap-4">
                     <div class="d-flex align-items-center gap-2">
                       <div style="width: 12px; height: 12px; border-radius: 50%; background: #22c55e;"></div>
-                      <small class="text-muted">Correct: <%= correctMarksTotal %></small>
+                      <small class="text-muted">Correct: <%= correctQuestionsTotal %></small>
                     </div>
                     <div class="d-flex align-items-center gap-2">
                       <div style="width: 12px; height: 12px; border-radius: 50%; background: #ef4444;"></div>
-                      <small class="text-muted">Incorrect: <%= incorrectMarksTotal %></small>
+                      <small class="text-muted">Incorrect: <%= incorrectQuestionsTotal %></small>
                     </div>
                     <div class="d-flex align-items-center gap-2">
                       <div style="width: 12px; height: 12px; border-radius: 50%; background: #94a3b8;"></div>
-                      <small class="text-muted">Unattempted: <%= unattemptedMarksTotal %></small>
+                      <small class="text-muted">Unattempted: <%= unattemptedQuestionsTotal %></small>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
+
+            <!-- Category-wise Analysis Carousel -->
+            <% if (categories.length > 0) { %>
+            <div class="row">
+              <div class="col-12">
+                <div class="card border-0 shadow-sm p-4">
+                  <h5 class="fw-bold mb-4 text-center" style="color:#27496d">Category-wise Analysis</h5>
+                  
+                  <div id="categoryCarousel" class="carousel slide" data-bs-ride="false">
+                    <!-- Indicators -->
+                    <div class="carousel-indicators">
+                      <% for (let i = 0; i < Math.ceil(categories.length / 3); i++) { %>
+                        <button type="button" data-bs-target="#categoryCarousel" data-bs-slide-to="<%= i %>" 
+                          class="<%= i === 0 ? 'active' : '' %>" aria-current="<%= i === 0 ? 'true' : 'false' %>" 
+                          aria-label="Slide <%= i + 1 %>"></button>
+                      <% } %>
+                    </div>
+
+                    <!-- Carousel Items -->
+                    <div class="carousel-inner">
+                      <% for (let slideIndex = 0; slideIndex < Math.ceil(categories.length / 3); slideIndex++) { %>
+                        <div class="carousel-item <%= slideIndex === 0 ? 'active' : '' %>">
+                          <div class="row g-4 px-3 py-4">
+                            <% for (let i = slideIndex * 3; i < Math.min((slideIndex + 1) * 3, categories.length); i++) { 
+                              const category = categories[i];
+                              const stats = categoryStats[category];
+                            %>
+                              <div class="col-lg-4 col-md-6">
+                                <div class="card border-0 h-100" style="background: linear-gradient(135deg, #f8fafc, #e2e8f0);">
+                                  <div class="card-body text-center">
+                                    <h6 class="fw-bold mb-3" style="color:#27496d"><%= category %></h6>
+                                    <div style="height: 200px; position: relative; margin-bottom: 1rem;">
+                                      <canvas id="categoryChart<%= i %>"></canvas>
+                                    </div>
+                                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                                      <div class="text-center">
+                                        <div style="width: 10px; height: 10px; border-radius: 50%; background: #22c55e; margin: 0 auto 4px;"></div>
+                                        <small class="text-muted d-block">Correct</small>
+                                        <strong style="color:#22c55e"><%= stats.correct %></strong>
+                                      </div>
+                                      <div class="text-center">
+                                        <div style="width: 10px; height: 10px; border-radius: 50%; background: #ef4444; margin: 0 auto 4px;"></div>
+                                        <small class="text-muted d-block">Incorrect</small>
+                                        <strong style="color:#ef4444"><%= stats.incorrect %></strong>
+                                      </div>
+                                      <div class="text-center">
+                                        <div style="width: 10px; height: 10px; border-radius: 50%; background: #94a3b8; margin: 0 auto 4px;"></div>
+                                        <small class="text-muted d-block">Unattempted</small>
+                                        <strong style="color:#94a3b8"><%= stats.unattempted %></strong>
+                                      </div>
+                                    </div>
+                                    <div class="mt-2">
+                                      <small class="text-muted">Total Questions: <strong><%= stats.total %></strong></small>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            <% } %>
+                          </div>
+                        </div>
+                      <% } %>
+                    </div>
+
+                    <!-- Controls -->
+                    <% if (categories.length > 3) { %>
+                      <button class="carousel-control-prev" type="button" data-bs-target="#categoryCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true" style="filter: invert(1);"></span>
+                        <span class="visually-hidden">Previous</span>
+                      </button>
+                      <button class="carousel-control-next" type="button" data-bs-target="#categoryCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true" style="filter: invert(1);"></span>
+                        <span class="visually-hidden">Next</span>
+                      </button>
+                    <% } %>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <% } %>
 
           </div>
         </div>
@@ -135,6 +253,7 @@
                       <th>Your Answer</th>
                       <th>Correct</th>
                       <th>Score</th>
+                      <th>Category</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -171,10 +290,15 @@
                         <td style="background:<%= rowBgColor %>">
                           <%= score %>
                         </td>
+                        <td style="background:<%= rowBgColor %>">
+                          <span class="badge" style="background-color: #27496d; font-size: 0.75rem;">
+                            <%= q.category || 'N/A' %>
+                          </span>
+                        </td>
                       </tr>
 
                       <tr class="collapse" id="opt-<%= i %>">
-                        <td colspan="5" class="p-0">
+                        <td colspan="6" class="p-0">
                           <div style="background:<%= rowBgColor %>; padding: 16px;">
                             <div class="options-container">
                               <% const opts=[q.option1, q.option2, q.option3, q.option4].filter(Boolean); for (let oi=0;
@@ -269,13 +393,54 @@
       background-color: white;
       color: #dc3545;
     }
+
+    /* Carousel styling */
+    #categoryCarousel .carousel-control-prev,
+    #categoryCarousel .carousel-control-next {
+      width: 5%;
+      opacity: 0.8;
+    }
+
+    #categoryCarousel .carousel-control-prev:hover,
+    #categoryCarousel .carousel-control-next:hover {
+      opacity: 1;
+    }
+
+    #categoryCarousel .carousel-control-prev-icon,
+    #categoryCarousel .carousel-control-next-icon {
+      /* background-color: #27496d; */
+      border-radius: 50%;
+      padding: 20px;
+    }
+    #categoryCarousel .carousel-control-prev-icon{
+      margin-right: 60px;
+    }
+    #categoryCarousel .carousel-control-next-icon {
+      margin-left: 60px;
+    }
+    #categoryCarousel .carousel-indicators {
+      margin-bottom: -1rem;
+    }
+
+    #categoryCarousel .carousel-indicators button {
+      background-color: #27496d;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    #categoryCarousel .carousel-item {
+      min-height: 350px;
+    }
   </style>
 
   <script>
     (function () {
       const btn = document.getElementById("expandToggle");
+      const categoryFilter = document.getElementById("categoryFilter");
       let open = false;
 
+      // Expand/Collapse All functionality
       btn?.addEventListener("click", () => {
         document.querySelectorAll(".collapse").forEach(el => {
           const c = bootstrap.Collapse.getOrCreateInstance(el, { toggle: false });
@@ -284,11 +449,44 @@
         btn.innerText = open ? "Expand All" : "Collapse All";
         open = !open;
       });
+
+      // Category Filter functionality
+      categoryFilter?.addEventListener("change", (e) => {
+        const selectedCategory = e.target.value;
+        const questionRows = document.querySelectorAll(".question-row");
+        const detailRows = document.querySelectorAll(".question-detail");
+        
+        questionRows.forEach((row, index) => {
+          const rowCategory = row.getAttribute("data-category");
+          const detailRow = detailRows[index];
+          
+          if (selectedCategory === "all" || rowCategory === selectedCategory) {
+            row.style.display = "";
+            if (detailRow) {
+              detailRow.style.display = "";
+            }
+          } else {
+            row.style.display = "none";
+            if (detailRow) {
+              detailRow.style.display = "none";
+              // Collapse the detail row if it's expanded
+              const collapse = bootstrap.Collapse.getInstance(detailRow);
+              if (collapse) {
+                collapse.hide();
+              }
+            }
+          }
+        });
+
+        // Reset expand/collapse button state
+        open = false;
+        btn.innerText = "Expand All";
+      });
     })();
   </script>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
+    // Overall Performance Chart
     (function () {
       const ctx = document.getElementById('performanceChart').getContext('2d');
       new Chart(ctx, {
@@ -296,9 +494,10 @@
         data: {
           labels: ['Correct', 'Incorrect', 'Unattempted'],
           datasets: [{
-            data: [<%= correctMarksTotal %>, <%= incorrectMarksTotal %>, <%= unattemptedMarksTotal %>],
+            data: [<%= correctQuestionsTotal %>, <%= incorrectQuestionsTotal %>, <%= unattemptedQuestionsTotal %>],
             backgroundColor: ['#22c55e', '#ef4444', '#94a3b8'],
-            borderWidth: 0,
+            borderWidth: 2,
+            borderColor: '#fff',
             hoverOffset: 10
           }]
         },
@@ -315,7 +514,7 @@
                     label += ': ';
                   }
                   if (context.parsed !== null) {
-                    label += context.parsed + ' marks';
+                    label += context.parsed + ' question' + (context.parsed !== 1 ? 's' : '');
                   }
                   return label;
                 }
@@ -327,6 +526,51 @@
         }
       });
     })();
+
+    // Category-wise Charts
+    <% categories.forEach((category, index) => { 
+      const stats = categoryStats[category];
+    %>
+      (function () {
+        const ctx = document.getElementById('categoryChart<%= index %>').getContext('2d');
+        new Chart(ctx, {
+          type: 'pie',
+          data: {
+            labels: ['Correct', 'Incorrect', 'Unattempted'],
+            datasets: [{
+              data: [<%= stats.correct %>, <%= stats.incorrect %>, <%= stats.unattempted %>],
+              backgroundColor: ['#22c55e', '#ef4444', '#94a3b8'],
+              borderWidth: 2,
+              borderColor: '#fff',
+              hoverOffset: 8
+            }]
+          },
+          options: {
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    let label = context.label || '';
+                    if (label) {
+                      label += ': ';
+                    }
+                    if (context.parsed !== null) {
+                      label += context.parsed + ' question' + (context.parsed !== 1 ? 's' : '');
+                    }
+                    return label;
+                  }
+                }
+              }
+            },
+            responsive: true,
+            maintainAspectRatio: false
+          }
+        });
+      })();
+    <% }); %>
   </script>
   </body>
 

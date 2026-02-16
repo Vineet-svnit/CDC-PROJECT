@@ -277,10 +277,10 @@ app.get('/settings', isLoggedIn, async (req, res) => {
 
 app.post('/settings/update', isLoggedIn, async (req, res) => {
     try {
-        const { name, email, phone } = req.body;
+        const { name } = req.body;
         const user = await User.findByIdAndUpdate(
             req.user._id,
-            { name, email, phone },
+            { name },
             { new: true, runValidators: true }
         );
         req.flash('success', 'Profile updated successfully!');
@@ -303,7 +303,7 @@ app.get('/admin/logout', (req, res, next) => {
 
 app.post('/register', async (req, res) => {
     try {
-        const { username, password, email, name, phone, branch, year } = req.body;
+        const { username, password, email, name, program, branch, year } = req.body;
 
         // Check if user already exists
         const existingUser = await User.findOne({ $or: [{ username }, { email }] });
@@ -325,7 +325,7 @@ app.post('/register', async (req, res) => {
                 email,
                 otp,
                 expiresAt,
-                userData: { username, password, email, name, phone, branch, year }
+                userData: { username, password, email, name, program, branch, year }
             },
             { upsert: true, new: true }
         );
@@ -380,8 +380,8 @@ app.post('/verify-otp', async (req, res) => {
         }
 
         // OTP is correct, create user account
-        const { username, password, name, phone, branch, year } = otpRecord.userData;
-        const user = new User({ username, email, name, phone, branch, year });
+        const { username, password, name, program, branch, year } = otpRecord.userData;
+        const user = new User({ username, email, name, program, branch, year });
         const registeredUser = await User.register(user, password);
 
         // Delete OTP record after successful registration

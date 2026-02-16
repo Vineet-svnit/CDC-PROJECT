@@ -39,28 +39,18 @@
                 <label for="name">Full name</label>
             </div>
             <div class="form-floating mb-3">
-                <input type="number" class="form-control" name="phone" placeholder="Enter Phone Number" id="phone"
-                    required>
-                <label for="phone">Phone number</label>
-            </div>
-            <div class="form-floating mb-3">
                 <input type="number" class="form-control" name="year" placeholder="Year" id="year" required>
                 <label for="year">Year</label>
             </div>
-            <select class="form-select form-select-lg mb-3" aria-label="Large select example" name="branch" required>
+            <select class="form-select form-select-lg mb-3" aria-label="Select program" name="program" id="program" required>
+                <option value="" disabled selected>Select program</option>
+                <option value="btech">B.Tech</option>
+                <option value="mtech">M.Tech</option>
+                <option value="mba">MBA</option>
+                <option value="msc">M.Sc</option>
+            </select>
+            <select class="form-select form-select-lg mb-3" aria-label="Select branch" name="branch" id="branch" required>
                 <option value="" disabled selected>Select branch</option>
-                <option value="ai">Artificial Intelligence</option>
-                <option value="che">Chemical Engineering</option>
-                <option value="chm">Chemistry</option>
-                <option value="ce">Civil Engineering</option>
-                <option value="cse">Computer Science and Engineering</option>
-                <option value="ee">Electrical Engineering</option>
-                <option value="ece">Electronics Engineering</option>
-                <option value="hss">Humanities and Social Sciences</option>
-                <option value="ms">Management Studies</option>
-                <option value="math">Mathematics</option>
-                <option value="me">Mechanical Engineering</option>
-                <option value="phy">Physics</option>
             </select>
             <button class="btn btn-dark mb-3" id="register">Register</button>
             <p>Already have an account? &MediumSpace;<a href="/login">Log in</a>
@@ -70,6 +60,70 @@
     <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="/js/script.js"></script>
     <script src="/js/register_login.js"></script>
+    <script>
+        // Dynamic branch dropdown based on program selection
+        const programSelect = document.getElementById('program');
+        const branchSelect = document.getElementById('branch');
+
+        const branchOptions = {
+            btech: [
+                { value: 'ai', text: 'Artificial Intelligence' },
+                { value: 'che', text: 'Chemical Engineering' },
+                { value: 'chm', text: 'Chemistry' },
+                { value: 'ce', text: 'Civil Engineering' },
+                { value: 'cse', text: 'Computer Science and Engineering' },
+                { value: 'ee', text: 'Electrical Engineering' },
+                { value: 'ece', text: 'Electronics Engineering' },
+                { value: 'hss', text: 'Humanities and Social Sciences' },
+                { value: 'ms', text: 'Management Studies' },
+                { value: 'math', text: 'Mathematics' },
+                { value: 'me', text: 'Mechanical Engineering' },
+                { value: 'phy', text: 'Physics' }
+            ],
+            mtech: [
+                { value: 'ai', text: 'Artificial Intelligence' },
+                { value: 'che', text: 'Chemical Engineering' },
+                { value: 'chm', text: 'Chemistry' },
+                { value: 'ce', text: 'Civil Engineering' },
+                { value: 'cse', text: 'Computer Science and Engineering' },
+                { value: 'ee', text: 'Electrical Engineering' },
+                { value: 'ece', text: 'Electronics Engineering' },
+                { value: 'hss', text: 'Humanities and Social Sciences' },
+                { value: 'ms', text: 'Management Studies' },
+                { value: 'math', text: 'Mathematics' },
+                { value: 'me', text: 'Mechanical Engineering' },
+                { value: 'phy', text: 'Physics' }
+            ],
+            msc: [
+                { value: 'physics', text: 'Physics' },
+                { value: 'chemistry', text: 'Chemistry' },
+                { value: 'math', text: 'Mathematics' }
+            ],
+            mba: [
+                { value: '', text: 'No branch required' }
+            ]
+        };
+
+        programSelect.addEventListener('change', function() {
+            const selectedProgram = this.value;
+            branchSelect.innerHTML = '<option value="" disabled selected>Select branch</option>';
+            
+            if (selectedProgram && branchOptions[selectedProgram]) {
+                branchOptions[selectedProgram].forEach(option => {
+                    const opt = document.createElement('option');
+                    opt.value = option.value;
+                    opt.textContent = option.text;
+                    branchSelect.appendChild(opt);
+                });
+                branchSelect.disabled = false;
+            } else {
+                branchSelect.disabled = true;
+            }
+        });
+
+        // Initially disable branch select
+        branchSelect.disabled = true;
+    </script>
 </body>
 
 </html>
