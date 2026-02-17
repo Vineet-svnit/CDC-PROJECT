@@ -1,340 +1,441 @@
 <% layout("/layouts/adminBoilerplate") %>
 
-<!-- Admin Header -->
-<div class="admin-header">
+  <!-- Admin Header -->
+  <div class="admin-header">
+    <div class="container-lg">
+      <h1>Admin Dashboard</h1>
+    </div>
+  </div>
+
   <div class="container-lg">
-    <h1>Admin Dashboard</h1>
-  </div>
-</div>
-
-<div class="container-lg">
-  <!-- Stats Cards -->
-  <div class="row g-4 mb-5">
-    <div class="col-lg-3 col-md-6">
-      <div class="stats-card students">
-        <div class="card-icon">
-          <i class="fas fa-users"></i>
-        </div>
-        <h6>Total Students</h6>
-        <h3 id="totalStudents">--</h3>
-        <div class="text-muted">Registered Users</div>
-      </div>
-    </div>
-    <div class="col-lg-3 col-md-6">
-      <div class="stats-card active-tests">
-        <div class="card-icon">
-          <i class="fas fa-play-circle"></i>
-        </div>
-        <h6>Active Tests</h6>
-        <h3 id="activeTests">--</h3>
-        <div class="text-muted">Ongoing right now</div>
-      </div>
-    </div>
-    <div class="col-lg-3 col-md-6">
-      <div class="stats-card completed-tests">
-        <div class="card-icon">
-          <i class="fas fa-check-circle"></i>
-        </div>
-        <h6>Completed Tests</h6>
-        <h3 id="completedTests">--</h3>
-        <div class="text-muted">Already finished</div>
-      </div>
-    </div>
-    <div class="col-lg-3 col-md-6">
-      <div class="stats-card upcoming-tests">
-        <div class="card-icon">
-          <i class="fas fa-clock"></i>
-        </div>
-        <h6>Upcoming Tests</h6>
-        <h3 id="upcomingTests">--</h3>
-        <div class="text-muted">Starting soon</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Announcements & Tests -->
-  <div class="row g-4 mb-5">
-    <div class="col-lg-6">
-      <div class="admin-section-card">
-        <div class="card-header">
-          <h5 class="announcements">Announcements</h5>
-          <a href="/announcement/new" class="btn btn-primary btn-sm">
-            <i class="fas fa-plus"></i> New Announcement
-          </a>
-        </div>
-        <div class="card-body">
-          <% if (allAnnouncements && allAnnouncements.length > 0) { %>
-            <% for (let ai = 0; ai < allAnnouncements.length; ai++) { const announcement = allAnnouncements[ai]; %>
-              <div class="announcement-item" data-index="<%= ai %>">
-                <div class="fw-semibold"><%= announcement.title %></div>
-                <div class="text-muted small">Date: <%= announcement.date %></div>
-                <div class="mt-2"><%- announcement.body %></div>
-                <div class="mt-3 text-end">
-                  <a href="/announcement/<%= announcement._id %>" class="btn btn-sm btn-warning">
-                    <i class="fas fa-edit"></i> Edit
-                  </a>
-                  <form action="/announcement/<%= announcement._id %>?_method=DELETE" method="POST" style="display:inline">
-                    <button class="btn btn-danger btn-sm">
-                      <i class="fas fa-trash"></i> Delete
-                    </button>
-                  </form>
-                </div>
-              </div>
-            <% } %>
-          <% } else { %>
-            <div class="text-center py-4">
-              <i class="fas fa-bullhorn text-muted" style="font-size: 3rem; opacity: 0.3;"></i>
-              <p class="text-muted mt-2">No announcements yet</p>
-            </div>
-          <% } %>
-        </div>
-        <% if (allAnnouncements && allAnnouncements.length > 5) { %>
-          <div class="card-footer bg-white text-center">
-            <button id="toggleAnnouncementsBtn" class="btn btn-sm btn-outline-primary">
-              <i class="fas fa-eye"></i> Show All Announcements
-            </button>
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-5">
+      <div class="col-lg-3 col-md-6">
+        <div class="stats-card students">
+          <div class="card-icon">
+            <i class="fas fa-users"></i>
           </div>
-        <% } %>
-        <div class="card-footer bg-white" style="padding: 15px;">
-          <h6 class="fw-bold mb-3">
-            <i class="fas fa-download text-primary"></i> Download Results
-          </h6>
-          <form action="/download" method="POST" class="row g-3 align-items-end" style="padding: 15px;">
-            <div class="col-md-6">
-              <label for="branch_name" class="form-label">Select Branch</label>
-              <select class="form-select" id="branch_name" name="branch_name" required>
-                <option value="" disabled selected>Select branch</option>
-                <option value="lr">Logical Reasoning and Aptitude</option>
-                <option value="ai">Artificial Intelligence</option>
-                <option value="che">Chemical Engineering</option>
-                <option value="chm">Chemistry</option>
-                <option value="ce">Civil Engineering</option>
-                <option value="cse">Computer Science and Engineering</option>
-                <option value="ee">Electrical Engineering</option>
-                <option value="ece">Electronics Engineering</option>
-                <option value="hss">Humanities and Social Sciences</option>
-                <option value="ms">Management Studies</option>
-                <option value="math">Mathematics</option>
-                <option value="me">Mechanical Engineering</option>
-                <option value="phy">Physics</option>
-              </select>
-            </div>
-            <div class="col-md-6">
-              <label for="test_id" class="form-label">Select Test</label>
-              <select class="form-select" id="test_id" name="test_id" required>
-                <option value="" disabled selected>Select test</option>
-              </select>
-            </div>
-            <div class="col-12">
-              <button type="submit" class="btn btn-success w-100">
-                <i class="fas fa-download"></i> Download Result
-              </button>
-            </div>
-          </form>
+          <h6>Total Students</h6>
+          <h3 id="totalStudents">--</h3>
+          <div class="text-muted">Registered Users</div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="stats-card active-tests">
+          <div class="card-icon">
+            <i class="fas fa-play-circle"></i>
+          </div>
+          <h6>Active Tests</h6>
+          <h3 id="activeTests">--</h3>
+          <div class="text-muted">Ongoing right now</div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="stats-card completed-tests">
+          <div class="card-icon">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <h6>Completed Tests</h6>
+          <h3 id="completedTests">--</h3>
+          <div class="text-muted">Already finished</div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-6">
+        <div class="stats-card upcoming-tests">
+          <div class="card-icon">
+            <i class="fas fa-clock"></i>
+          </div>
+          <h6>Upcoming Tests</h6>
+          <h3 id="upcomingTests">--</h3>
+          <div class="text-muted">Starting soon</div>
         </div>
       </div>
     </div>
 
-    <div class="col-lg-6">
-      <div class="admin-section-card">
-        <div class="card-header">
-          <h5 class="tests">Tests</h5>
-          <a href="/test/new" class="btn btn-primary btn-sm">
-            <i class="fas fa-plus"></i> New Test
-          </a>
-        </div>
-        <div class="card-body">
-          <div id="testsList">
-            <% if (allTests && allTests.length > 0) { %>
-              <% for (let ti = 0; ti < allTests.length; ti++) { const test = allTests[ti]; %>
-                <div class="test-item" data-index="<%= ti %>">
-                  <div class="fw-semibold"><%= test.testName %></div>
-                  <div class="text-muted small">Scheduled: <%= formatDate(test.startTime) %> <%= formatTime(test.startTime) %></div>
-                  <div class="mt-2">
-                    <span class="badge bg-info">
-                      <i class="fas fa-question-circle"></i> <%= test.numberOfQues %> Questions
-                    </span>
-                    <span class="badge bg-success">
-                      <i class="fas fa-star"></i> <%= test.totalMarks %> Marks
-                    </span>
+    <!-- Announcements & Tests -->
+    <div class="row g-4 mb-5">
+      <div class="col-lg-6">
+        <div class="admin-section-card">
+          <div class="card-header">
+            <h5 class="announcements">Announcements</h5>
+            <a href="/announcement/new" class="btn btn-primary btn-sm">
+              <i class="fas fa-plus"></i> New Announcement
+            </a>
+          </div>
+          <div class="card-body">
+            <% if (allAnnouncements && allAnnouncements.length> 0) { %>
+              <% for (let ai=0; ai < allAnnouncements.length; ai++) { const announcement=allAnnouncements[ai]; %>
+                <div class="announcement-item" data-index="<%= ai %>">
+                  <div class="fw-semibold">
+                    <%= announcement.title %>
                   </div>
+                  <div class="text-muted small">Date: <%= announcement.date %>
+                  </div>
+                  <div class="mt-2"><%- announcement.body %></div>
                   <div class="mt-3 text-end">
-                    <a href="/test/<%= test._id %>" class="btn btn-sm btn-warning">
+                    <a href="/announcement/<%= announcement._id %>" class="btn btn-sm btn-warning">
                       <i class="fas fa-edit"></i> Edit
                     </a>
-                    <form action="/test/<%= test._id %>?_method=DELETE" method="POST" style="display:inline">
-                      <button class="btn btn-danger btn-sm" <%= hasStarted(test.startTime) ? 'disabled' : '' %>>
+                    <form action="/announcement/<%= announcement._id %>?_method=DELETE" method="POST"
+                      style="display:inline">
+                      <button class="btn btn-danger btn-sm">
                         <i class="fas fa-trash"></i> Delete
                       </button>
                     </form>
                   </div>
                 </div>
-              <% } %>
-            <% } else { %>
-              <div class="text-center py-4">
-                <i class="fas fa-clipboard-list text-muted" style="font-size: 3rem; opacity: 0.3;"></i>
-                <p class="text-muted mt-2">No tests yet</p>
-              </div>
-            <% } %>
+                <% } %>
+                  <% } else { %>
+                    <div class="text-center py-4">
+                      <i class="fas fa-bullhorn text-muted" style="font-size: 3rem; opacity: 0.3;"></i>
+                      <p class="text-muted mt-2">No announcements yet</p>
+                    </div>
+                    <% } %>
           </div>
-          <% if (allTests && allTests.length > 5) { %>
-            <div class="text-center mt-3">
-              <button id="toggleTestsBtn" class="btn btn-sm btn-outline-primary">
-                <i class="fas fa-eye"></i> Show All Tests
+          <% if (allAnnouncements && allAnnouncements.length> 5) { %>
+            <div class="card-footer bg-white text-center">
+              <button id="toggleAnnouncementsBtn" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-eye"></i> Show All Announcements
               </button>
             </div>
-          <% } %>
+            <% } %>
+              <div class="card-footer bg-white" style="padding: 15px;">
+                <h6 class="fw-bold mb-3">
+                  <i class="fas fa-download text-primary"></i> Download Results
+                </h6>
+                <form action="/download" method="POST" class="row g-3 align-items-end" style="padding: 15px;">
+                  <div class="col-md-6">
+                    <label for="branch_name" class="form-label">Select Branch</label>
+                    <select class="form-select" id="branch_name" name="branch_name" required>
+                      <option value="" disabled selected>Select branch</option>
+                      <option value="lr">Logical Reasoning and Aptitude</option>
+                      <option value="ai">Artificial Intelligence</option>
+                      <option value="che">Chemical Engineering</option>
+                      <option value="chm">Chemistry</option>
+                      <option value="ce">Civil Engineering</option>
+                      <option value="cse">Computer Science and Engineering</option>
+                      <option value="ee">Electrical Engineering</option>
+                      <option value="ece">Electronics Engineering</option>
+                      <option value="hss">Humanities and Social Sciences</option>
+                      <option value="ms">Management Studies</option>
+                      <option value="math">Mathematics</option>
+                      <option value="me">Mechanical Engineering</option>
+                      <option value="phy">Physics</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="test_id" class="form-label">Select Test</label>
+                    <select class="form-select" id="test_id" name="test_id" required>
+                      <option value="" disabled selected>Select test</option>
+                    </select>
+                  </div>
+                  <div class="col-12">
+                    <button type="submit" class="btn btn-success w-100">
+                      <i class="fas fa-download"></i> Download Result
+                    </button>
+                  </div>
+                </form>
+              </div>
+        </div>
+      </div>
 
-          <div class="upload-section">
-            <h6 class="fw-bold mb-3">
-              <i class="fas fa-upload text-info"></i> Upload Questions
-            </h6>
-            <form action="/upload" method="POST" enctype="multipart/form-data" class="row g-3 align-items-end">
-              <div class="col-md-6">
-                <label for="branch" class="form-label">Select Branch</label>
-                <select class="form-select" id="branch" name="branch" required>
-                  <option value="" disabled selected>Select branch</option>
-                  <option value="lr">Logical Reasoning and Aptitude</option>
-                  <option value="ai">Artificial Intelligence</option>
-                  <option value="che">Chemical Engineering</option>
-                  <option value="chm">Chemistry</option>
-                  <option value="ce">Civil Engineering</option>
-                  <option value="cse">Computer Science and Engineering</option>
-                  <option value="ee">Electrical Engineering</option>
-                  <option value="ece">Electronics Engineering</option>
-                  <option value="hss">Humanities and Social Sciences</option>
-                  <option value="ms">Management Studies</option>
-                  <option value="math">Mathematics</option>
-                  <option value="me">Mechanical Engineering</option>
-                  <option value="phy">Physics</option>
-                </select>
-              </div>
-              <div class="col-md-6">
-                <label for="file" class="form-label">Upload Excel File</label>
-                <input class="form-control" type="file" id="file" name="file" accept=".xlsx,.xls" required>
-              </div>
-              <div class="col-12">
-                <button type="submit" class="btn btn-success w-100">
-                  <i class="fas fa-upload"></i> Upload Questions
+      <div class="col-lg-6">
+        <div class="admin-section-card">
+          <div class="card-header">
+            <h5 class="tests">Tests</h5>
+            <a href="/test/new" class="btn btn-primary btn-sm">
+              <i class="fas fa-plus"></i> New Test
+            </a>
+          </div>
+          <div class="card-body">
+            <div id="testsList">
+              <% if (allTests && allTests.length> 0) { %>
+                <% for (let ti=0; ti < allTests.length; ti++) { const test=allTests[ti]; %>
+                  <div class="test-item" data-index="<%= ti %>">
+                    <div class="fw-semibold">
+                      <%= test.testName %>
+                    </div>
+                    <div class="text-muted small">Scheduled: <%= formatDate(test.startTime) %>
+                        <%= formatTime(test.startTime) %>
+                    </div>
+                    <div class="mt-2">
+                      <span class="badge bg-info">
+                        <i class="fas fa-question-circle"></i>
+                        <%= test.numberOfQues %> Questions
+                      </span>
+                      <span class="badge bg-success">
+                        <i class="fas fa-star"></i>
+                        <%= test.totalMarks %> Marks
+                      </span>
+                    </div>
+                    <div class="mt-3 text-end">
+                      <a href="/test/<%= test._id %>" class="btn btn-sm btn-warning">
+                        <i class="fas fa-edit"></i> Edit
+                      </a>
+                      <form action="/test/<%= test._id %>?_method=DELETE" method="POST" style="display:inline">
+                        <button class="btn btn-danger btn-sm" <%=hasStarted(test.startTime) ? 'disabled' : '' %>>
+                          <i class="fas fa-trash"></i> Delete
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                  <% } %>
+                    <% } else { %>
+                      <div class="text-center py-4">
+                        <i class="fas fa-clipboard-list text-muted" style="font-size: 3rem; opacity: 0.3;"></i>
+                        <p class="text-muted mt-2">No tests yet</p>
+                      </div>
+                      <% } %>
+            </div>
+            <% if (allTests && allTests.length> 5) { %>
+              <div class="text-center mt-3">
+                <button id="toggleTestsBtn" class="btn btn-sm btn-outline-primary">
+                  <i class="fas fa-eye"></i> Show All Tests
                 </button>
               </div>
-            </form>
+              <% } %>
+
+                <div class="upload-section">
+                  <h6 class="fw-bold mb-3">
+                    <i class="fas fa-upload text-info"></i> Upload Questions
+                  </h6>
+                  <form action="/upload" method="POST" enctype="multipart/form-data" class="row g-3 align-items-end">
+                    <div class="col-md-6">
+                      <label for="branch" class="form-label">Select Branch</label>
+                      <select class="form-select" id="branch" name="branch" required>
+                        <option value="" disabled selected>Select branch</option>
+                        <option value="lr">Logical Reasoning and Aptitude</option>
+                        <option value="ai">Artificial Intelligence</option>
+                        <option value="che">Chemical Engineering</option>
+                        <option value="chm">Chemistry</option>
+                        <option value="ce">Civil Engineering</option>
+                        <option value="cse">Computer Science and Engineering</option>
+                        <option value="ee">Electrical Engineering</option>
+                        <option value="ece">Electronics Engineering</option>
+                        <option value="hss">Humanities and Social Sciences</option>
+                        <option value="ms">Management Studies</option>
+                        <option value="math">Mathematics</option>
+                        <option value="me">Mechanical Engineering</option>
+                        <option value="phy">Physics</option>
+                      </select>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="file" class="form-label">Upload Excel File</label>
+                      <input class="form-control" type="file" id="file" name="file" accept=".xlsx,.xls" required>
+                    </div>
+                    <div class="col-12">
+                      <button type="submit" class="btn btn-success w-100">
+                        <i class="fas fa-upload"></i> Upload Questions
+                      </button>
+                    </div>
+                  </form>
+                </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Leaderboard -->
-  <div class="admin-section-card">
-    <div class="card-header">
-      <h5>
-        <i class="fas fa-trophy text-warning"></i> Leaderboard
-      </h5>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-wrap gap-3 mb-4">
-        <div class="flex-fill">
-          <label for="branchSelect" class="form-label">Branch</label>
-          <select id="branchSelect" class="form-select">
-            <option value="lr" selected>Logical Reasoning</option>
-            <option value="ai">Artificial Intelligence</option>
-            <option value="che">Chemical Engineering</option>
-            <option value="chm">Chemistry</option>
-            <option value="ce">Civil Engineering</option>
-            <option value="cse">Computer Science & Engineering</option>
-            <option value="ee">Electrical Engineering</option>
-            <option value="ece">Electronics & Communication</option>
-            <option value="hss">Humanities & Social Sciences</option>
-            <option value="ms">Management Studies</option>
-            <option value="math">Mathematics</option>
-            <option value="me">Mechanical Engineering</option>
-            <option value="phy">Physics</option>
-          </select>
-        </div>
-        <div class="flex-fill">
-          <label for="testSelect" class="form-label">Test</label>
-          <select id="testSelect" class="form-select">
-            <option value="">Select Test</option>
-          </select>
+    <!-- Branch Performance Analysis -->
+    <div class="row g-4 mb-5">
+      <div class="col-12">
+        <div class="admin-section-card">
+          <div class="card-header">
+            <h5 class="stats">
+              <i class="fas fa-chart-pie text-primary"></i> Branch Performance Analysis
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-3">
+                <label for="stats_program" class="form-label">Program</label>
+                <select class="form-select" id="stats_program" required>
+                  <option value="" disabled selected>Select program</option>
+                  <option value="btech">B.Tech</option>
+                  <option value="mtech">M.Tech</option>
+                  <option value="mba">MBA</option>
+                  <option value="msc">M.Sc</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label for="stats_year" class="form-label">Year (Admission)</label>
+                <input type="number" class="form-control" id="stats_year" placeholder="e.g. 2023" required>
+              </div>
+              <div class="col-md-3">
+                <label for="stats_branch" class="form-label">Branch</label>
+                <select class="form-select" id="stats_branch" required disabled>
+                  <option value="" disabled selected>Select branch</option>
+                </select>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label d-block">Test Type</label>
+                <div class="form-check form-check-inline mt-2">
+                  <input class="form-check-input" type="radio" name="testType" id="typeTech" value="technical" checked>
+                  <label class="form-check-label" for="typeTech">Technical</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="testType" id="typeNonTech" value="non-technical">
+                  <label class="form-check-label" for="typeNonTech">Non-Technical</label>
+                </div>
+              </div>
+              <div class="col-12 mt-4">
+                <button id="generateStatsBtn" class="btn btn-primary w-100">
+                  <i class="fas fa-sync-alt"></i> Generate Visualization
+                </button>
+              </div>
+            </div>
+
+            <div id="statsResultArea" class="mt-5" style="display: none;">
+              <div class="row align-items-center">
+                <div class="col-md-6 text-center">
+                  <div style="max-width: 300px; margin: 0 auto;">
+                    <canvas id="qualificationChart"></canvas>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="stats-summary p-4 bg-light rounded shadow-sm">
+                    <h6 class="fw-bold mb-3">Qualification Overview</h6>
+                    <div class="d-flex justify-content-between mb-2">
+                      <span>Total Submissions:</span>
+                      <span id="stat_total" class="fw-bold">0</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2 text-success">
+                      <span>Qualified:</span>
+                      <span id="stat_qualified" class="fw-bold">0</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3 text-danger">
+                      <span>Not Qualified:</span>
+                      <span id="stat_notQualified" class="fw-bold">0</span>
+                    </div>
+                    <div class="progress" style="height: 10px;">
+                      <div id="stat_progressBar" class="progress-bar bg-success" role="progressbar" style="width: 0%">
+                      </div>
+                    </div>
+                    <div class="text-center mt-2 small text-muted">
+                      <span id="stat_percentage">0</span>% Qualification Rate
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="statsNoData" class="text-center py-5" style="display: none;">
+              <i class="fas fa-info-circle text-muted" style="font-size: 3rem; opacity: 0.3;"></i>
+              <p class="text-muted mt-2">No submission data found for the selected criteria.</p>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="table-responsive">
-        <table class="table">
-          <thead>
-            <tr>
-              <th><i class="fas fa-medal"></i> Rank</th>
-              <th><i class="fas fa-user"></i> Name</th>
-              <th><i class="fas fa-star"></i> Score</th>
-              <th><i class="fas fa-info-circle"></i> Status</th>
-            </tr>
-          </thead>
-          <tbody id="leaderboardBody">
-            <tr>
-              <td colspan="4" class="text-center py-4">
-                <i class="fas fa-trophy text-muted" style="font-size: 3rem; opacity: 0.3;"></i>
-                <p class="text-muted mt-2">Select a test to view leaderboard</p>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+    </div>
+
+    <!-- Leaderboard -->
+    <div class="admin-section-card">
+      <div class="card-header">
+        <h5>
+          <i class="fas fa-trophy text-warning"></i> Leaderboard
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="d-flex flex-wrap gap-3 mb-4">
+          <div class="flex-fill">
+            <label for="branchSelect" class="form-label">Branch</label>
+            <select id="branchSelect" class="form-select">
+              <option value="lr" selected>Logical Reasoning</option>
+              <option value="ai">Artificial Intelligence</option>
+              <option value="che">Chemical Engineering</option>
+              <option value="chm">Chemistry</option>
+              <option value="ce">Civil Engineering</option>
+              <option value="cse">Computer Science & Engineering</option>
+              <option value="ee">Electrical Engineering</option>
+              <option value="ece">Electronics & Communication</option>
+              <option value="hss">Humanities & Social Sciences</option>
+              <option value="ms">Management Studies</option>
+              <option value="math">Mathematics</option>
+              <option value="me">Mechanical Engineering</option>
+              <option value="phy">Physics</option>
+            </select>
+          </div>
+          <div class="flex-fill">
+            <label for="testSelect" class="form-label">Test</label>
+            <select id="testSelect" class="form-select">
+              <option value="">Select Test</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th><i class="fas fa-medal"></i> Rank</th>
+                <th><i class="fas fa-user"></i> Name</th>
+                <th><i class="fas fa-star"></i> Score</th>
+                <th><i class="fas fa-info-circle"></i> Status</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardBody">
+              <tr>
+                <td colspan="4" class="text-center py-4">
+                  <i class="fas fa-trophy text-muted" style="font-size: 3rem; opacity: 0.3;"></i>
+                  <p class="text-muted mt-2">Select a test to view leaderboard</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<script src="/js/dashboard.js"></script>
-<script>
-  // show only top 5 test items initially, toggle to show all
-  (function(){
-    const list = document.getElementById('testsList');
-    const toggle = document.getElementById('toggleTestsBtn');
-    if (!list || !toggle) return;
-    const items = Array.from(list.querySelectorAll('.test-item'));
-    const limit = 5;
-    function updateVisibility(showAll){
-      items.forEach((it, idx) => {
-        if (idx >= limit) {
-          it.style.display = showAll ? '' : 'none';
+  <script src="/js/dashboard.js"></script>
+  <script>
+    // show only top 5 test items initially, toggle to show all
+    (function () {
+      const list = document.getElementById('testsList');
+      const toggle = document.getElementById('toggleTestsBtn');
+      if (!list || !toggle) return;
+      const items = Array.from(list.querySelectorAll('.test-item'));
+      const limit = 5;
+      function updateVisibility(showAll) {
+        items.forEach((it, idx) => {
+          if (idx >= limit) {
+            it.style.display = showAll ? '' : 'none';
+          }
+        });
+        const icon = toggle.querySelector('i');
+        if (showAll) {
+          toggle.innerHTML = '<i class="fas fa-eye-slash"></i> Show Top 5';
+        } else {
+          toggle.innerHTML = '<i class="fas fa-eye"></i> Show All Tests';
         }
-      });
-      const icon = toggle.querySelector('i');
-      if (showAll) {
-        toggle.innerHTML = '<i class="fas fa-eye-slash"></i> Show Top 5';
-      } else {
-        toggle.innerHTML = '<i class="fas fa-eye"></i> Show All Tests';
       }
-    }
-    // initial state: show top 5
-    updateVisibility(false);
-    toggle.addEventListener('click', ()=>{
-      const showingAll = toggle.textContent.includes('Show Top 5');
-      updateVisibility(!showingAll);
-    });
-  })();
+      // initial state: show top 5
+      updateVisibility(false);
+      toggle.addEventListener('click', () => {
+        const showingAll = toggle.textContent.includes('Show Top 5');
+        updateVisibility(!showingAll);
+      });
+    })();
 
-  // announcements: show only top 5 initially, toggle to show all
-  (function(){
-    const list = document.querySelectorAll('.announcement-item');
-    const toggle = document.getElementById('toggleAnnouncementsBtn');
-    if (!list || !list.length || !toggle) return;
-    const limit = 5;
-    function updateAnnouncements(showAll){
-      list.forEach((el, idx) => {
-        if (idx >= limit) {
-          el.style.display = showAll ? '' : 'none';
+    // announcements: show only top 5 initially, toggle to show all
+    (function () {
+      const list = document.querySelectorAll('.announcement-item');
+      const toggle = document.getElementById('toggleAnnouncementsBtn');
+      if (!list || !list.length || !toggle) return;
+      const limit = 5;
+      function updateAnnouncements(showAll) {
+        list.forEach((el, idx) => {
+          if (idx >= limit) {
+            el.style.display = showAll ? '' : 'none';
+          }
+        });
+        if (showAll) {
+          toggle.innerHTML = '<i class="fas fa-eye-slash"></i> Show Top 5';
+        } else {
+          toggle.innerHTML = '<i class="fas fa-eye"></i> Show All Announcements';
         }
-      });
-      if (showAll) {
-        toggle.innerHTML = '<i class="fas fa-eye-slash"></i> Show Top 5';
-      } else {
-        toggle.innerHTML = '<i class="fas fa-eye"></i> Show All Announcements';
       }
-    }
-    updateAnnouncements(false);
-    toggle.addEventListener('click', ()=>{
-      const showingAll = toggle.textContent.includes('Show Top 5');
-      updateAnnouncements(!showingAll);
-    });
-  })();
-</script>
+      updateAnnouncements(false);
+      toggle.addEventListener('click', () => {
+        const showingAll = toggle.textContent.includes('Show Top 5');
+        updateAnnouncements(!showingAll);
+      });
+    })();
+  </script>

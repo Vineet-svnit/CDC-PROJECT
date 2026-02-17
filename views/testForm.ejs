@@ -161,7 +161,7 @@
         const branchEl = document.getElementById('branch');
         if (branchEl) branchEl.addEventListener('change', async function () {
             const branch = this.value;
-            const res = await fetch(`/api/categories/${branch}`);
+            const res = await fetch(`/categories/${branch}`);
             availableCategories = await res.json();
             document.getElementById('categories-section').style.display = 'block';
             document.getElementById('categories-container').innerHTML = '';

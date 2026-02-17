@@ -599,7 +599,7 @@ app.get('/branchTests', isAdmin, async (req, res) => {
     res.send(allTests);
 })
 
-app.get("/api/categories/:branch", isAdmin, async (req, res) => {
+app.get("/categories/:branch", isAdmin, async (req, res) => {
     const { branch } = req.params;
     let model;
     switch (branch) {
@@ -792,7 +792,7 @@ app.post("/submission/:id", isLoggedIn, checkSubmit, async (req, res) => {
 
     // --- CUTOFF CALCULATION START ---
     const categoryStats = {};
-    
+
     // Initialize stats from test definition to ensure we have cutoffs
     if (test.category && test.category.length > 0) {
         test.category.forEach(cat => {
@@ -1518,6 +1518,60 @@ app.get("/stats", isAdmin, async (req, res) => {
         });
     } catch (err) {
         console.error("Error fetching stats:", err);
+        res.status(500).json({ success: false, error: err.message });
+    }
+});
+
+app.get("/admin/qualification-stats", isAdmin, async (req, res) => {
+    try {
+        const { program, year, branch, type } = req.query;
+
+        if (!program || !year || !branch || !type) {
+            return res.status(400).json({ success: false, error: "Missing required parameters" });
+        }
+
+        const yearShort = year.toString().slice(-2);
+
+        const query = {
+            program: program,
+            branch: branch,
+            username: { $regex: `^.${yearShort}`, $options: 'i' }
+        };
+
+        const users = await User.find(query).populate('submissions.test_id');
+
+        let qualifiedCount = 0;
+        let notQualifiedCount = 0;
+
+        users.forEach(user => {
+            user.submissions.forEach(sub => {
+                if (!sub.test_id) return;
+
+                const testBranch = sub.test_id.branch;
+                const isTech = type === 'technical';
+
+                // If technical: count tests where branch matches user's branch
+                // If non-technical: count tests where branch is 'lr'
+                const matchesType = isTech ? (testBranch === branch) : (testBranch === 'lr');
+
+                if (matchesType) {
+                    if (sub.isQualified) {
+                        qualifiedCount++;
+                    } else {
+                        notQualifiedCount++;
+                    }
+                }
+            });
+        });
+
+        res.json({
+            success: true,
+            qualified: qualifiedCount,
+            notQualified: notQualifiedCount,
+            total: qualifiedCount + notQualifiedCount
+        });
+    } catch (err) {
+        console.error("Error fetching qualification stats:", err);
         res.status(500).json({ success: false, error: err.message });
     }
 });
