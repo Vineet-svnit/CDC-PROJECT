@@ -99,7 +99,17 @@ const userSchema = new Schema({
             score: {
                 type: Number,
                 default: 0
-            }
+            },
+            isQualified: {
+                type: Boolean,
+                default: false
+            },
+            categoryResults: [{
+                category: String,
+                score: Number,
+                percentage: Number,
+                isQualified: Boolean
+            }]
         }
     ]
 }, { timestamps: true });

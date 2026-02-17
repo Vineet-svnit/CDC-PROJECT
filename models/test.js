@@ -41,11 +41,19 @@ const testSchema = new Schema({
     },
     category: [{
         category_name: String,
-        numberOfQues: Number
+        numberOfQues: Number,
+        cutoffPercentage: {
+            type: Number,
+            default: 0
+        }
     }],
     totalMarks: {
         type: Number,
         min: 0
+    },
+    totalCutoffPercentage: {
+        type: Number,
+        default: 0
     },
     branchModel: {
         type: String,
@@ -58,7 +66,15 @@ const testSchema = new Schema({
     }],
     branch: {
         type: String,
-        enum: ['ai', 'che', 'chm', 'ce', 'cse', 'ee', 'ece', 'hss', 'ms', 'math', 'me', 'phy', 'lr'],
+        enum: ['ai', 'che', 'chm', 'ce', 'cse', 'ee', 'ece', 'hss', 'ms', 'math', 'me', 'phy', 'physics', 'chemistry', 'lr'],
+        required: true
+    },
+    program: {
+        type: String,
+        required: true
+    },
+    year: {
+        type: Number,
         required: true
     }
 });

@@ -555,11 +555,11 @@ app.get("/", isLoggedIn, async (req, res) => {
 
     const absoluteUrl = BASE_URL + path;
     // console.log("eeeeeeeeeeeeeeeeeeeeeee", absoluteUrl);
-    
+
     const expectedHash = sha256Hex(absoluteUrl + configKey);
 
     // console.log("aaaaaaaaaaaaaaaaaaa", isSEB, receivedHash, configKey, expectedHash);
-    
+
 
     const isValid = isSEB && receivedHash && configKey && (expectedHash === receivedHash)
 
@@ -648,6 +648,29 @@ app.get("/api/categories/:branch", isAdmin, async (req, res) => {
 app.get("/core", isLoggedIn, async (req, res) => {
     let branch = req.user.branch;
     let allTests = await Test.find({ branch: branch });
+
+    // Filter by Program and Year
+    const userProgram = req.user.program;
+    // Extract admission year from username (e.g., u21cs... -> 21)
+    // Assuming format uYY... or iYY... or similar where 2nd and 3rd chars are year
+    // User said: "admission number of users' 2nd and 3rd digit (representing the yr in which they joined)"
+    // Example: "u23..." -> "23". 
+    // Wait, typical admission number is like U23CS001. So index 1 and 2 (0-based) are '2' and '3'.
+    // Or is it index 1 and 2 of the string? substring(1, 3).
+    // Let's assume standard format matches regex /^[a-z][0-9]{2}/
+
+    const admissionYearShort = req.user.username.substring(1, 3);
+    const admissionYearFull = 2000 + parseInt(admissionYearShort); // e.g. 2023
+
+    allTests = allTests.filter(test => {
+        // If test has no program/year (legacy data), maybe show it? or hide? 
+        // User requirements imply strict filtering for new flow.
+        if (test.program && test.year) {
+            return test.program === userProgram && test.year === admissionYearFull;
+        }
+        return true; // Keep legacy tests visible
+    });
+
     // req.session.check = 'abc';
     allTests.reverse();
     allTests.forEach((test) => {
@@ -766,6 +789,69 @@ app.post("/submission/:id", isLoggedIn, checkSubmit, async (req, res) => {
     }
     submission.score = score;
     submission.questions = questions;
+
+    // --- CUTOFF CALCULATION START ---
+    const categoryStats = {};
+    
+    // Initialize stats from test definition to ensure we have cutoffs
+    if (test.category && test.category.length > 0) {
+        test.category.forEach(cat => {
+            categoryStats[cat.category_name] = {
+                score: 0,
+                totalMarks: 0,
+                cutoff: cat.cutoffPercentage || 0
+            };
+        });
+    }
+
+    // Aggregate scores from the processed answers
+    for (let i = 0; i < questions.length; i++) {
+        const question = questions[i];
+        const category = question.category;
+        const maxMarks = (question._type === 'MCQ') ? 4 : 3;
+        const qScore = answers[i].score || 0; // The scoring loop above updated this
+
+        if (category) {
+            // Initialize if defined in question but not in test definition (fallback)
+            if (!categoryStats[category]) {
+                categoryStats[category] = { score: 0, totalMarks: 0, cutoff: 0 };
+            }
+            categoryStats[category].score += qScore;
+            categoryStats[category].totalMarks += maxMarks;
+        }
+    }
+
+    // Determine Qualification
+    let allCategoriesQualified = true;
+    const categoryResults = [];
+
+    for (const [catName, stats] of Object.entries(categoryStats)) {
+        let percentage = 0;
+        if (stats.totalMarks > 0) {
+            percentage = (stats.score / stats.totalMarks) * 100;
+        }
+        const isQualified = percentage >= stats.cutoff;
+        if (!isQualified) allCategoriesQualified = false;
+
+        categoryResults.push({
+            category: catName,
+            score: stats.score,
+            percentage: percentage,
+            isQualified: isQualified
+        });
+    }
+
+    let totalPercentage = 0;
+    if (test.totalMarks > 0) {
+        totalPercentage = (score / test.totalMarks) * 100;
+    }
+    const totalCutoff = test.totalCutoffPercentage || 0;
+    const isTotalQualified = totalPercentage >= totalCutoff;
+
+    submission.categoryResults = categoryResults;
+    submission.isQualified = allCategoriesQualified && isTotalQualified;
+    // --- CUTOFF CALCULATION END ---
+
     await user.save();
     res.redirect(`/submission/${testId}`);
 });
@@ -777,16 +863,18 @@ app.get("/test/new", isAdmin, (req, res) => {
 
 // Create Test Route
 app.post("/test/questions/new", isAdmin, async (req, res) => {
-    let { testName, date, time, duration, branch, category_name, catNumberOfQues } = req.body;
+    let { testName, date, time, duration, branch, category_name, catNumberOfQues, totalCutoffPercentage, catCutoffPercentage } = req.body;
 
     // Normalize categories from form input
     let categories = [];
     if (category_name) {
         const names = Array.isArray(category_name) ? category_name : [category_name];
         const counts = Array.isArray(catNumberOfQues) ? catNumberOfQues : [catNumberOfQues];
+        const cutoffs = Array.isArray(catCutoffPercentage) ? catCutoffPercentage : [catCutoffPercentage];
         categories = names.map((name, i) => ({
             category_name: name,
-            numberOfQues: Number(counts[i])
+            numberOfQues: Number(counts[i]),
+            cutoffPercentage: Number(cutoffs[i] || 0)
         }));
     }
 
@@ -794,12 +882,18 @@ app.post("/test/questions/new", isAdmin, async (req, res) => {
     const startTime = convertISTToUTC(date, time);
     const endTime = new Date(startTime.getTime() + (Number(duration) * 60 * 1000));
 
+    // Calculate Batch Year
+    // user said: "store curr year - year (passed in form)"
+    // assuming 'year' in form is 1, 2, 3, 4, 5
+    const currentYear = new Date().getFullYear();
+    const batchYear = currentYear - parseInt(req.body.year);
+
     let Model;
     switch (branch) {
         case 'lr': Model = Question; break;
         case 'ai': Model = AiDepartment; break;
         case 'che': Model = ChemicalDepartment; break;
-        case 'chm': Model = ChemistryDepartment; break;
+        case 'chm': case 'chemistry': Model = ChemistryDepartment; break;
         case 'ce': Model = CivilDepartment; break;
         case 'cse': Model = ComputerScienceDepartment; break;
         case 'ee': Model = ElectricalDepartment; break;
@@ -808,8 +902,8 @@ app.post("/test/questions/new", isAdmin, async (req, res) => {
         case 'ms': Model = ManagementStudiesDepartment; break;
         case 'math': Model = MathematicsDepartment; break;
         case 'me': Model = MechanicalDepartment; break;
-        case 'phy': Model = PhysicsDepartment; break;
-        default: Model = null; break;
+        case 'phy': case 'physics': Model = PhysicsDepartment; break;
+        default: return res.status(400).send("Invalid branch");
     }
 
     if (!Model || categories.length === 0) {
@@ -881,10 +975,14 @@ app.post("/test/questions/new", isAdmin, async (req, res) => {
         endTime,
         duration,
         numberOfQues: totalNumberOfQues,
+        totalMarks,
+        totalCutoffPercentage: Number(req.body.totalCutoffPercentage || 0),
         category: categories,
         questions: randomIds,
         branch,
-        branchModel: branchToModel[branch]
+        branchModel: Model.modelName,
+        program: req.body.program,
+        year: batchYear
     });
 
     newTest.totalMarks = totalMarks;
@@ -1429,12 +1527,12 @@ app.use((err, req, res, next) => {
     let { status = 500, message = "Sorry! Some error occurred." } = err;
     err.status = status;
     err.message = message;
-    
+
     // Ensure currentPath is set for error template
     if (typeof res.locals.currentPath === 'undefined') {
         res.locals.currentPath = req.path || '/';
     }
-    
+
     res.status(status).render("error", { err });
 });
 //.......
