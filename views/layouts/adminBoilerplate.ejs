@@ -14,33 +14,54 @@
   <link rel="stylesheet" href="/css/global.css">
   <link rel="stylesheet" href="/css/dashboard.css">
   <link rel="stylesheet" href="/css/admin-forms.css">
+  <link rel="stylesheet" href="/css/sidebar.css">
   <title>CDC Admin</title>
 </head>
 
-<body style="background: var(--bg);">
-  <header class="py-3 shadow-sm" style="background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);">
-    <div class="container-lg d-flex align-items-center">
+<body>
+  <header class="py-3 shadow-sm"
+    style="background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%); position: sticky; top: 0; z-index: 1100;">
+    <div class="container-fluid px-4 d-flex align-items-center">
+      <button id="sidebarToggle" class="me-3 btn btn-link text-white p-0 shadow-none">
+        <i class="fas fa-bars"></i>
+      </button>
       <a href="/" class="text-decoration-none d-flex align-items-center text-white">
-        <img src="/images/CDC Logo.png" alt="CDC Logo" height="60" class="me-3">
-        <div>
-          <h4 class="mb-0 fw-bold">CDC Admin</h4>
-          <small class="opacity-75">Career Development Cell</small>
-        </div>
+        <img src="/images/CDC Logo.png" alt="CDC Logo" height="45" class="me-2">
+        <h4 class="mb-0 fw-bold">CDC Admin</h4>
       </a>
       <nav class="ms-auto">
-        <a href="/admin/logout" class="btn btn-light btn-sm">
+        <a href="/admin/logout" class="btn btn-outline-light btn-sm px-3">
           <i class="fas fa-sign-out-alt"></i> Logout
         </a>
       </nav>
     </div>
   </header>
 
-  <main class="py-4">
-    <div class="container-lg">
-      <%- include("../includes/flash.ejs") %>
-        <%- body %>
-    </div>
-  </main>
+  <div class="admin-layout-container">
+    <aside id="adminSidebar">
+      <div class="sidebar-nav mt-3">
+        <div class="nav-link active" data-view="statsView">
+          <i class="fas fa-chart-line"></i>
+          <span class="nav-text">Statistics</span>
+        </div>
+        <div class="nav-link" data-view="managementView">
+          <i class="fas fa-tasks"></i>
+          <span class="nav-text">Management</span>
+        </div>
+        <div class="nav-link" data-view="operationsView">
+          <i class="fas fa-cogs"></i>
+          <span class="nav-text">Operations</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content-wrapper py-4">
+      <div class="container-fluid px-4">
+        <%- include("../includes/flash.ejs") %>
+          <%- body %>
+      </div>
+    </main>
+  </div>
 
   <%- include("../includes/footer.ejs") %>
     <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>

@@ -34,21 +34,6 @@ const server = http.createServer(app); // Use HTTP server
 const io = socketIo(server); // Initialize socket.io with the server
 const PORT = process.env.PORT || 5000;
 // server.listen(8080);
-const departments = {
-    ai: "ai",
-    che: "che",
-    chm: "chm",
-    ce: "ce",
-    cse: "cse",
-    ee: "ee",
-    ece: "ece",
-    hss: "hss",
-    ms: "ms",
-    math: "math",
-    me: "me",
-    phy: "phy"
-};
-
 
 //Require Schemas
 const User = require('./models/user.js');
@@ -251,7 +236,7 @@ app.get("/login", (req, res) => {
 });
 
 app.get("/admin/login", (req, res) => {
-    res.render('register_login/AdminLogin');
+    res.render('register_login/AdminLogin', );
 })
 
 app.get('/logout', (req, res, next) => {
@@ -594,8 +579,16 @@ app.get("/announcement", isLoggedIn, async (req, res) => {
 });
 
 app.get('/branchTests', isAdmin, async (req, res) => {
-    const { branch_name } = req.query;
-    const allTests = await Test.find({ branch: branch_name });
+    const { branch_name, program, year } = req.query;
+    const query = { branch: branch_name };
+
+    if (program) query.program = program;
+    if (year) {
+        const currentYear = new Date().getFullYear();
+        query.year = currentYear - parseInt(year);
+    }
+
+    const allTests = await Test.find(query);
     res.send(allTests);
 })
 
@@ -893,7 +886,7 @@ app.post("/test/questions/new", isAdmin, async (req, res) => {
         case 'lr': Model = Question; break;
         case 'ai': Model = AiDepartment; break;
         case 'che': Model = ChemicalDepartment; break;
-        case 'chm': case 'chemistry': Model = ChemistryDepartment; break;
+        case 'chm': Model = ChemistryDepartment; break;
         case 'ce': Model = CivilDepartment; break;
         case 'cse': Model = ComputerScienceDepartment; break;
         case 'ee': Model = ElectricalDepartment; break;
@@ -902,7 +895,7 @@ app.post("/test/questions/new", isAdmin, async (req, res) => {
         case 'ms': Model = ManagementStudiesDepartment; break;
         case 'math': Model = MathematicsDepartment; break;
         case 'me': Model = MechanicalDepartment; break;
-        case 'phy': case 'physics': Model = PhysicsDepartment; break;
+        case 'phy': Model = PhysicsDepartment; break;
         default: return res.status(400).send("Invalid branch");
     }
 
@@ -1207,34 +1200,82 @@ app.post("/upload", isAdmin, upload.single("file"), async (req, res) => {
 });
 
 app.post("/download", isAdmin, async (req, res) => {
-    const { test_id, branch_name } = req.body;
+    const { test_id, branch_name, program, year } = req.body;
     if (!test_id) return res.status(400).send("Test ID is required");
+
+    // Calculate admission year (e.g., if current year is 2026 and year is 2, it's 2024 batch)
+    const currentYear = new Date().getFullYear();
+    const admissionYear = currentYear - parseInt(year);
+    const shortYear = admissionYear.toString().slice(-2);
+    const yearRegex = new RegExp(`^.${shortYear}`);
+
     const query = {
-        'submissions.test_id': test_id
+        'submissions.test_id': test_id,
+        program: program,
+        username: { $regex: yearRegex }
     }
     if (branch_name !== 'lr')
         query.branch = branch_name;
+
     const users = await User.find(query).lean();
     const test = await Test.findById(test_id).lean();
     const testName = test ? `Test Name: ${test.testName}` : "Test Name: Test";
+
+    // Prepare headers dynamically based on categories
+    const categories = test && test.category ? test.category.map(cat => cat.category_name) : [];
+    const headers = ['Username', 'Name', 'Branch', 'Year'];
+
+    categories.forEach(cat => {
+        headers.push(`${cat} Score`);
+        headers.push(`${cat} Verdict`);
+    });
+
+    headers.push('Total Score');
+    headers.push('Final Verdict');
 
     // Prepare data array for xlsx
     const data = [
         [testName], // Test Name at top
         [], // blank row
-        ['Username', 'Name', 'Branch', 'Year', 'Score'] // headers
+        headers // headers
     ];
 
     // Add each user's data
     users.forEach(user => {
         const submission = user.submissions.find(sub => sub.test_id.toString() === test_id);
-        data.push([
+        const rowData = [
             user.username,
             user.name,
             user.branch,
-            user.year,
-            submission ? submission.score : 0
-        ]);
+            user.year
+        ];
+
+        if (submission) {
+            // Add category scores and verdicts
+            categories.forEach(catName => {
+                const catResult = (submission.categoryResults || []).find(r => r.category === catName);
+                if (catResult) {
+                    rowData.push(catResult.score || 0);
+                    rowData.push(catResult.isQualified ? "Qualified" : "Not-Qualified");
+                } else {
+                    rowData.push(0);
+                    rowData.push("Not-Qualified");
+                }
+            });
+            // Total Score and Final Verdict
+            rowData.push(submission.score || 0);
+            rowData.push(submission.isQualified ? "Qualified" : "Not-Qualified");
+        } else {
+            // Fill with empty/zero data if no submission
+            categories.forEach(() => {
+                rowData.push(0);
+                rowData.push("N/A");
+            });
+            rowData.push(0);
+            rowData.push("N/A");
+        }
+
+        data.push(rowData);
     });
 
     // Create worksheet and workbook
@@ -1248,7 +1289,7 @@ app.post("/download", isAdmin, async (req, res) => {
     // Send as downloadable file
     res.setHeader(
         'Content-Disposition',
-        `attachment; filename=${testName}_results.xlsx`
+        `attachment; filename=${test.testName}_results.xlsx`
     );
     res.setHeader(
         'Content-Type',
@@ -1277,9 +1318,35 @@ app.get("/test/:id", isAdmin, async (req, res, next) => {
 //Update Test
 app.put("/test/:id", isAdmin, async (req, res) => {
     let { id } = req.params;
-    let { date, time, duration, testName, questions: changedQuestions, branch, category_name, catNumberOfQues } = req.body;
+    let { date, time, duration, testName, questions: changedQuestions, branch, category_name, catNumberOfQues, program, year_offset } = req.body;
 
     const oldTest = await Test.findById(id);
+    const started = hasTestStarted(oldTest.startTime);
+    const ended = hasTestEnded(oldTest.endTime);
+
+    if (ended) {
+        req.flash("error", "Cannot edit a test that has already ended.");
+        return res.redirect(`/test/${id}`);
+    }
+
+    if (started) {
+        if (Number(duration) < oldTest.duration) {
+            req.flash("error", "Duration can only be increased once the test has started.");
+            return res.redirect(`/test/${id}`);
+        }
+        // If started, force critical metadata to remain unchanged
+        program = oldTest.program;
+        year_offset = undefined;
+        branch = oldTest.branch;
+        // startTime remains oldTest.startTime, but we need date/time for the calculation below if we don't override startTime
+    }
+
+    const currentYear = new Date().getFullYear();
+    let batchYear = oldTest.year;
+    if (year_offset) {
+        batchYear = currentYear - parseInt(year_offset);
+    }
+    const finalProgram = program || oldTest.program;
     let newCategories = oldTest.category || [];
     if (category_name) {
         const names = Array.isArray(category_name) ? category_name : [category_name];
@@ -1291,7 +1358,10 @@ app.put("/test/:id", isAdmin, async (req, res) => {
     }
 
     // Convert IST input to UTC for storage
-    const startTime = convertISTToUTC(date, time);
+    let startTime = oldTest.startTime;
+    if (!started) {
+        startTime = convertISTToUTC(date, time);
+    }
     const endTime = new Date(startTime.getTime() + (Number(duration) * 60 * 1000));
 
     let questionsIds = oldTest.questions;
@@ -1362,7 +1432,9 @@ app.put("/test/:id", isAdmin, async (req, res) => {
         endTime,
         category: newCategories,
         questions: questionsIds,
-        numberOfQues: totalNumberOfQues
+        numberOfQues: totalNumberOfQues,
+        program: finalProgram,
+        year: batchYear
     }, { new: true }).populate("questions").exec();
 
     const questions = test.questions;
@@ -1472,7 +1544,7 @@ app.get("/leaderboard", isAdmin, async (req, res) => {
             .populate({
                 path: "submissions.test_id",   // populate test details
                 model: "Test",
-                select: "testName branch totalMarks" // limit fields if needed
+                select: "testName branch program year totalMarks" // limit fields if needed
             })
             .lean(); // faster read-only objects
 

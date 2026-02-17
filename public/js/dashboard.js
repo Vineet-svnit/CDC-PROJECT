@@ -1,25 +1,84 @@
+// --- Sidebar and View Switching Logic ---
+document.addEventListener('DOMContentLoaded', () => {
+  const sidebar = document.getElementById('adminSidebar');
+  const sidebarToggle = document.getElementById('sidebarToggle');
+  const navLinks = document.querySelectorAll('#adminSidebar .nav-link');
+  const viewSections = document.querySelectorAll('.dashboard-view-section');
+
+  // Sidebar Toggle
+  if (sidebarToggle && sidebar) {
+    sidebarToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('collapsed');
+      // For mobile
+      if (window.innerWidth <= 768) {
+        sidebar.classList.toggle('show');
+      }
+    });
+  }
+
+  // View Switching
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      const targetViewId = link.getAttribute('data-view');
+      if (!targetViewId) return;
+
+      // Update Active Link
+      navLinks.forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+
+      // Update Active Section
+      viewSections.forEach(section => {
+        section.classList.remove('active');
+        if (section.id === targetViewId) {
+          section.classList.add('active');
+        }
+      });
+
+      // Close sidebar on mobile after selection
+      if (window.innerWidth <= 768 && sidebar) {
+        sidebar.classList.remove('show');
+      }
+    });
+  });
+});
+
 // Optional download form selectors (only present in some pages)
-const branch_name = document.querySelector('#branch_name');
-const test_id = document.querySelector('#test_id');
-if (branch_name && test_id) {
-  branch_name.addEventListener('change', () => {
-    axios.get('/branchTests', {
-      params: { branch_name: branch_name.value }
-    })
-      .then((response) => {
-        const allTests = response.data;
-        test_id.innerHTML = "<option value='' disabled>Select Test</option>";
-        allTests.forEach((opt) => {
-          const new_option = document.createElement("option");
-          new_option.value = opt._id;
-          new_option.textContent = opt.testName;
-          test_id.appendChild(new_option);
-        })
-      })
-      .catch((err) => {
-        console.log('error received: ', err);
-      })
+const downloadForm = {
+  branch: document.querySelector('#branch_name'),
+  test: document.querySelector('#test_id'),
+  program: document.querySelector('#download_program'),
+  year: document.querySelector('#download_year')
+};
+
+function updateTestDropdown() {
+  if (!downloadForm.branch.value || !downloadForm.program?.value || !downloadForm.year?.value) return;
+
+  axios.get('/branchTests', {
+    params: {
+      branch_name: downloadForm.branch.value,
+      program: downloadForm.program.value,
+      year: downloadForm.year.value
+    }
   })
+    .then((response) => {
+      const allTests = response.data;
+      downloadForm.test.innerHTML = "<option value='' disabled selected>Select Test</option>";
+      allTests.forEach((opt) => {
+        const new_option = document.createElement("option");
+        new_option.value = opt._id;
+        new_option.textContent = opt.testName;
+        downloadForm.test.appendChild(new_option);
+      })
+    })
+    .catch((err) => {
+      console.log('error received: ', err);
+    });
+}
+
+if (downloadForm.branch && downloadForm.test) {
+  downloadForm.branch.addEventListener('change', updateTestDropdown);
+  if (downloadForm.program) downloadForm.program.addEventListener('change', updateTestDropdown);
+  if (downloadForm.year) downloadForm.year.addEventListener('change', updateTestDropdown);
 }
 
 async function loadDashboardStats() {
@@ -42,7 +101,49 @@ async function loadDashboardStats() {
 
 loadDashboardStats();
 
+// --- Leaderboard Logic ---
+const branchOptions = {
+  btech: [
+    { value: 'ai', text: 'Artificial Intelligence' },
+    { value: 'che', text: 'Chemical' },
+    { value: 'chm', text: 'Chemistry' },
+    { value: 'ce', text: 'Civil Engineering' },
+    { value: 'cse', text: 'Computer Science and Engineering' },
+    { value: 'ee', text: 'Electrical Engineering' },
+    { value: 'ece', text: 'Electronics Engineering' },
+    { value: 'hss', text: 'Humanities and Social Sciences' },
+    { value: 'ms', text: 'Management Studies' },
+    { value: 'math', text: 'Mathematics' },
+    { value: 'me', text: 'Mechanical Engineering' },
+    { value: 'phy', text: 'Physics' }
+  ],
+  mtech: [
+    { value: 'ai', text: 'Artificial Intelligence' },
+    { value: 'che', text: 'Chemical' },
+    { value: 'chm', text: 'Chemistry' },
+    { value: 'ce', text: 'Civil Engineering' },
+    { value: 'cse', text: 'Computer Science and Engineering' },
+    { value: 'ee', text: 'Electrical Engineering' },
+    { value: 'ece', text: 'Electronics Engineering' },
+    { value: 'hss', text: 'Humanities and Social Sciences' },
+    { value: 'ms', text: 'Management Studies' },
+    { value: 'math', text: 'Mathematics' },
+    { value: 'me', text: 'Mechanical Engineering' },
+    { value: 'phy', text: 'Physics' }
+  ],
+  msc: [
+    { value: 'phy', text: 'Physics' },
+    { value: 'chm', text: 'Chemistry' },
+    { value: 'math', text: 'Mathematics' }
+  ],
+  mba: [
+    { value: '', text: 'No branch required' }
+  ]
+};
+
 const branchSelect = document.getElementById("branchSelect");
+const leaderboardProgram = document.getElementById("leaderboardProgram");
+const leaderboardYear = document.getElementById("leaderboardYear");
 const testSelect = document.getElementById("testSelect");
 const leaderboardBody = document.getElementById("leaderboardBody");
 const testCaption = document.getElementById("testCaption");
@@ -59,18 +160,56 @@ async function fetchLeaderboard() {
   }
 }
 
+function updateLeaderboardBranches() {
+  if (!leaderboardProgram || !branchSelect) return;
+  const selectedProgram = leaderboardProgram.value;
+  branchSelect.innerHTML = '<option value="" disabled selected>Select branch</option>';
+
+  if (selectedProgram && branchOptions[selectedProgram]) {
+    // Add LR option manually
+    const lrOption = document.createElement('option');
+    lrOption.value = 'lr';
+    lrOption.textContent = 'Logical Reasoning and Aptitude';
+    branchSelect.appendChild(lrOption);
+
+    branchOptions[selectedProgram].forEach(option => {
+      const opt = document.createElement('option');
+      opt.value = option.value;
+      opt.textContent = option.text;
+      branchSelect.appendChild(opt);
+    });
+    branchSelect.disabled = false;
+    if (selectedProgram === 'mba') {
+      branchSelect.value = '';
+    } else {
+      // Automatically select the first option if it's not MBA
+      // (Optional: keep as "Select branch" to force user interaction)
+    }
+  } else {
+    branchSelect.disabled = true;
+  }
+}
+
 function populateTests() {
-  if (!branchSelect || !testSelect) return;
+  if (!branchSelect || !testSelect || !leaderboardProgram || !leaderboardYear) return;
   const selectedBranch = branchSelect.value;
+  const selectedProgram = leaderboardProgram.value;
+  const selectedYearLevel = parseInt(leaderboardYear.value);
+  const currentYear = new Date().getFullYear();
+  const targetAdmissionYear = currentYear - selectedYearLevel;
+
   testSelect.innerHTML = "<option value=''>Select Test</option>";
 
-  // Get all unique tests for this branch
+  // Get all unique tests for this branch, program, and admission year
   const tests = new Map();
 
   allUsers.forEach(user => {
     (user.submissions || []).forEach(sub => {
       const test = sub.test_id;
-      if (test && test.branch === selectedBranch) {
+      if (test &&
+        test.branch === selectedBranch &&
+        test.program === selectedProgram &&
+        parseInt(test.year) === targetAdmissionYear) {
         tests.set(test._id, test);
       }
     });
@@ -107,9 +246,17 @@ function populateLeaderboard() {
   if (testCaption) testCaption.textContent = `${selectedTest?.testName || ""} — Total Marks: ${selectedTest?.totalMarks || 0
     }`;
 
-  // Filter users who attempted this test
+  // Filter users who attempted this test and match the selected Year/Program/Branch
+  const selectedYearLevel = parseInt(leaderboardYear.value);
+  const currentYear = new Date().getFullYear();
+  const targetYearShort = (currentYear - selectedYearLevel).toString().substring(2);
+
   const participants = allUsers
     .map(user => {
+      // Basic year check using username: u23cs001 -> 23
+      const userYearShort = user.username ? user.username.substring(1, 3) : "";
+      if (userYearShort !== targetYearShort) return null;
+
       const submission = (user.submissions || []).find(
         sub => sub && sub.test_id && sub.test_id._id === selectedTestId
       );
@@ -132,19 +279,31 @@ function populateLeaderboard() {
         <td>${p.score}</td>
         <td>${p.status}</td>
       `;
+    row.style.animation = `fadeInUp 0.3s ease-out forwards ${index * 0.05}s`;
     leaderboardBody.appendChild(row);
   });
 }
 
-if (branchSelect) branchSelect.addEventListener("change", async () => {
-  // Clear previous leaderboard and test selection when branch changes
+function resetLeaderboard() {
   if (leaderboardBody) leaderboardBody.innerHTML = "";
   if (testSelect) testSelect.innerHTML = "<option value=''>Select Test</option>";
   if (testCaption) testCaption.textContent = "Select a test to view leaderboard";
-  await fetchLeaderboard();
   populateTests();
-});
+}
+
+if (leaderboardProgram) {
+  leaderboardProgram.addEventListener("change", () => {
+    updateLeaderboardBranches();
+    resetLeaderboard();
+  });
+}
+if (branchSelect) branchSelect.addEventListener("change", resetLeaderboard);
+if (leaderboardYear) leaderboardYear.addEventListener("change", resetLeaderboard);
 if (testSelect) testSelect.addEventListener("change", populateLeaderboard);
+
+// Initial setup
+updateLeaderboardBranches();
+fetchLeaderboard();
 
 // --- Branch Performance Analysis Logic ---
 const statsProgram = document.getElementById('stats_program');
@@ -154,52 +313,19 @@ const generateBtn = document.getElementById('generateStatsBtn');
 const resultArea = document.getElementById('statsResultArea');
 const noDataArea = document.getElementById('statsNoData');
 
-const branchOptionsStats = {
-  btech: [
-    { value: 'ai', text: 'Artificial Intelligence' },
-    { value: 'che', text: 'Chemical Engineering' },
-    { value: 'chm', text: 'Chemistry' },
-    { value: 'ce', text: 'Civil Engineering' },
-    { value: 'cse', text: 'Computer Science and Engineering' },
-    { value: 'ee', text: 'Electrical Engineering' },
-    { value: 'ece', text: 'Electronics Engineering' },
-    { value: 'hss', text: 'Humanities and Social Sciences' },
-    { value: 'ms', text: 'Management Studies' },
-    { value: 'math', text: 'Mathematics' },
-    { value: 'me', text: 'Mechanical Engineering' },
-    { value: 'phy', text: 'Physics' }
-  ],
-  mtech: [
-    { value: 'ai', text: 'Artificial Intelligence' },
-    { value: 'che', text: 'Chemical Engineering' },
-    { value: 'chm', text: 'Chemistry' },
-    { value: 'ce', text: 'Civil Engineering' },
-    { value: 'cse', text: 'Computer Science and Engineering' },
-    { value: 'ee', text: 'Electrical Engineering' },
-    { value: 'ece', text: 'Electronics Engineering' },
-    { value: 'hss', text: 'Humanities and Social Sciences' },
-    { value: 'ms', text: 'Management Studies' },
-    { value: 'math', text: 'Mathematics' },
-    { value: 'me', text: 'Mechanical Engineering' },
-    { value: 'phy', text: 'Physics' }
-  ],
-  msc: [
-    { value: 'physics', text: 'Physics' },
-    { value: 'chemistry', text: 'Chemistry' },
-    { value: 'math', text: 'Mathematics' }
-  ],
-  mba: [
-    { value: '', text: 'No branch required' }
-  ]
-};
-
 if (statsProgram && statsBranch) {
   statsProgram.addEventListener('change', function () {
     const selectedProgram = this.value;
     statsBranch.innerHTML = '<option value="" disabled selected>Select branch</option>';
 
-    if (selectedProgram && branchOptionsStats[selectedProgram]) {
-      branchOptionsStats[selectedProgram].forEach(option => {
+    if (selectedProgram && branchOptions[selectedProgram]) {
+      // Add LR option manually
+      const lrOption = document.createElement('option');
+      lrOption.value = 'lr';
+      lrOption.textContent = 'Logical Reasoning and Aptitude';
+      statsBranch.appendChild(lrOption);
+
+      branchOptions[selectedProgram].forEach(option => {
         const opt = document.createElement('option');
         opt.value = option.value;
         opt.textContent = option.text;

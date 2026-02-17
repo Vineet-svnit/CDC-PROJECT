@@ -26,7 +26,7 @@ const userSchema = new Schema({
     },
     branch: {
         type: String,
-        enum: ['ai', 'che', 'chm', 'ce', 'cse', 'ee', 'ece', 'hss', 'ms', 'math', 'me', 'phy', 'physics', 'chemistry', ''],
+        enum: ['ai', 'che', 'chm', 'ce', 'cse', 'ee', 'ece', 'hss', 'ms', 'math', 'me', 'phy', ''],
         required: true
     },
     year: {
