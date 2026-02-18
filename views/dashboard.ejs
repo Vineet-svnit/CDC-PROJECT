@@ -58,8 +58,8 @@
                 </select>
               </div>
               <div class="col-md-3">
-                <label for="stats_year" class="form-label">Year (Admission)</label>
-                <input type="number" class="form-control" id="stats_year" placeholder="e.g. 2023" required>
+                <label for="stats_year" class="form-label">Admission Year</label>
+                <input type="number" class="form-control" id="stats_year" placeholder="e.g. 2024" min="2000" max="2100" required>
               </div>
               <div class="col-md-3">
                 <label for="stats_branch" class="form-label">Branch</label>
@@ -151,14 +151,8 @@
             </select>
           </div>
           <div class="flex-fill">
-            <label for="leaderboardYear" class="form-label">Year</label>
-            <select id="leaderboardYear" class="form-select">
-              <option value="1" selected>1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-            </select>
+            <label for="leaderboardYear" class="form-label">Admission Year</label>
+            <input type="number" class="form-control" id="leaderboardYear" placeholder="e.g. 2024" min="2000" max="2100" value="<%= new Date().getFullYear() %>">
           </div>
           <div class="flex-fill">
             <label for="testSelect" class="form-label">Test</label>
@@ -311,15 +305,8 @@
                 </select>
               </div>
               <div class="col-md-6">
-                <label for="download_year" class="form-label">Year</label>
-                <select class="form-select" id="download_year" name="year" required>
-                  <option value="" disabled selected>Select year</option>
-                  <option value="1">1st Year</option>
-                  <option value="2">2nd Year</option>
-                  <option value="3">3rd Year</option>
-                  <option value="4">4th Year</option>
-                  <option value="5">5th Year</option>
-                </select>
+                <label for="download_year" class="form-label">Admission Year</label>
+                <input type="number" class="form-control" id="download_year" name="year" placeholder="e.g. 2024" min="2000" max="2100" required>
               </div>
               <div class="col-md-12">
                 <label for="branch_name" class="form-label">Select Branch</label>

@@ -19,14 +19,17 @@
         <h1>Register Here</h1>
         <form method="post" action="/register" class="needs-validation" novalidate>
             <div class="form-floating mb-3">
-                <input type="text" class="form-control" name="username" placeholder="Enter Admission Number"
-                    id="username" required>
-                <label for="username">Admission number</label>
-            </div>
-            <div class="form-floating mb-3">
                 <input type="email" class="form-control" name="email" placeholder="Enter Institute Email" id="email"
                     required>
                 <label for="email">Institute email</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" name="username" placeholder="Username" id="username" readonly>
+                <label for="username">Username</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" name="program" placeholder="Program" id="program" readonly>
+                <label for="program">Program</label>
             </div>
             <div class="form-floating mb-3 password-wrapper">
                 <input type="password" class="form-control" name="password" placeholder="Enter Password" id="password"
@@ -38,17 +41,6 @@
                 <input type="text" class="form-control" name="name" placeholder="Enter Full Name" id="name" required>
                 <label for="name">Full name</label>
             </div>
-            <div class="form-floating mb-3">
-                <input type="number" class="form-control" name="year" placeholder="Year" id="year" required>
-                <label for="year">Year</label>
-            </div>
-            <select class="form-select form-select-lg mb-3" aria-label="Select program" name="program" id="program" required>
-                <option value="" disabled selected>Select program</option>
-                <option value="btech">B.Tech</option>
-                <option value="mtech">M.Tech</option>
-                <option value="mba">MBA</option>
-                <option value="msc">M.Sc</option>
-            </select>
             <select class="form-select form-select-lg mb-3" aria-label="Select branch" name="branch" id="branch" required>
                 <option value="" disabled selected>Select branch</option>
             </select>
@@ -61,9 +53,11 @@
     <script src="/js/script.js"></script>
     <script src="/js/register_login.js"></script>
     <script>
-        // Dynamic branch dropdown based on program selection
-        const programSelect = document.getElementById('program');
+        // Dynamic branch dropdown based on program detection
+        const programInput = document.getElementById('program');
         const branchSelect = document.getElementById('branch');
+        const emailInput = document.getElementById('email');
+        const usernameInput = document.getElementById('username');
 
         const branchOptions = {
             btech: [
@@ -95,8 +89,8 @@
                 { value: 'phy', text: 'Physics' }
             ],
             msc: [
-                { value: 'physics', text: 'Physics' },
-                { value: 'chemistry', text: 'Chemistry' },
+                { value: 'phy', text: 'Physics' },
+                { value: 'chm', text: 'Chemistry' },
                 { value: 'math', text: 'Mathematics' }
             ],
             mba: [
@@ -104,8 +98,52 @@
             ]
         };
 
-        programSelect.addEventListener('change', function() {
-            const selectedProgram = this.value;
+        const programDisplayNames = {
+            btech: 'B.Tech',
+            mtech: 'M.Tech',
+            msc: 'M.Sc',
+            mba: 'MBA'
+        };
+
+        // Auto-populate username from email and detect program
+        emailInput.addEventListener('input', function() {
+            const email = this.value.toLowerCase();
+            if (email.includes('@')) {
+                const username = email.split('@')[0];
+                usernameInput.value = username;
+                
+                let detectedProgram = '';
+                
+                // Auto-detect program from email pattern
+                if (username.match(/^[ub]\d{2}[a-z]{2,5}\d{3}$/)) {
+                    // B.Tech pattern (u24cs001, b21me002, etc.)
+                    detectedProgram = 'btech';
+                } else if (username.match(/^[p]\d{2}[a-z]{2,5}\d{3}$/)) {
+                    // M.Tech pattern (p24co005, etc.)
+                    detectedProgram = 'mtech';
+                } else if (username.match(/^[i]\d{2}[a-z]{2,5}\d{3}$/)) {
+                    // M.Sc pattern (i22ph010, etc.)
+                    detectedProgram = 'msc';
+                } else if (username.match(/^[b]\d{2}[m][g]\d{3}$/)) {
+                    // MBA pattern (b21mg002, etc.)
+                    detectedProgram = 'mba';
+                }
+                
+                if (detectedProgram) {
+                    programInput.value = programDisplayNames[detectedProgram];
+                    updateBranchOptions(detectedProgram);
+                } else {
+                    programInput.value = '';
+                    updateBranchOptions('');
+                }
+            } else {
+                usernameInput.value = '';
+                programInput.value = '';
+                updateBranchOptions('');
+            }
+        });
+
+        function updateBranchOptions(selectedProgram) {
             branchSelect.innerHTML = '<option value="" disabled selected>Select branch</option>';
             
             if (selectedProgram && branchOptions[selectedProgram]) {
@@ -119,7 +157,7 @@
             } else {
                 branchSelect.disabled = true;
             }
-        });
+        }
 
         // Initially disable branch select
         branchSelect.disabled = true;

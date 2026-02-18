@@ -30,8 +30,10 @@ const userSchema = new Schema({
         required: true
     },
     year: {
-        type: String,
-        required: true
+        type: Number,
+        required: true,
+        // Stores admission academic year (e.g., 2024)
+        // Academic year runs from May 30 to May 30 of next year
     },
     pendingTestId: {
         type: Schema.Types.ObjectId,

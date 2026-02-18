@@ -55,7 +55,10 @@ const {
     isInBufferPeriod,
     canAccessTest,
     getTestStatus,
-    getAnnouncementDate
+    getAnnouncementDate,
+    getCurrentAcademicYear,
+    getAcademicYearFromEmail,
+    calculateYearLevel
 } = require('./utils/timeUtils.js');
 
 // Import template helpers
@@ -288,7 +291,28 @@ app.get('/admin/logout', (req, res, next) => {
 
 app.post('/register', async (req, res) => {
     try {
-        const { username, password, email, name, program, branch, year } = req.body;
+        const { email, password, name, branch } = req.body;
+        
+        // Extract username from email
+        const username = email.split('@')[0].toLowerCase();
+        
+        // Extract admission academic year from email using utility function
+        const admissionYear = getAcademicYearFromEmail(email);
+
+        // Extract program from email pattern
+        let program = '';
+        if (username.match(/^[ub]\d{2}[a-z]{2,5}\d{3}$/)) {
+            program = 'btech';
+        } else if (username.match(/^[p]\d{2}[a-z]{2,5}\d{3}$/)) {
+            program = 'mtech';
+        } else if (username.match(/^[i]\d{2}[a-z]{2,5}\d{3}$/)) {
+            program = 'msc';
+        } else if (username.match(/^[b]\d{2}[m][g]\d{3}$/)) {
+            program = 'mba';
+        } else {
+            req.flash('error', 'Invalid email format - unable to detect program');
+            return res.redirect('/register');
+        }
 
         // Check if user already exists
         const existingUser = await User.findOne({ $or: [{ username }, { email }] });
@@ -310,7 +334,7 @@ app.post('/register', async (req, res) => {
                 email,
                 otp,
                 expiresAt,
-                userData: { username, password, email, name, program, branch, year }
+                userData: { username, password, email, name, program, branch, year: admissionYear }
             },
             { upsert: true, new: true }
         );
@@ -584,8 +608,8 @@ app.get('/branchTests', isAdmin, async (req, res) => {
 
     if (program) query.program = program;
     if (year) {
-        const currentYear = new Date().getFullYear();
-        query.year = currentYear - parseInt(year);
+        // year is admission academic year (e.g., 2024)
+        query.year = parseInt(year);
     }
 
     const allTests = await Test.find(query);
@@ -644,22 +668,13 @@ app.get("/core", isLoggedIn, async (req, res) => {
 
     // Filter by Program and Year
     const userProgram = req.user.program;
-    // Extract admission year from username (e.g., u21cs... -> 21)
-    // Assuming format uYY... or iYY... or similar where 2nd and 3rd chars are year
-    // User said: "admission number of users' 2nd and 3rd digit (representing the yr in which they joined)"
-    // Example: "u23..." -> "23". 
-    // Wait, typical admission number is like U23CS001. So index 1 and 2 (0-based) are '2' and '3'.
-    // Or is it index 1 and 2 of the string? substring(1, 3).
-    // Let's assume standard format matches regex /^[a-z][0-9]{2}/
-
-    const admissionYearShort = req.user.username.substring(1, 3);
-    const admissionYearFull = 2000 + parseInt(admissionYearShort); // e.g. 2023
+    const userAdmissionYear = req.user.year; // This is the admission academic year (e.g., 2024)
 
     allTests = allTests.filter(test => {
         // If test has no program/year (legacy data), maybe show it? or hide? 
         // User requirements imply strict filtering for new flow.
         if (test.program && test.year) {
-            return test.program === userProgram && test.year === admissionYearFull;
+            return test.program === userProgram && test.year === userAdmissionYear;
         }
         return true; // Keep legacy tests visible
     });
@@ -875,11 +890,8 @@ app.post("/test/questions/new", isAdmin, async (req, res) => {
     const startTime = convertISTToUTC(date, time);
     const endTime = new Date(startTime.getTime() + (Number(duration) * 60 * 1000));
 
-    // Calculate Batch Year
-    // user said: "store curr year - year (passed in form)"
-    // assuming 'year' in form is 1, 2, 3, 4, 5
-    const currentYear = new Date().getFullYear();
-    const batchYear = currentYear - parseInt(req.body.year);
+    // year from form is admission academic year (e.g., 2024)
+    const admissionYear = parseInt(req.body.year);
 
     let Model;
     switch (branch) {
@@ -975,7 +987,7 @@ app.post("/test/questions/new", isAdmin, async (req, res) => {
         branch,
         branchModel: Model.modelName,
         program: req.body.program,
-        year: batchYear
+        year: admissionYear
     });
 
     newTest.totalMarks = totalMarks;
@@ -1203,16 +1215,12 @@ app.post("/download", isAdmin, async (req, res) => {
     const { test_id, branch_name, program, year } = req.body;
     if (!test_id) return res.status(400).send("Test ID is required");
 
-    // Calculate admission year (e.g., if current year is 2026 and year is 2, it's 2024 batch)
-    const currentYear = new Date().getFullYear();
-    const admissionYear = currentYear - parseInt(year);
-    const shortYear = admissionYear.toString().slice(-2);
-    const yearRegex = new RegExp(`^.${shortYear}`);
-
+    // year from form is the admission academic year (e.g., 2024)
+    // Filter users by program and admission year directly
     const query = {
         'submissions.test_id': test_id,
         program: program,
-        username: { $regex: yearRegex }
+        year: parseInt(year)
     }
     if (branch_name !== 'lr')
         query.branch = branch_name;
@@ -1318,7 +1326,7 @@ app.get("/test/:id", isAdmin, async (req, res, next) => {
 //Update Test
 app.put("/test/:id", isAdmin, async (req, res) => {
     let { id } = req.params;
-    let { date, time, duration, testName, questions: changedQuestions, branch, category_name, catNumberOfQues, program, year_offset } = req.body;
+    let { date, time, duration, testName, questions: changedQuestions, branch, category_name, catNumberOfQues, program, year } = req.body;
 
     const oldTest = await Test.findById(id);
     const started = hasTestStarted(oldTest.startTime);
@@ -1336,16 +1344,12 @@ app.put("/test/:id", isAdmin, async (req, res) => {
         }
         // If started, force critical metadata to remain unchanged
         program = oldTest.program;
-        year_offset = undefined;
+        year = oldTest.year; // Keep original admission year
         branch = oldTest.branch;
         // startTime remains oldTest.startTime, but we need date/time for the calculation below if we don't override startTime
     }
 
-    const currentYear = new Date().getFullYear();
-    let batchYear = oldTest.year;
-    if (year_offset) {
-        batchYear = currentYear - parseInt(year_offset);
-    }
+    const admissionYear = year ? parseInt(year) : oldTest.year;
     const finalProgram = program || oldTest.program;
     let newCategories = oldTest.category || [];
     if (category_name) {
@@ -1434,7 +1438,7 @@ app.put("/test/:id", isAdmin, async (req, res) => {
         questions: questionsIds,
         numberOfQues: totalNumberOfQues,
         program: finalProgram,
-        year: batchYear
+        year: admissionYear
     }, { new: true }).populate("questions").exec();
 
     const questions = test.questions;
@@ -1602,12 +1606,11 @@ app.get("/admin/qualification-stats", isAdmin, async (req, res) => {
             return res.status(400).json({ success: false, error: "Missing required parameters" });
         }
 
-        const yearShort = year.toString().slice(-2);
-
+        // year is admission academic year (e.g., 2024)
         const query = {
             program: program,
             branch: branch,
-            username: { $regex: `^.${yearShort}`, $options: 'i' }
+            year: parseInt(year)
         };
 
         const users = await User.find(query).populate('submissions.test_id');

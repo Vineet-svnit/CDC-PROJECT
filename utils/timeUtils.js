@@ -217,6 +217,63 @@ const getAnnouncementDate = () => {
     });
 };
 
+/**
+ * Get current academic year based on May 30 cutoff
+ * Academic year runs from May 30 to May 30 of next year
+ * Example: May 30, 2024 to May 29, 2025 = Academic Year 2024
+ * @returns {number} Current academic year (e.g., 2024)
+ */
+const getCurrentAcademicYear = () => {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth(); // 0-indexed (0 = January, 4 = May)
+    const currentDay = now.getDate();
+    
+    // If before May 30, we're still in previous academic year
+    // If on or after May 30, we're in current academic year
+    if (currentMonth < 4 || (currentMonth === 4 && currentDay < 30)) {
+        // Before May 30 - still in previous academic year
+        return currentYear - 1;
+    } else {
+        // On or after May 30 - in current academic year
+        return currentYear;
+    }
+};
+
+/**
+ * Calculate academic year from admission year in email
+ * @param {string} email - User email (e.g., u24cs001@coed.svnit.ac.in)
+ * @returns {number} Academic year (e.g., 2024)
+ */
+const getAcademicYearFromEmail = (email) => {
+    const username = email.split('@')[0].toLowerCase();
+    const yearMatch = username.match(/^[a-z](\d{2})/);
+    
+    if (!yearMatch) {
+        throw new Error('Invalid email format - cannot extract year');
+    }
+    
+    const yearFromEmail = parseInt(yearMatch[1]);
+    // Convert 2-digit year to 4-digit (e.g., 24 -> 2024)
+    const admissionYear = yearFromEmail < 50 ? 2000 + yearFromEmail : 1900 + yearFromEmail;
+    
+    return admissionYear;
+};
+
+/**
+ * Calculate user's current academic year level (1st year, 2nd year, etc.)
+ * Based on admission year and current academic year
+ * @param {number} admissionYear - Year user was admitted (e.g., 2024)
+ * @returns {number} Current year level (1, 2, 3, 4, 5)
+ */
+const calculateYearLevel = (admissionYear) => {
+    const currentAcademicYear = getCurrentAcademicYear();
+    const yearLevel = currentAcademicYear - admissionYear + 1;
+    
+    // Ensure year level is at least 1
+    return Math.max(1, yearLevel);
+};
+
 module.exports = {
     getCurrentIST,
     getCurrentUTC,
@@ -234,5 +291,8 @@ module.exports = {
     canAccessTest,
     getTestStatus,
     getAnnouncementDate,
+    getCurrentAcademicYear,
+    getAcademicYearFromEmail,
+    calculateYearLevel,
     IST_TIMEZONE
 };

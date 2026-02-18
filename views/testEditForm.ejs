@@ -61,18 +61,12 @@
                   <% } %>
               </div>
               <div class="col-md-6">
-                <label class="form-label">Year</label>
-                <% const currentYear=new Date().getFullYear(); const currentOffset=currentYear - test.year; %>
-                  <select class="form-select" name="year_offset" required <%=disableSelect %>>
-                    <option value="1" <%=currentOffset===1 ? 'selected' : '' %>>1</option>
-                    <option value="2" <%=currentOffset===2 ? 'selected' : '' %>>2</option>
-                    <option value="3" <%=currentOffset===3 ? 'selected' : '' %>>3</option>
-                    <option value="4" <%=currentOffset===4 ? 'selected' : '' %>>4</option>
-                    <option value="5" <%=currentOffset===5 ? 'selected' : '' %>>5</option>
-                  </select>
-                  <% if(started) { %>
-                    <input type="hidden" name="year_offset" value="<%= currentOffset %>">
-                    <% } %>
+                <label class="form-label">Admission Year</label>
+                <input type="number" class="form-control" name="year" value="<%= test.year %>" min="2000" max="2100" required <%=disableSelect ? 'readonly' : '' %>>
+                <% if(started) { %>
+                  <input type="hidden" name="year" value="<%= test.year %>">
+                <% } %>
+              </div>
               </div>
             </div>
 

@@ -194,9 +194,7 @@ function populateTests() {
   if (!branchSelect || !testSelect || !leaderboardProgram || !leaderboardYear) return;
   const selectedBranch = branchSelect.value;
   const selectedProgram = leaderboardProgram.value;
-  const selectedYearLevel = parseInt(leaderboardYear.value);
-  const currentYear = new Date().getFullYear();
-  const targetAdmissionYear = currentYear - selectedYearLevel;
+  const selectedAdmissionYear = parseInt(leaderboardYear.value);
 
   testSelect.innerHTML = "<option value=''>Select Test</option>";
 
@@ -209,7 +207,7 @@ function populateTests() {
       if (test &&
         test.branch === selectedBranch &&
         test.program === selectedProgram &&
-        parseInt(test.year) === targetAdmissionYear) {
+        parseInt(test.year) === selectedAdmissionYear) {
         tests.set(test._id, test);
       }
     });
@@ -232,7 +230,7 @@ function populateLeaderboard() {
     return;
   }
 
-  // Get test info for caption
+  // Get test info for caption and filtering
   let selectedTest;
   for (const user of allUsers) {
     for (const sub of (user.submissions || [])) {
@@ -241,43 +239,69 @@ function populateLeaderboard() {
         break;
       }
     }
+    if (selectedTest) break;
   }
 
-  if (testCaption) testCaption.textContent = `${selectedTest?.testName || ""} — Total Marks: ${selectedTest?.totalMarks || 0
-    }`;
+  if (!selectedTest) {
+    leaderboardBody.innerHTML = `
+      <tr>
+        <td colspan="4" class="text-center py-4">
+          <i class="fas fa-info-circle text-muted" style="font-size: 2rem; opacity: 0.3;"></i>
+          <p class="text-muted mt-2">Test not found</p>
+        </td>
+      </tr>
+    `;
+    return;
+  }
 
-  // Filter users who attempted this test and match the selected Year/Program/Branch
-  const selectedYearLevel = parseInt(leaderboardYear.value);
-  const currentYear = new Date().getFullYear();
-  const targetYearShort = (currentYear - selectedYearLevel).toString().substring(2);
+  if (testCaption) testCaption.textContent = `${selectedTest.testName} — Total Marks: ${selectedTest.totalMarks} — Year: ${selectedTest.year}`;
 
+  // Use test's year and program to filter users (branch is only for test filtering, not user matching)
+  const testYear = selectedTest.year;
+  const testProgram = selectedTest.program;
+
+  // Filter users who attempted this test and match the test's Year/Program
   const participants = allUsers
     .map(user => {
-      // Basic year check using username: u23cs001 -> 23
-      const userYearShort = user.username ? user.username.substring(1, 3) : "";
-      if (userYearShort !== targetYearShort) return null;
+      // Check if user matches the test's year and program
+      if (user.program !== testProgram) return null;
+      if (user.year !== testYear) return null;
 
       const submission = (user.submissions || []).find(
         sub => sub && sub.test_id && sub.test_id._id === selectedTestId
       );
       if (!submission) return null;
+      
       return {
         name: user.name,
         score: submission.score || 0,
-        status: (submission.score || 0) > 0 ? "Completed" : "Attempted"
+        status: submission.isQualified ? "Qualified" : "Not Qualified"
       };
     })
     .filter(Boolean)
     .sort((a, b) => b.score - a.score);
 
   leaderboardBody.innerHTML = "";
+  
+  if (participants.length === 0) {
+    leaderboardBody.innerHTML = `
+      <tr>
+        <td colspan="4" class="text-center py-4">
+          <i class="fas fa-info-circle text-muted" style="font-size: 2rem; opacity: 0.3;"></i>
+          <p class="text-muted mt-2">No submissions found for this test</p>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+  
   participants.forEach((p, index) => {
     const row = document.createElement("tr");
     row.innerHTML = `
         <td>${index + 1}</td>
         <td>${p.name}</td>
         <td>${p.score}</td>
-        <td>${p.status}</td>
+        <td><span class="badge ${p.status === 'Qualified' ? 'bg-success' : 'bg-danger'}">${p.status}</span></td>
       `;
     row.style.animation = `fadeInUp 0.3s ease-out forwards ${index * 0.05}s`;
     leaderboardBody.appendChild(row);
