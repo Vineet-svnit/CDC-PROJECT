@@ -133,29 +133,40 @@
         <h5><i class="fas fa-trophy text-warning"></i> Leaderboard</h5>
       </div>
       <div class="card-body">
-        <div class="d-flex flex-wrap gap-3 mb-4">
-          <div class="flex-fill">
+        <div class="row g-3 mb-4">
+          <div class="col-md-3">
             <label for="leaderboardProgram" class="form-label">Program</label>
-            <select id="leaderboardProgram" class="form-select">
-              <option value="btech" selected>B.Tech</option>
+            <select id="leaderboardProgram" class="form-select" required>
+              <option value="" disabled selected>Select program</option>
+              <option value="btech">B.Tech</option>
               <option value="mtech">M.Tech</option>
               <option value="mba">MBA</option>
               <option value="msc">M.Sc</option>
             </select>
           </div>
-          <div class="flex-fill">
+          <div class="col-md-3">
+            <label for="leaderboardYear" class="form-label">Admission Year</label>
+            <input type="number" class="form-control" id="leaderboardYear" placeholder="e.g. 2024" min="2000" max="2100" required>
+          </div>
+          <div class="col-md-3">
             <label for="branchSelect" class="form-label">Branch</label>
-            <select id="branchSelect" class="form-select">
-              <!-- Options populated dynamically -->
+            <select id="branchSelect" class="form-select" required disabled>
               <option value="" disabled selected>Select branch</option>
             </select>
           </div>
-          <div class="flex-fill">
-            <label for="leaderboardYear" class="form-label">Admission Year</label>
-            <input type="number" class="form-control" id="leaderboardYear" placeholder="e.g. 2024" min="2000" max="2100" value="<%= new Date().getFullYear() %>">
+          <div class="col-md-3">
+            <label class="form-label d-block">Test Type</label>
+            <div class="form-check form-check-inline mt-2">
+              <input class="form-check-input" type="radio" name="leaderboardTestType" id="leaderboardTypeTech" value="technical" checked>
+              <label class="form-check-label" for="leaderboardTypeTech">Technical</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="leaderboardTestType" id="leaderboardTypeNonTech" value="non-technical">
+              <label class="form-check-label" for="leaderboardTypeNonTech">Non-Technical</label>
+            </div>
           </div>
-          <div class="flex-fill">
-            <label for="testSelect" class="form-label">Test</label>
+          <div class="col-12">
+            <label for="testSelect" class="form-label">Select Test</label>
             <select id="testSelect" class="form-select">
               <option value="">Select Test</option>
             </select>
@@ -309,23 +320,21 @@
                 <input type="number" class="form-control" id="download_year" name="year" placeholder="e.g. 2024" min="2000" max="2100" required>
               </div>
               <div class="col-md-12">
-                <label for="branch_name" class="form-label">Select Branch</label>
-                <select class="form-select" id="branch_name" name="branch_name" required>
+                <label for="download_branch" class="form-label">Branch</label>
+                <select class="form-select" id="download_branch" name="branch_name" required disabled>
                   <option value="" disabled selected>Select branch</option>
-                  <option value="lr">Logical Reasoning and Aptitude</option>
-                  <option value="ai">Artificial Intelligence</option>
-                  <option value="che">Chemical</option>
-                  <option value="chm">Chemistry</option>
-                  <option value="ce">Civil Engineering</option>
-                  <option value="cse">Computer Science and Engineering</option>
-                  <option value="ee">Electrical Engineering</option>
-                  <option value="ece">Electronics Engineering</option>
-                  <option value="hss">Humanities and Social Sciences</option>
-                  <option value="ms">Management Studies</option>
-                  <option value="math">Mathematics</option>
-                  <option value="me">Mechanical Engineering</option>
-                  <option value="phy">Physics</option>
                 </select>
+              </div>
+              <div class="col-12">
+                <label class="form-label d-block">Test Type</label>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="testType" id="downloadTypeTech" value="technical" checked>
+                  <label class="form-check-label" for="downloadTypeTech">Technical</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="testType" id="downloadTypeNonTech" value="non-technical">
+                  <label class="form-check-label" for="downloadTypeNonTech">Non-Technical</label>
+                </div>
               </div>
               <div class="col-12">
                 <label for="test_id" class="form-label">Select Test</label>
@@ -354,7 +363,7 @@
                 <label for="branch" class="form-label">Select Branch</label>
                 <select class="form-select" id="branch" name="branch" required>
                   <option value="" disabled selected>Select branch</option>
-                  <option value="lr">Logical Reasoning and Aptitude</option>
+                  <!-- <option value="lr">Logical Reasoning and Aptitude</option> -->
                   <option value="ai">Artificial Intelligence</option>
                   <option value="che">Chemical</option>
                   <option value="chm">Chemistry</option>

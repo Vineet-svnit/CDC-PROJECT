@@ -1216,14 +1216,13 @@ app.post("/download", isAdmin, async (req, res) => {
     if (!test_id) return res.status(400).send("Test ID is required");
 
     // year from form is the admission academic year (e.g., 2024)
-    // Filter users by program and admission year directly
+    // Filter users by program, year, and branch
     const query = {
         'submissions.test_id': test_id,
         program: program,
-        year: parseInt(year)
+        year: parseInt(year),
+        branch: branch_name
     }
-    if (branch_name !== 'lr')
-        query.branch = branch_name;
 
     const users = await User.find(query).lean();
     const test = await Test.findById(test_id).lean();

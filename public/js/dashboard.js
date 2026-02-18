@@ -44,20 +44,60 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Optional download form selectors (only present in some pages)
 const downloadForm = {
-  branch: document.querySelector('#branch_name'),
+  branch: document.querySelector('#download_branch'),
   test: document.querySelector('#test_id'),
   program: document.querySelector('#download_program'),
   year: document.querySelector('#download_year')
 };
 
+function updateDownloadBranches() {
+  if (!downloadForm.program || !downloadForm.branch) return;
+  const selectedProgram = downloadForm.program.value;
+  downloadForm.branch.innerHTML = '<option value="" disabled selected>Select branch</option>';
+
+  if (selectedProgram && branchOptions[selectedProgram]) {
+    // Add LR option manually
+    const lrOption = document.createElement('option');
+    lrOption.value = 'lr';
+    lrOption.textContent = 'Logical Reasoning and Aptitude';
+    downloadForm.branch.appendChild(lrOption);
+
+    branchOptions[selectedProgram].forEach(option => {
+      const opt = document.createElement('option');
+      opt.value = option.value;
+      opt.textContent = option.text;
+      downloadForm.branch.appendChild(opt);
+    });
+    downloadForm.branch.disabled = false;
+    if (selectedProgram === 'mba') {
+      downloadForm.branch.value = '';
+    }
+  } else {
+    downloadForm.branch.disabled = true;
+  }
+}
+
 function updateTestDropdown() {
-  if (!downloadForm.branch.value || !downloadForm.program?.value || !downloadForm.year?.value) return;
+  if (!downloadForm.branch || !downloadForm.test || !downloadForm.program || !downloadForm.year) return;
+  
+  const selectedBranch = downloadForm.branch.value;
+  const selectedProgram = downloadForm.program.value;
+  const selectedYear = downloadForm.year.value;
+  const testTypeEl = document.querySelector('input[name="testType"]:checked');
+  
+  if (!selectedBranch || !selectedProgram || !selectedYear || !testTypeEl) {
+    downloadForm.test.innerHTML = "<option value='' disabled selected>Select Test</option>";
+    return;
+  }
+
+  const testType = testTypeEl.value;
+  const isTech = testType === 'technical';
 
   axios.get('/branchTests', {
     params: {
-      branch_name: downloadForm.branch.value,
-      program: downloadForm.program.value,
-      year: downloadForm.year.value
+      branch_name: isTech ? selectedBranch : 'lr',
+      program: selectedProgram,
+      year: selectedYear
     }
   })
     .then((response) => {
@@ -75,10 +115,21 @@ function updateTestDropdown() {
     });
 }
 
+if (downloadForm.program) {
+  downloadForm.program.addEventListener('change', () => {
+    updateDownloadBranches();
+    updateTestDropdown();
+  });
+}
 if (downloadForm.branch && downloadForm.test) {
   downloadForm.branch.addEventListener('change', updateTestDropdown);
-  if (downloadForm.program) downloadForm.program.addEventListener('change', updateTestDropdown);
   if (downloadForm.year) downloadForm.year.addEventListener('change', updateTestDropdown);
+  
+  // Add event listener for test type radio buttons
+  const downloadTestTypeRadios = document.querySelectorAll('input[name="testType"]');
+  downloadTestTypeRadios.forEach(radio => {
+    radio.addEventListener('change', updateTestDropdown);
+  });
 }
 
 async function loadDashboardStats() {
@@ -154,11 +205,11 @@ async function fetchLeaderboard() {
   try {
     const res = await fetch("/leaderboard");
     allUsers = await res.json();
-    populateTests();
   } catch (err) {
     console.error("Error fetching leaderboard:", err);
   }
 }
+
 
 function updateLeaderboardBranches() {
   if (!leaderboardProgram || !branchSelect) return;
@@ -190,24 +241,41 @@ function updateLeaderboardBranches() {
   }
 }
 
-function populateTests() {
+function populateLeaderboardTests() {
   if (!branchSelect || !testSelect || !leaderboardProgram || !leaderboardYear) return;
+  
   const selectedBranch = branchSelect.value;
   const selectedProgram = leaderboardProgram.value;
-  const selectedAdmissionYear = parseInt(leaderboardYear.value);
+  const selectedYear = parseInt(leaderboardYear.value);
+  const testTypeEl = document.querySelector('input[name="leaderboardTestType"]:checked');
+  
+  if (!selectedBranch || !selectedProgram || !selectedYear || !testTypeEl) {
+    testSelect.innerHTML = "<option value=''>Select Test</option>";
+    return;
+  }
+
+  const testType = testTypeEl.value;
+  const isTech = testType === 'technical';
 
   testSelect.innerHTML = "<option value=''>Select Test</option>";
 
-  // Get all unique tests for this branch, program, and admission year
+  // Get all unique tests matching the criteria
   const tests = new Map();
 
   allUsers.forEach(user => {
     (user.submissions || []).forEach(sub => {
       const test = sub.test_id;
-      if (test &&
-        test.branch === selectedBranch &&
-        test.program === selectedProgram &&
-        parseInt(test.year) === selectedAdmissionYear) {
+      if (!test) return;
+
+      // Match program and year
+      if (test.program !== selectedProgram) return;
+      if (parseInt(test.year) !== selectedYear) return;
+
+      // For technical: test branch should match selected branch
+      // For non-technical: test branch should be 'lr'
+      const matchesBranch = isTech ? (test.branch === selectedBranch) : (test.branch === 'lr');
+      
+      if (matchesBranch) {
         tests.set(test._id, test);
       }
     });
@@ -230,7 +298,7 @@ function populateLeaderboard() {
     return;
   }
 
-  // Get test info for caption and filtering
+  // Get test info for caption
   let selectedTest;
   for (const user of allUsers) {
     for (const sub of (user.submissions || [])) {
@@ -239,33 +307,22 @@ function populateLeaderboard() {
         break;
       }
     }
-    if (selectedTest) break;
   }
 
-  if (!selectedTest) {
-    leaderboardBody.innerHTML = `
-      <tr>
-        <td colspan="4" class="text-center py-4">
-          <i class="fas fa-info-circle text-muted" style="font-size: 2rem; opacity: 0.3;"></i>
-          <p class="text-muted mt-2">Test not found</p>
-        </td>
-      </tr>
-    `;
-    return;
-  }
+  if (testCaption) testCaption.textContent = `${selectedTest?.testName || ""} — Total Marks: ${selectedTest?.totalMarks || 0}`;
 
-  if (testCaption) testCaption.textContent = `${selectedTest.testName} — Total Marks: ${selectedTest.totalMarks} — Year: ${selectedTest.year}`;
+  // Get selected filters
+  const selectedBranch = branchSelect.value;
+  const selectedProgram = leaderboardProgram.value;
+  const selectedAdmissionYear = parseInt(leaderboardYear.value);
 
-  // Use test's year and program to filter users (branch is only for test filtering, not user matching)
-  const testYear = selectedTest.year;
-  const testProgram = selectedTest.program;
-
-  // Filter users who attempted this test and match the test's Year/Program
+  // Filter users who attempted this test and match the selected Year/Program/Branch
   const participants = allUsers
     .map(user => {
-      // Check if user matches the test's year and program
-      if (user.program !== testProgram) return null;
-      if (user.year !== testYear) return null;
+      // Check if user matches the selected filters
+      if (user.program !== selectedProgram) return null;
+      if (user.year !== selectedAdmissionYear) return null;
+      if (user.branch !== selectedBranch) return null;
 
       const submission = (user.submissions || []).find(
         sub => sub && sub.test_id && sub.test_id._id === selectedTestId
@@ -312,7 +369,7 @@ function resetLeaderboard() {
   if (leaderboardBody) leaderboardBody.innerHTML = "";
   if (testSelect) testSelect.innerHTML = "<option value=''>Select Test</option>";
   if (testCaption) testCaption.textContent = "Select a test to view leaderboard";
-  populateTests();
+  populateLeaderboardTests();
 }
 
 if (leaderboardProgram) {
@@ -323,6 +380,13 @@ if (leaderboardProgram) {
 }
 if (branchSelect) branchSelect.addEventListener("change", resetLeaderboard);
 if (leaderboardYear) leaderboardYear.addEventListener("change", resetLeaderboard);
+
+// Add event listener for test type radio buttons
+const testTypeRadios = document.querySelectorAll('input[name="leaderboardTestType"]');
+testTypeRadios.forEach(radio => {
+  radio.addEventListener("change", resetLeaderboard);
+});
+
 if (testSelect) testSelect.addEventListener("change", populateLeaderboard);
 
 // Initial setup
