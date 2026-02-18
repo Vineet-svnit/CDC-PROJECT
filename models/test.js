@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const branchToModel = {
-    lr: 'Question', // assuming LogicalReasoning uses Question model
     ai: 'AiDepartment',
     che: 'ChemicalDepartment',
     chm: 'ChemistryDepartment',
@@ -47,6 +46,10 @@ const testSchema = new Schema({
             default: 0
         }
     }],
+    isTechnical: {
+        type: Boolean,
+        default: false
+    },
     totalMarks: {
         type: Number,
         min: 0
@@ -66,7 +69,7 @@ const testSchema = new Schema({
     }],
     branch: {
         type: String,
-        enum: ['ai', 'che', 'chm', 'ce', 'cse', 'ee', 'ece', 'hss', 'ms', 'math', 'me', 'phy', 'lr'],
+        enum: ['ai', 'che', 'chm', 'ce', 'cse', 'ee', 'ece', 'hss', 'ms', 'math', 'me', 'phy'],
         required: true
     },
     program: {
