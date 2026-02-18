@@ -597,7 +597,36 @@ app.get("/history", isLoggedIn, async (req, res) => {
 });
 
 app.get("/announcement", isLoggedIn, async (req, res) => {
-    let allAnnouncements = await Announcement.find({});
+    const user = req.user;
+    
+    // Build query to filter announcements
+    // Show announcements that match user's program, branch, and year OR are for "all"
+    const query = {
+        $or: [
+            // Announcements for all programs
+            { program: 'all' },
+            // Announcements for user's program
+            {
+                program: user.program,
+                $or: [
+                    // All branches in this program
+                    { branch: 'all' },
+                    // User's specific branch
+                    {
+                        branch: user.branch,
+                        $or: [
+                            // All years in this branch
+                            { year: null },
+                            // User's specific year
+                            { year: user.year }
+                        ]
+                    }
+                ]
+            }
+        ]
+    };
+    
+    let allAnnouncements = await Announcement.find(query);
     allAnnouncements.reverse();
     res.render("user/announcement.ejs", { allAnnouncements, page: "announcement" });
 });
@@ -1504,9 +1533,21 @@ app.get("/announcement/new", isAdmin, (req, res) => {
 
 //Create Announcement
 app.post("/announcement/new", isAdmin, async (req, res) => {
-    let announcement = req.body;
+    let { title, body, issued_by, program, branch, year } = req.body;
     let date = getAnnouncementDate();
-    newAnnouncement = new Announcement({ ...announcement, date });
+    
+    // Convert empty year to null
+    const announcementYear = year ? parseInt(year) : null;
+    
+    newAnnouncement = new Announcement({ 
+        title, 
+        body, 
+        issued_by, 
+        date,
+        program: program || 'all',
+        branch: branch || 'all',
+        year: announcementYear
+    });
     await newAnnouncement.save();
     res.redirect("/dashboard");
 })
@@ -1528,8 +1569,19 @@ app.get("/announcement/:id", isAdmin, async (req, res) => {
 //Update Announcement
 app.put("/announcement/:id", isAdmin, async (req, res) => {
     let { id } = req.params;
-    let announcement = await Announcement.findById(id);
-    await Announcement.findByIdAndUpdate(id, { ...req.body })
+    let { title, body, issued_by, program, branch, year } = req.body;
+    
+    // Convert empty year to null
+    const announcementYear = year ? parseInt(year) : null;
+    
+    await Announcement.findByIdAndUpdate(id, { 
+        title, 
+        body, 
+        issued_by,
+        program: program || 'all',
+        branch: branch || 'all',
+        year: announcementYear
+    });
     res.redirect("/dashboard");
 });
 

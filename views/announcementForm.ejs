@@ -23,6 +23,32 @@
           <label for="issued_by" class="form-label">Issued by</label>
           <input name="issued_by" placeholder="Enter the issuer name" type="text" id="issued_by" class="form-control" required />
         </div>
+
+        <hr class="my-4">
+        <h6 class="mb-3">Target Audience (Optional - Leave as "All" for everyone)</h6>
+        
+        <div class="row g-3 mb-4">
+          <div class="col-md-4">
+            <label for="program" class="form-label">Program</label>
+            <select class="form-select" id="program" name="program">
+              <option value="all" selected>All Programs</option>
+              <option value="btech">B.Tech</option>
+              <option value="mtech">M.Tech</option>
+              <option value="mba">MBA</option>
+              <option value="msc">M.Sc</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label for="branch" class="form-label">Branch</label>
+            <select class="form-select" id="branch" name="branch" disabled>
+              <option value="all" selected>All Branches</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label for="year" class="form-label">Admission Year</label>
+            <input type="number" class="form-control" id="year" name="year" placeholder="All years (leave empty)">
+          </div>
+        </div>
         
         <div class="text-center">
           <button class="btn btn-primary btn-lg px-5">
@@ -60,6 +86,66 @@
       document.querySelector('#body').classList.add('is-invalid'); 
     } else { 
       document.querySelector('#body').classList.remove('is-invalid'); 
+    }
+  });
+
+  // Branch options based on program
+  const branchOptions = {
+    btech: [
+      { value: 'ai', text: 'Artificial Intelligence' },
+      { value: 'che', text: 'Chemical' },
+      { value: 'chm', text: 'Chemistry' },
+      { value: 'ce', text: 'Civil Engineering' },
+      { value: 'cse', text: 'Computer Science and Engineering' },
+      { value: 'ee', text: 'Electrical Engineering' },
+      { value: 'ece', text: 'Electronics Engineering' },
+      { value: 'hss', text: 'Humanities and Social Sciences' },
+      { value: 'ms', text: 'Management Studies' },
+      { value: 'math', text: 'Mathematics' },
+      { value: 'me', text: 'Mechanical Engineering' },
+      { value: 'phy', text: 'Physics' }
+    ],
+    mtech: [
+      { value: 'ai', text: 'Artificial Intelligence' },
+      { value: 'che', text: 'Chemical' },
+      { value: 'chm', text: 'Chemistry' },
+      { value: 'ce', text: 'Civil Engineering' },
+      { value: 'cse', text: 'Computer Science and Engineering' },
+      { value: 'ee', text: 'Electrical Engineering' },
+      { value: 'ece', text: 'Electronics Engineering' },
+      { value: 'hss', text: 'Humanities and Social Sciences' },
+      { value: 'ms', text: 'Management Studies' },
+      { value: 'math', text: 'Mathematics' },
+      { value: 'me', text: 'Mechanical Engineering' },
+      { value: 'phy', text: 'Physics' }
+    ],
+    msc: [
+      { value: 'phy', text: 'Physics' },
+      { value: 'chm', text: 'Chemistry' },
+      { value: 'math', text: 'Mathematics' }
+    ],
+    mba: [
+      { value: '', text: 'No branch required' }
+    ]
+  };
+
+  const programSelect = document.getElementById('program');
+  const branchSelect = document.getElementById('branch');
+
+  programSelect.addEventListener('change', function() {
+    const selectedProgram = this.value;
+    branchSelect.innerHTML = '<option value="all" selected>All Branches</option>';
+    
+    if (selectedProgram !== 'all' && branchOptions[selectedProgram]) {
+      branchOptions[selectedProgram].forEach(option => {
+        const opt = document.createElement('option');
+        opt.value = option.value;
+        opt.textContent = option.text;
+        branchSelect.appendChild(opt);
+      });
+      branchSelect.disabled = false;
+    } else {
+      branchSelect.disabled = true;
     }
   });
 </script>
