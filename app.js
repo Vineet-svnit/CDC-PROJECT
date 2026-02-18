@@ -1598,15 +1598,21 @@ app.get("/leaderboard", isAdmin, async (req, res) => {
     try {
         const { program, branch, year, testId } = req.query;
 
-        if (!testId || testId === 'undefined') {
+        if (!program || !branch || !year || !testId || testId === 'undefined') {
             return res.status(200).json([]);
         }
 
+        const parsedYear = parseInt(year, 10);
+        if (Number.isNaN(parsedYear) || !mongoose.Types.ObjectId.isValid(testId)) {
+            return res.status(200).json([]);
+        }
+
+        const testObjectId = new mongoose.Types.ObjectId(testId);
         const query = {
             program: program,
             branch: branch,
-            year: parseInt(year),
-            "submissions.test_id": testId
+            year: parsedYear,
+            submissions: { $elemMatch: { test_id: testObjectId } }
         };
 
         const users = await User.find(query)
@@ -1617,7 +1623,18 @@ app.get("/leaderboard", isAdmin, async (req, res) => {
             })
             .lean();
 
-        res.status(200).json(users);
+        const filteredUsers = users
+            .map(user => ({
+                ...user,
+                submissions: (user.submissions || []).filter(sub => {
+                    if (!sub?.test_id) return false;
+                    const subTestId = sub.test_id._id ? sub.test_id._id.toString() : sub.test_id.toString();
+                    return subTestId === testId;
+                })
+            }))
+            .filter(user => user.submissions.length > 0);
+
+        res.status(200).json(filteredUsers);
     } catch (err) {
         console.error("[Leaderboard] API Error:", err);
         res.status(500).json({ error: err.message });
@@ -1760,5 +1777,6 @@ connectDB()
     .catch((error) => {
         console.error("Database connection failed:", error);
     });
+
 
 
