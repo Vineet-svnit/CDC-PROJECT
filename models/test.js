@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const branchToModel = {
+    lr: 'Question',
     ai: 'AiDepartment',
     che: 'ChemicalDepartment',
     chm: 'ChemistryDepartment',
