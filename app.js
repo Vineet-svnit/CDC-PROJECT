@@ -307,7 +307,7 @@ app.post('/register', async (req, res) => {
             program = 'mtech';
         } else if (username.match(/^[i]\d{2}[a-z]{2,5}\d{3}$/)) {
             program = 'msc';
-        } else if (username.match(/^[b]\d{2}[m][g]\d{3}$/)) {
+        } else if (username.match(/^[m]\d{2}[b][a]\d{3}$/)) {
             program = 'mba';
         } else {
             req.flash('error', 'Invalid email format - unable to detect program');
