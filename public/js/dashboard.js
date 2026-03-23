@@ -184,7 +184,7 @@ const branchOptions = {
     { value: 'math', text: 'Mathematics' }
   ],
   mba: [
-    { value: '', text: 'No branch required' }
+    { value: '', text: 'Business Analytics' }
   ]
 };
 
