@@ -56,11 +56,6 @@ function updateDownloadBranches() {
   downloadForm.branch.innerHTML = '<option value="" disabled selected>Select branch</option>';
 
   if (selectedProgram && branchOptions[selectedProgram]) {
-    // Add LR option manually
-    const lrOption = document.createElement('option');
-    lrOption.value = 'lr';
-    lrOption.textContent = 'Logical Reasoning and Aptitude';
-    downloadForm.branch.appendChild(lrOption);
 
     branchOptions[selectedProgram].forEach(option => {
       const opt = document.createElement('option');
@@ -79,12 +74,12 @@ function updateDownloadBranches() {
 
 function updateTestDropdown() {
   if (!downloadForm.branch || !downloadForm.test || !downloadForm.program || !downloadForm.year) return;
-  
+
   const selectedBranch = downloadForm.branch.value;
   const selectedProgram = downloadForm.program.value;
   const selectedYear = downloadForm.year.value;
-  const testTypeEl = document.querySelector('input[name="testType"]:checked');
-  
+  const testTypeEl = document.querySelector('input[name="downloadTestType"]:checked');
+
   if (!selectedBranch || !selectedProgram || !selectedYear || !testTypeEl) {
     downloadForm.test.innerHTML = "<option value='' disabled selected>Select Test</option>";
     return;
@@ -95,9 +90,10 @@ function updateTestDropdown() {
 
   axios.get('/branchTests', {
     params: {
-      branch_name: isTech ? selectedBranch : 'lr',
+      branch_name: selectedBranch,
       program: selectedProgram,
-      year: selectedYear
+      year: selectedYear,
+      isTechnical: isTech
     }
   })
     .then((response) => {
@@ -124,9 +120,9 @@ if (downloadForm.program) {
 if (downloadForm.branch && downloadForm.test) {
   downloadForm.branch.addEventListener('change', updateTestDropdown);
   if (downloadForm.year) downloadForm.year.addEventListener('change', updateTestDropdown);
-  
+
   // Add event listener for test type radio buttons
-  const downloadTestTypeRadios = document.querySelectorAll('input[name="testType"]');
+  const downloadTestTypeRadios = document.querySelectorAll('input[name="downloadTestType"]');
   downloadTestTypeRadios.forEach(radio => {
     radio.addEventListener('change', updateTestDropdown);
   });
@@ -188,7 +184,7 @@ const branchOptions = {
     { value: 'math', text: 'Mathematics' }
   ],
   mba: [
-    { value: '', text: 'No branch required' }
+    { value: '', text: 'Business Analytics' }
   ]
 };
 
@@ -201,13 +197,26 @@ const testCaption = document.getElementById("testCaption");
 
 let allUsers = [];
 
-async function fetchLeaderboard() {
+// fetchLeaderboard is now specific to a cohort and a test (if selected)
+// We'll rename it to avoid confusion or just use populateLeaderboard directly
+async function fetchTestParticipants(testId, program, branch, year) {
   try {
-    const res = await fetch("/leaderboard");
-    allUsers = await res.json();
+    const res = await fetch(`/leaderboard?program=${program}&branch=${branch}&year=${year}&testId=${testId}`);
+    return await res.json();
   } catch (err) {
-    console.error("Error fetching leaderboard:", err);
+    console.error("Error fetching leaderboard participants:", err);
+    return [];
   }
+}
+
+// Helper to get ID from populated or unpopulated field
+function getTestId(sub) {
+  if (!sub || !sub.test_id) return null;
+  const test = sub.test_id;
+  // If populated object
+  if (test._id) return test._id.toString();
+  // If raw string or ObjectId
+  return test.toString();
 }
 
 
@@ -217,11 +226,6 @@ function updateLeaderboardBranches() {
   branchSelect.innerHTML = '<option value="" disabled selected>Select branch</option>';
 
   if (selectedProgram && branchOptions[selectedProgram]) {
-    // Add LR option manually
-    const lrOption = document.createElement('option');
-    lrOption.value = 'lr';
-    lrOption.textContent = 'Logical Reasoning and Aptitude';
-    branchSelect.appendChild(lrOption);
 
     branchOptions[selectedProgram].forEach(option => {
       const opt = document.createElement('option');
@@ -241,14 +245,14 @@ function updateLeaderboardBranches() {
   }
 }
 
-function populateLeaderboardTests() {
+async function populateLeaderboardTests() {
   if (!branchSelect || !testSelect || !leaderboardProgram || !leaderboardYear) return;
-  
+
   const selectedBranch = branchSelect.value;
   const selectedProgram = leaderboardProgram.value;
-  const selectedYear = parseInt(leaderboardYear.value);
+  const selectedYear = leaderboardYear.value;
   const testTypeEl = document.querySelector('input[name="leaderboardTestType"]:checked');
-  
+
   if (!selectedBranch || !selectedProgram || !selectedYear || !testTypeEl) {
     testSelect.innerHTML = "<option value=''>Select Test</option>";
     return;
@@ -257,78 +261,81 @@ function populateLeaderboardTests() {
   const testType = testTypeEl.value;
   const isTech = testType === 'technical';
 
-  testSelect.innerHTML = "<option value=''>Select Test</option>";
-
-  // Get all unique tests matching the criteria
-  const tests = new Map();
-
-  allUsers.forEach(user => {
-    (user.submissions || []).forEach(sub => {
-      const test = sub.test_id;
-      if (!test) return;
-
-      // Match program and year
-      if (test.program !== selectedProgram) return;
-      if (parseInt(test.year) !== selectedYear) return;
-
-      // For technical: test branch should match selected branch
-      // For non-technical: test branch should be 'lr'
-      const matchesBranch = isTech ? (test.branch === selectedBranch) : (test.branch === 'lr');
-      
-      if (matchesBranch) {
-        tests.set(test._id, test);
+  try {
+    const response = await axios.get('/branchTests', {
+      params: {
+        branch_name: selectedBranch,
+        program: selectedProgram,
+        year: selectedYear,
+        isTechnical: isTech
       }
     });
-  });
 
-  for (const [id, test] of tests.entries()) {
-    const opt = document.createElement("option");
-    opt.value = id;
-    opt.textContent = test.testName;
-    testSelect.appendChild(opt);
+    const allTests = response.data;
+    testSelect.innerHTML = "<option value=''>Select Test</option>";
+
+    allTests.forEach((test) => {
+      const opt = document.createElement("option");
+      opt.value = test._id;
+      opt.textContent = test.testName;
+      testSelect.appendChild(opt);
+    });
+  } catch (err) {
+    console.error('Error fetching tests for leaderboard:', err);
   }
 }
 
-function populateLeaderboard() {
+async function populateLeaderboard() {
   if (!testSelect || !leaderboardBody) return;
   const selectedTestId = testSelect.value;
+
   if (!selectedTestId) {
-    leaderboardBody.innerHTML = "";
+    leaderboardBody.innerHTML = `
+      <tr>
+        <td colspan="4" class="text-center py-4">
+          <i class="fas fa-info-circle text-muted" style="font-size: 2rem; opacity: 0.3;"></i>
+          <p class="text-muted mt-2">Select a test to view leaderboard</p>
+        </td>
+      </tr>
+    `;
     if (testCaption) testCaption.textContent = "Select a test to view leaderboard";
     return;
   }
 
-  // Get test info for caption
-  let selectedTest;
-  for (const user of allUsers) {
-    for (const sub of (user.submissions || [])) {
-      if (sub && sub.test_id && sub.test_id._id === selectedTestId) {
-        selectedTest = sub.test_id;
-        break;
-      }
-    }
-  }
-
-  if (testCaption) testCaption.textContent = `${selectedTest?.testName || ""} — Total Marks: ${selectedTest?.totalMarks || 0}`;
-
-  // Get selected filters
+  // Get current filters
   const selectedBranch = branchSelect.value;
   const selectedProgram = leaderboardProgram.value;
-  const selectedAdmissionYear = parseInt(leaderboardYear.value);
+  const selectedAdmissionYear = leaderboardYear.value;
 
-  // Filter users who attempted this test and match the selected Year/Program/Branch
-  const participants = allUsers
+  // Fetch only participants for this specific test
+  console.log(`[Dashboard] Fetching participants for testId: ${selectedTestId}, program: ${selectedProgram}, branch: ${selectedBranch}, year: ${selectedAdmissionYear}`);
+  const participantsData = await fetchTestParticipants(selectedTestId, selectedProgram, selectedBranch, selectedAdmissionYear);
+  console.log(`[Dashboard] Received ${participantsData.length} users from server`);
+
+  // Update caption using first participant's test info
+  if (participantsData.length > 0) {
+    const sub = participantsData[0].submissions.find(s => {
+      const tid = getTestId(s);
+      return tid === selectedTestId;
+    });
+    const test = sub?.test_id;
+    if (testCaption) testCaption.textContent = `${test?.testName || ""} — Total Marks: ${test?.totalMarks || 0}`;
+  }
+
+  const participants = participantsData
     .map(user => {
-      // Check if user matches the selected filters
-      if (user.program !== selectedProgram) return null;
-      if (user.year !== selectedAdmissionYear) return null;
-      if (user.branch !== selectedBranch) return null;
-
       const submission = (user.submissions || []).find(
-        sub => sub && sub.test_id && sub.test_id._id === selectedTestId
+        sub => {
+          const tid = getTestId(sub);
+          const matches = (tid === selectedTestId);
+          return matches;
+        }
       );
-      if (!submission) return null;
-      
+      if (!submission) {
+        console.warn(`[Dashboard] User ${user.name} returned by server but no matching submission found in sub array. Data mismatch?`);
+        return null;
+      }
+
       return {
         name: user.name,
         score: submission.score || 0,
@@ -339,7 +346,7 @@ function populateLeaderboard() {
     .sort((a, b) => b.score - a.score);
 
   leaderboardBody.innerHTML = "";
-  
+
   if (participants.length === 0) {
     leaderboardBody.innerHTML = `
       <tr>
@@ -351,14 +358,14 @@ function populateLeaderboard() {
     `;
     return;
   }
-  
+
   participants.forEach((p, index) => {
     const row = document.createElement("tr");
     row.innerHTML = `
         <td>${index + 1}</td>
         <td>${p.name}</td>
         <td>${p.score}</td>
-        <td><span class="badge ${p.status === 'Qualified' ? 'bg-success' : 'bg-danger'}">${p.status}</span></td>
+        <td><span class="badge ${p.status === 'Qualified' ? 'bg-success' : p.status === 'Not Attempted' ? 'bg-secondary' : 'bg-danger'}">${p.status}</span></td>
       `;
     row.style.animation = `fadeInUp 0.3s ease-out forwards ${index * 0.05}s`;
     leaderboardBody.appendChild(row);
@@ -373,27 +380,36 @@ function resetLeaderboard() {
 }
 
 if (leaderboardProgram) {
-  leaderboardProgram.addEventListener("change", () => {
+  leaderboardProgram.addEventListener("change", async () => {
     updateLeaderboardBranches();
-    resetLeaderboard();
+    await populateLeaderboardTests();
+    populateLeaderboard(); // Clear it
   });
 }
-if (branchSelect) branchSelect.addEventListener("change", resetLeaderboard);
-if (leaderboardYear) leaderboardYear.addEventListener("change", resetLeaderboard);
+if (branchSelect) branchSelect.addEventListener("change", async () => {
+  await populateLeaderboardTests();
+  populateLeaderboard(); // Clear it
+});
+if (leaderboardYear) leaderboardYear.addEventListener("change", async () => {
+  await populateLeaderboardTests();
+  populateLeaderboard(); // Clear it
+});
 
 // Add event listener for test type radio buttons
 const testTypeRadios = document.querySelectorAll('input[name="leaderboardTestType"]');
 testTypeRadios.forEach(radio => {
-  radio.addEventListener("change", resetLeaderboard);
+  radio.addEventListener("change", async () => {
+    await populateLeaderboardTests();
+    populateLeaderboard(); // Clear it
+  });
 });
 
 if (testSelect) testSelect.addEventListener("change", populateLeaderboard);
 
 // Initial setup
+updateDownloadBranches();
 updateLeaderboardBranches();
-fetchLeaderboard();
-
-// --- Branch Performance Analysis Logic ---
+// Remove fetchLeaderboard() from here - it should only run when filters are selected
 const statsProgram = document.getElementById('stats_program');
 const statsBranch = document.getElementById('stats_branch');
 const statsYear = document.getElementById('stats_year');
@@ -407,11 +423,6 @@ if (statsProgram && statsBranch) {
     statsBranch.innerHTML = '<option value="" disabled selected>Select branch</option>';
 
     if (selectedProgram && branchOptions[selectedProgram]) {
-      // Add LR option manually
-      const lrOption = document.createElement('option');
-      lrOption.value = 'lr';
-      lrOption.textContent = 'Logical Reasoning and Aptitude';
-      statsBranch.appendChild(lrOption);
 
       branchOptions[selectedProgram].forEach(option => {
         const opt = document.createElement('option');
@@ -436,11 +447,11 @@ if (generateBtn) {
     const program = statsProgram.value;
     const branch = statsBranch.value;
     const year = statsYear.value;
-    const typeEl = document.querySelector('input[name="testType"]:checked');
+    const typeEl = document.querySelector('input[name="statsTestType"]:checked');
     if (!typeEl) return;
     const type = typeEl.value;
 
-    if (!program || !year || (program !== 'mba' && !branch)) {
+    if (!program || !year || !branch) {
       alert('Please select Program, Year and Branch');
       return;
     }

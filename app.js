@@ -239,7 +239,7 @@ app.get("/login", (req, res) => {
 });
 
 app.get("/admin/login", (req, res) => {
-    res.render('register_login/AdminLogin', );
+    res.render('register_login/AdminLogin',);
 })
 
 app.get('/logout', (req, res, next) => {
@@ -292,10 +292,10 @@ app.get('/admin/logout', (req, res, next) => {
 app.post('/register', async (req, res) => {
     try {
         const { email, password, name, branch } = req.body;
-        
+
         // Extract username from email
         const username = email.split('@')[0].toLowerCase();
-        
+
         // Extract admission academic year from email using utility function
         const admissionYear = getAcademicYearFromEmail(email);
 
@@ -307,7 +307,7 @@ app.post('/register', async (req, res) => {
             program = 'mtech';
         } else if (username.match(/^[i]\d{2}[a-z]{2,5}\d{3}$/)) {
             program = 'msc';
-        } else if (username.match(/^[b]\d{2}[m][g]\d{3}$/)) {
+        } else if (username.match(/^[m]\d{2}[b][a]\d{3}$/)) {
             program = 'mba';
         } else {
             req.flash('error', 'Invalid email format - unable to detect program');
@@ -498,9 +498,16 @@ app.post('/admin/login', async (req, res) => {
 
 
 app.get("/", isLoggedIn, async (req, res) => {
-    // const branch = req.user.branch;
-    // let user_id = req.user._id;
-    let allTests = await Test.find({ branch: "lr" });
+    const userProgram = req.user.program;
+    const userYear = req.user.year;
+    const userBranch = req.user.branch;
+
+    let allTests = await Test.find({
+        branch: userBranch,
+        program: userProgram,
+        year: userYear,
+        isTechnical: false
+    });
     allTests.reverse();
     allTests.forEach((test) => {
         if (!scheduledJobs.has(test._id.toString())) {
@@ -598,7 +605,7 @@ app.get("/history", isLoggedIn, async (req, res) => {
 
 app.get("/announcement", isLoggedIn, async (req, res) => {
     const user = req.user;
-    
+
     // Build query to filter announcements
     // Show announcements that match user's program, branch, and year OR are for "all"
     const query = {
@@ -625,21 +632,19 @@ app.get("/announcement", isLoggedIn, async (req, res) => {
             }
         ]
     };
-    
+
     let allAnnouncements = await Announcement.find(query);
     allAnnouncements.reverse();
     res.render("user/announcement.ejs", { allAnnouncements, page: "announcement" });
 });
 
 app.get('/branchTests', isAdmin, async (req, res) => {
-    const { branch_name, program, year } = req.query;
+    const { branch_name, program, year, isTechnical } = req.query;
     const query = { branch: branch_name };
 
     if (program) query.program = program;
-    if (year) {
-        // year is admission academic year (e.g., 2024)
-        query.year = parseInt(year);
-    }
+    if (year) query.year = parseInt(year);
+    if (isTechnical !== undefined) query.isTechnical = (isTechnical === 'true');
 
     const allTests = await Test.find(query);
     res.send(allTests);
@@ -692,24 +697,20 @@ app.get("/categories/:branch", isAdmin, async (req, res) => {
 });
 
 app.get("/core", isLoggedIn, async (req, res) => {
-    let branch = req.user.branch;
-    let allTests = await Test.find({ branch: branch });
-
-    // Filter by Program and Year
     const userProgram = req.user.program;
-    const userAdmissionYear = req.user.year; // This is the admission academic year (e.g., 2024)
+    const userYear = req.user.year;
+    const userBranch = req.user.branch;
 
-    allTests = allTests.filter(test => {
-        // If test has no program/year (legacy data), maybe show it? or hide? 
-        // User requirements imply strict filtering for new flow.
-        if (test.program && test.year) {
-            return test.program === userProgram && test.year === userAdmissionYear;
-        }
-        return true; // Keep legacy tests visible
+    let allTests = await Test.find({
+        branch: userBranch,
+        program: userProgram,
+        year: userYear,
+        isTechnical: true
     });
 
-    // req.session.check = 'abc';
     allTests.reverse();
+
+    // req.session.check = 'abc';
     allTests.forEach((test) => {
         if (!scheduledJobs.has(test._id.toString())) {
             const runAt = new Date(test.startTime);
@@ -900,7 +901,9 @@ app.get("/test/new", isAdmin, (req, res) => {
 
 // Create Test Route
 app.post("/test/questions/new", isAdmin, async (req, res) => {
-    let { testName, date, time, duration, branch, category_name, catNumberOfQues, totalCutoffPercentage, catCutoffPercentage } = req.body;
+    let { testName, date, time, duration, branch, isTechnical, category_name, catNumberOfQues, totalCutoffPercentage, catCutoffPercentage } = req.body;
+
+    const technical = isTechnical === 'true';
 
     // Normalize categories from form input
     let categories = [];
@@ -919,11 +922,14 @@ app.post("/test/questions/new", isAdmin, async (req, res) => {
     const startTime = convertISTToUTC(date, time);
     const endTime = new Date(startTime.getTime() + (Number(duration) * 60 * 1000));
 
-    // year from form is admission academic year (e.g., 2024)
+    // academic year from form is admission academic year (e.g., 2024)
     const admissionYear = parseInt(req.body.year);
 
+    // Get questions from 'lr' model if non-technical, otherwise from branch model
+    const sourceModelBranch = technical ? branch : 'lr';
+
     let Model;
-    switch (branch) {
+    switch (sourceModelBranch) {
         case 'lr': Model = Question; break;
         case 'ai': Model = AiDepartment; break;
         case 'che': Model = ChemicalDepartment; break;
@@ -987,22 +993,6 @@ app.post("/test/questions/new", isAdmin, async (req, res) => {
             totalMarks += 4;
     }
 
-    const branchToModel = {
-        lr: 'Question',
-        ai: 'AiDepartment',
-        che: 'ChemicalDepartment',
-        chm: 'ChemistryDepartment',
-        ce: 'CivilDepartment',
-        cse: 'ComputerScienceDepartment',
-        ee: 'ElectricalDepartment',
-        ece: 'ElectronicsCommunicationDepartment',
-        hss: 'HumanitiesSocialSciencesDepartment',
-        ms: 'ManagementStudiesDepartment',
-        math: 'MathematicsDepartment',
-        me: 'MechanicalDepartment',
-        phy: 'PhysicsDepartment'
-    };
-
     const newTest = new Test({
         testName,
         startTime,
@@ -1014,6 +1004,7 @@ app.post("/test/questions/new", isAdmin, async (req, res) => {
         category: categories,
         questions: randomIds,
         branch,
+        isTechnical: technical,
         branchModel: Model.modelName,
         program: req.body.program,
         year: admissionYear
@@ -1354,7 +1345,7 @@ app.get("/test/:id", isAdmin, async (req, res, next) => {
 //Update Test
 app.put("/test/:id", isAdmin, async (req, res) => {
     let { id } = req.params;
-    let { date, time, duration, testName, questions: changedQuestions, branch, category_name, catNumberOfQues, program, year } = req.body;
+    let { date, time, duration, testName, questions: changedQuestions, branch, isTechnical, category_name, catNumberOfQues, program, year } = req.body;
 
     const oldTest = await Test.findById(id);
     const started = hasTestStarted(oldTest.startTime);
@@ -1365,6 +1356,8 @@ app.put("/test/:id", isAdmin, async (req, res) => {
         return res.redirect(`/test/${id}`);
     }
 
+    const technical = isTechnical === 'true';
+
     if (started) {
         if (Number(duration) < oldTest.duration) {
             req.flash("error", "Duration can only be increased once the test has started.");
@@ -1374,6 +1367,7 @@ app.put("/test/:id", isAdmin, async (req, res) => {
         program = oldTest.program;
         year = oldTest.year; // Keep original admission year
         branch = oldTest.branch;
+        isTechnical = oldTest.isTechnical;
         // startTime remains oldTest.startTime, but we need date/time for the calculation below if we don't override startTime
     }
 
@@ -1402,10 +1396,15 @@ app.put("/test/:id", isAdmin, async (req, res) => {
     // Check if categories or counts have changed
     const categoriesChanged = JSON.stringify(oldTest.category) !== JSON.stringify(newCategories);
 
+    // Determine branch and isTechnical for update
+    const finalIsTechnical = started ? oldTest.isTechnical : technical;
+    const finalBranch = started ? oldTest.branch : branch;
+    const sourceModelBranch = finalIsTechnical ? finalBranch : 'lr';
+
     if (categoriesChanged && newCategories.length > 0) {
         // Resample questions
         let Model;
-        switch (branch) {
+        switch (sourceModelBranch) {
             case 'lr': Model = Question; break;
             case 'ai': Model = AiDepartment; break;
             case 'che': Model = ChemicalDepartment; break;
@@ -1437,7 +1436,7 @@ app.put("/test/:id", isAdmin, async (req, res) => {
         // Update individual questions
         const updatedPromises = changedQuestions.map(q => {
             const { _id, ...rest } = q;
-            switch (branch) {
+            switch (sourceModelBranch) {
                 case 'lr': return Question.findByIdAndUpdate(_id, rest, { new: true });
                 case 'ai': return AiDepartment.findByIdAndUpdate(_id, rest, { new: true });
                 case 'che': return ChemicalDepartment.findByIdAndUpdate(_id, rest, { new: true });
@@ -1466,7 +1465,9 @@ app.put("/test/:id", isAdmin, async (req, res) => {
         questions: questionsIds,
         numberOfQues: totalNumberOfQues,
         program: finalProgram,
-        year: admissionYear
+        year: admissionYear,
+        branch: finalBranch,
+        isTechnical: finalIsTechnical
     }, { new: true }).populate("questions").exec();
 
     const questions = test.questions;
@@ -1535,14 +1536,14 @@ app.get("/announcement/new", isAdmin, (req, res) => {
 app.post("/announcement/new", isAdmin, async (req, res) => {
     let { title, body, issued_by, program, branch, year } = req.body;
     let date = getAnnouncementDate();
-    
+
     // Convert empty year to null
     const announcementYear = year ? parseInt(year) : null;
-    
-    newAnnouncement = new Announcement({ 
-        title, 
-        body, 
-        issued_by, 
+
+    newAnnouncement = new Announcement({
+        title,
+        body,
+        issued_by,
         date,
         program: program || 'all',
         branch: branch || 'all',
@@ -1570,13 +1571,13 @@ app.get("/announcement/:id", isAdmin, async (req, res) => {
 app.put("/announcement/:id", isAdmin, async (req, res) => {
     let { id } = req.params;
     let { title, body, issued_by, program, branch, year } = req.body;
-    
+
     // Convert empty year to null
     const announcementYear = year ? parseInt(year) : null;
-    
-    await Announcement.findByIdAndUpdate(id, { 
-        title, 
-        body, 
+
+    await Announcement.findByIdAndUpdate(id, {
+        title,
+        body,
         issued_by,
         program: program || 'all',
         branch: branch || 'all',
@@ -1595,16 +1596,47 @@ app.get("/dashboard", isAdmin, async (req, res) => {
 
 app.get("/leaderboard", isAdmin, async (req, res) => {
     try {
-        const users = await User.find({})
-            .populate({
-                path: "submissions.test_id",   // populate test details
-                model: "Test",
-                select: "testName branch program year totalMarks" // limit fields if needed
-            })
-            .lean(); // faster read-only objects
+        const { program, branch, year, testId } = req.query;
 
-        res.status(200).json(users);
+        if (!program || !branch || !year || !testId || testId === 'undefined') {
+            return res.status(200).json([]);
+        }
+
+        const parsedYear = parseInt(year, 10);
+        if (Number.isNaN(parsedYear) || !mongoose.Types.ObjectId.isValid(testId)) {
+            return res.status(200).json([]);
+        }
+
+        const testObjectId = new mongoose.Types.ObjectId(testId);
+        const query = {
+            program: program,
+            branch: branch,
+            year: parsedYear,
+            submissions: { $elemMatch: { test_id: testObjectId } }
+        };
+
+        const users = await User.find(query)
+            .populate({
+                path: "submissions.test_id",
+                model: "Test",
+                select: "_id testName branch program year totalMarks isTechnical"
+            })
+            .lean();
+
+        const filteredUsers = users
+            .map(user => ({
+                ...user,
+                submissions: (user.submissions || []).filter(sub => {
+                    if (!sub?.test_id) return false;
+                    const subTestId = sub.test_id._id ? sub.test_id._id.toString() : sub.test_id.toString();
+                    return subTestId === testId;
+                })
+            }))
+            .filter(user => user.submissions.length > 0);
+
+        res.status(200).json(filteredUsers);
     } catch (err) {
+        console.error("[Leaderboard] API Error:", err);
         res.status(500).json({ error: err.message });
     }
 });
@@ -1657,7 +1689,7 @@ app.get("/admin/qualification-stats", isAdmin, async (req, res) => {
             return res.status(400).json({ success: false, error: "Missing required parameters" });
         }
 
-        // year is admission academic year (e.g., 2024)
+        // academic year is admission academic year (e.g., 2024)
         const query = {
             program: program,
             branch: branch,
@@ -1673,14 +1705,23 @@ app.get("/admin/qualification-stats", isAdmin, async (req, res) => {
             user.submissions.forEach(sub => {
                 if (!sub.test_id) return;
 
-                const testBranch = sub.test_id.branch;
-                const isTech = type === 'technical';
+                const isTechRequested = type === 'technical';
+                const test = sub.test_id;
 
-                // If technical: count tests where branch matches user's branch
-                // If non-technical: count tests where branch is 'lr'
-                const matchesType = isTech ? (testBranch === branch) : (testBranch === 'lr');
+                // Robustly get Test ID and fields (handle populated or unpopulated)
+                const testId = test._id ? test._id.toString() : test.toString();
+                const testIsTechnical = test.isTechnical;
+                const testBranch = test.branch;
+                const testProgram = test.program;
+                const testYear = test.year;
 
-                if (matchesType) {
+                // Match criteria strictly
+                const matchesCriteria = (testIsTechnical === isTechRequested) &&
+                    (testBranch === branch) &&
+                    (testProgram === program) &&
+                    (testYear !== undefined && parseInt(testYear) === parseInt(year));
+
+                if (matchesCriteria) {
                     if (sub.isQualified) {
                         qualifiedCount++;
                     } else {
@@ -1736,5 +1777,6 @@ connectDB()
     .catch((error) => {
         console.error("Database connection failed:", error);
     });
+
 
 

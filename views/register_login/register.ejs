@@ -41,9 +41,10 @@
                 <input type="text" class="form-control" name="name" placeholder="Enter Full Name" id="name" required>
                 <label for="name">Full name</label>
             </div>
-            <select class="form-select form-select-lg mb-3" aria-label="Select branch" name="branch" id="branch" required>
-                <option value="" disabled selected>Select branch</option>
-            </select>
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" name="branch" placeholder="Branch" id="branch" readonly>
+                <label for="branch">Branch</label>
+            </div>
             <button class="btn btn-dark mb-3" id="register">Register</button>
             <p>Already have an account? &MediumSpace;<a href="/login">Log in</a>
             </p>
@@ -94,7 +95,7 @@
                 { value: 'math', text: 'Mathematics' }
             ],
             mba: [
-                { value: '', text: 'No branch required' }
+                { value: '', text: 'Business Analytics' }
             ]
         };
 
@@ -111,9 +112,9 @@
             if (email.includes('@')) {
                 const username = email.split('@')[0];
                 usernameInput.value = username;
-                
+
                 let detectedProgram = '';
-                
+
                 // Auto-detect program from email pattern
                 if (username.match(/^[ub]\d{2}[a-z]{2,5}\d{3}$/)) {
                     // B.Tech pattern (u24cs001, b21me002, etc.)
@@ -124,28 +125,74 @@
                 } else if (username.match(/^[i]\d{2}[a-z]{2,5}\d{3}$/)) {
                     // M.Sc pattern (i22ph010, etc.)
                     detectedProgram = 'msc';
-                } else if (username.match(/^[b]\d{2}[m][g]\d{3}$/)) {
+                } else if (username.match(/^[m]\d{2}[b][a]\d{3}$/)) {
                     // MBA pattern (b21mg002, etc.)
                     detectedProgram = 'mba';
                 }
-                
+
                 if (detectedProgram) {
                     programInput.value = programDisplayNames[detectedProgram];
-                    updateBranchOptions(detectedProgram);
                 } else {
                     programInput.value = '';
-                    updateBranchOptions('');
+                }
+
+                // Validate branch code strictly by comparing the substring
+                const branchCode = username.slice(3, 5); // Extract branch code from username
+                const remainingPart = username.slice(5); // Extract remaining part after branch code
+                let validBranch = '';
+
+                if (detectedProgram === 'btech' || detectedProgram === 'mtech') {
+                    const branchMapping = {
+                        ai: 'Artificial Intelligence',
+                        ch: 'Chemical Engineering',
+                        ic: 'Chemistry',
+                        ce: 'Civil Engineering',
+                        cs: 'Computer Science and Engineering',
+                        ee: 'Electrical Engineering',
+                        ec: 'Electronics Engineering',
+                        hs: 'Humanities and Social Sciences',
+                        ms: 'Management Studies',
+                        mc: 'Mathematics',
+                        me: 'Mechanical Engineering',
+                        ep: 'Physics'
+                    };
+
+                    // Check if branch code exists and ensure no extra characters in the branch part
+                    if (branchMapping.hasOwnProperty(branchCode) && remainingPart.match(/^\d{3}$/)) {
+                        validBranch = branchMapping[branchCode];
+                    }
+                } else if (detectedProgram === 'msc') {
+                    const branchMapping = {
+                        ma: 'Mathematics',
+                        ph: 'Physics',
+                        cy: 'Chemistry'
+                    };
+
+                    // Check if branch code exists and ensure no extra characters in the branch part
+                    if (branchMapping.hasOwnProperty(branchCode) && remainingPart.match(/^\d{3}$/)) {
+                        validBranch = branchMapping[branchCode];
+                    }
+                } else if (detectedProgram === 'mba') {
+                    validBranch = branchCode === 'ba' && remainingPart.match(/^\d{3}$/) ? 'Business Analytics' : '';
+                }
+
+                // Ensure branch field displays the corresponding name on hitting @
+                const branchInput = document.getElementById('branch');
+                if (validBranch) {
+                    branchInput.value = validBranch; // Display the branch name in the field
+                } else {
+                    branchInput.value = 'Invalid branch'; // Display invalid branch if no match
                 }
             } else {
                 usernameInput.value = '';
                 programInput.value = '';
-                updateBranchOptions('');
+                document.getElementById('branch').value = '';
             }
         });
 
         function updateBranchOptions(selectedProgram) {
             branchSelect.innerHTML = '<option value="" disabled selected>Select branch</option>';
-            
+
             if (selectedProgram && branchOptions[selectedProgram]) {
                 branchOptions[selectedProgram].forEach(option => {
                     const opt = document.createElement('option');
