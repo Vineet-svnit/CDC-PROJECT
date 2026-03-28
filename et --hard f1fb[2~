@@ -1,0 +1,108 @@
+[33mf55a5db[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m mba name fix
+[33me03ea82[m Auto fill branch
+[33mf1fb506[m lr fix
+[33mc69908e[m Final
+[33mfb4903c[m 1
+[33m4152d7a[m Announcement updated
+[33mf52ad89[m leaderboard corrected
+[33m4d13935[m year changed
+[33mce2898b[m Organized admin dashboard
+[33m7f7a2c8[m Added detailed analysis on admin dashboard
+[33m7ac4c9c[m Added cutoff and program logic to tests
+[33mf16b2e4[m user model updated
+[33m508a28c[m Merge branch 'main' of https://github.com/Vineet-svnit/CDC-PROJECT
+[33m4a813c8[m buffer time
+[33m6f80597[m removed auto quit
+[33mc71d483[m otp corrected
+[33me6e4a3c[m otp corrected
+[33m48419ad[m added pie chart
+[33m1b40970[m UI fixes
+[33m98a9b27[m fixed redirect
+[33md8bbcee[m check2
+[33mb3d5731[m check
+[33mb837fbe[m Added full security
+[33m46a6007[m Merge branch 'main' of https://github.com/Vineet-svnit/CDC-PROJECT
+[33md80ddc4[m Fixed test ui and integrated smooth flow
+[33mdbc1241[m url changes
+[33mb7c8208[m Merge branch 'main' of https://github.com/Vineet-svnit/CDC-PROJECT
+[33m60edfb4[m dark mode removed
+[33m629a7b5[m login fix for sure
+[33mc6ce6d9[m check3
+[33md550022[m check2
+[33m3554e12[m check
+[33m497bf0b[m login fix
+[33m5f5b04d[m Integrated SEB with browser
+[33m5f63bbf[m Integrated SEB with chrome
+[33ma835ef9[m Admin side css updated
+[33mcae1546[m Configured SEB
+[33m5e2ae5e[m Major UI overhaul
+[33mab080ce[m Added auto - submission
+[33m0df9858[m user side timezone corrected
+[33m4b416bd[m postmark implemented for emailing
+[33m35c9267[m mailing error resolved
+[33mc87eb67[m corrected timezone error and use emailjs for mailing
+[33ma37dcd8[m otp verification implemented
+[33m7fdadc4[m checkpoint
+[33m6174e47[m checkpoint
+[33mf2b650b[m Added categorization to branches
+[33m1bd4c6e[m Updated Readme
+[33mb7d36c8[m Final changes done
+[33mf5f756b[m Testing
+[33m11e0b33[m Minorest changes
+[33me85dbfc[m changed layout
+[33m10f2e91[m leaderboard complete
+[33me9e14da[m Added download Result for admin
+[33mb426ea4[m Fixed upload issue
+[33m93a705a[m Added various exam- cheat detection features
+[33me0b91c4[m Fixed glitch in admin-login
+[33m740fc33[m admin password glitch handled
+[33m61729a8[m flash in admin
+[33me32cde9[m the final
+[33md5ab03c[m Jenil final changes
+[33m5b01fb3[m prev final
+[33m6890251[m abc
+[33mb49c251[m check
+[33m98aee37[m redep
+[33m1de6487[m deploy
+[33m2e39d2f[m redeployed
+[33md7e9fb2[m Redep
+[33m3188388[m Redeploying
+[33m49d4e8b[m Deploy check
+[33m277088a[m Added footer, fixed css of qn page
+[33m7d3ce40[m check
+[33md99d535[m Added feature to add questions using excel
+[33m1f4135c[m issued left
+[33m9ccbcfb[m currentTime
+[33mdd8a8dc[m 123
+[33m122fc5b[m instructions added
+[33m649b5d8[m Merge branch 'main' of https://github.com/ayushman-svnit/CDC-Project
+[33m3d80c76[m 9
+[33m5396de0[m Improved qn page, testForm css
+[33meee1a57[m Handeled attempted, unattempted count issue in questions
+[33mb860c5c[m Added working update tests, fixed altered time issue, some css
+[33mf5c0f1b[m 8
+[33m64f4099[m Merge branch 'main' of https://github.com/ayushman-svnit/CDC-Project
+[33m48aaefe[m 7
+[33m0954d0b[m Handled answers on update test
+[33mb9ee110[m 6
+[33ma81fc6d[m 5
+[33mcf376ce[m 4
+[33maa79d9b[m 3
+[33m27ef239[m 2
+[33m04aea65[m 1
+[33mf43c880[m Added Submissions page, History page, Admin Auth
+[33m0dca9f3[m Questions page
+[33me821afd[m Merge branch 'main' of https://github.com/ayushman-svnit/CDC-Project
+[33m490bb8c[m question.ejs
+[33mbe4f282[m Resolved minor errors
+[33m144398b[m no change
+[33m2e15d5b[m Added Authentication
+[33m73d13c7[m Add reg/login frontend
+[33m3cbc4f4[m Merge branch 'main' of https://github.com/ayushman-svnit/CDC-Project
+[33m1abd4db[m Update test
+[33mc0e903d[m Schema for user registration
+[33m1637513[m Make Dashboard
+[33me08c9ce[m update announcement page
+[33mf847cf2[m Merge branch 'main' of https://github.com/ayushman-svnit/CDC-Project
+[33m4cb7211[m First commit
+[33m2715043[m first commit

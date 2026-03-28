@@ -152,36 +152,36 @@ loadDashboardStats();
 const branchOptions = {
   btech: [
     { value: 'ai', text: 'Artificial Intelligence' },
-    { value: 'che', text: 'Chemical' },
-    { value: 'chm', text: 'Chemistry' },
+    { value: 'ch', text: 'Chemical' },
+    { value: 'ic', text: 'Chemistry' },
     { value: 'ce', text: 'Civil Engineering' },
-    { value: 'cse', text: 'Computer Science and Engineering' },
+    { value: 'cs', text: 'Computer Science and Engineering' },
     { value: 'ee', text: 'Electrical Engineering' },
-    { value: 'ece', text: 'Electronics Engineering' },
-    { value: 'hss', text: 'Humanities and Social Sciences' },
+    { value: 'ee', text: 'Electronics Engineering' },
+    { value: 'hs', text: 'Humanities and Social Sciences' },
     { value: 'ms', text: 'Management Studies' },
-    { value: 'math', text: 'Mathematics' },
+    { value: 'ma', text: 'Mathematics' },
     { value: 'me', text: 'Mechanical Engineering' },
-    { value: 'phy', text: 'Physics' }
+    { value: 'ep', text: 'Physics' }
   ],
   mtech: [
     { value: 'ai', text: 'Artificial Intelligence' },
-    { value: 'che', text: 'Chemical' },
-    { value: 'chm', text: 'Chemistry' },
+    { value: 'ch', text: 'Chemical' },
+    { value: 'ic', text: 'Chemistry' },
     { value: 'ce', text: 'Civil Engineering' },
-    { value: 'cse', text: 'Computer Science and Engineering' },
+    { value: 'cs', text: 'Computer Science and Engineering' },
     { value: 'ee', text: 'Electrical Engineering' },
-    { value: 'ece', text: 'Electronics Engineering' },
-    { value: 'hss', text: 'Humanities and Social Sciences' },
+    { value: 'ee', text: 'Electronics Engineering' },
+    { value: 'hs', text: 'Humanities and Social Sciences' },
     { value: 'ms', text: 'Management Studies' },
-    { value: 'math', text: 'Mathematics' },
+    { value: 'ma', text: 'Mathematics' },
     { value: 'me', text: 'Mechanical Engineering' },
-    { value: 'phy', text: 'Physics' }
+    { value: 'ep', text: 'Physics' }
   ],
   msc: [
-    { value: 'phy', text: 'Physics' },
-    { value: 'chm', text: 'Chemistry' },
-    { value: 'math', text: 'Mathematics' }
+    { value: 'ep', text: 'Physics' },
+    { value: 'ic', text: 'Chemistry' },
+    { value: 'ma', text: 'Mathematics' }
   ],
   mba: [
     { value: '', text: 'No branch required' }

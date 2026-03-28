@@ -26,7 +26,7 @@ const  announcemmentSchema=new Schema({
     },
     branch: {
         type: String,
-        enum: ['all', 'ai', 'che', 'chm', 'ce', 'cse', 'ee', 'ece', 'hss', 'ms', 'math', 'me', 'phy', ''],
+        enum: ['all', 'ai', 'ch', 'ic', 'ce', 'cs', 'ee', 'ee', 'hs', 'ms', 'ma', 'me', 'ep', ''],
         default: 'all'
     },
     year: {

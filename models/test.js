@@ -70,7 +70,7 @@ const testSchema = new Schema({
     }],
     branch: {
         type: String,
-        enum: ['ai', 'che', 'chm', 'ce', 'cse', 'ee', 'ece', 'hss', 'ms', 'math', 'me', 'phy'],
+        enum: ['ai', 'ch', 'ic', 'ce', 'cs', 'ee', 'ee', 'hs', 'ms', 'ma', 'me', 'ep'],
         required: true
     },
     program: {

@@ -73,17 +73,17 @@
             <label class="form-label">Branch</label>
             <select class="form-select" <%=disableSelect %>>
               <option value="ai" <%=test.branch=='ai' ? 'selected' : '' %>>Artificial Intelligence</option>
-              <option value="cse" <%=test.branch=='cse' ? 'selected' : '' %>>Computer Science</option>
+              <option value="cse" <%=test.branch=='cs' ? 'selected' : '' %>>Computer Science</option>
               <option value="me" <%=test.branch=='me' ? 'selected' : '' %>>Mechanical</option>
-              <option value="che" <%=test.branch=='che' ? 'selected' : '' %>>Chemical</option>
-              <option value="chm" <%=test.branch=='chm' ? 'selected' : '' %>>Chemistry</option>
+              <option value="che" <%=test.branch=='ch' ? 'selected' : '' %>>Chemical</option>
+              <option value="chm" <%=test.branch=='ic' ? 'selected' : '' %>>Chemistry</option>
               <option value="ce" <%=test.branch=='ce' ? 'selected' : '' %>>Civil</option>
               <option value="ee" <%=test.branch=='ee' ? 'selected' : '' %>>Electrical</option>
-              <option value="ece" <%=test.branch=='ece' ? 'selected' : '' %>>Electronics</option>
-              <option value="hss" <%=test.branch=='hss' ? 'selected' : '' %>>Humanities</option>
+              <option value="ece" <%=test.branch=='ee' ? 'selected' : '' %>>Electronics</option>
+              <option value="hss" <%=test.branch=='hs' ? 'selected' : '' %>>Humanities</option>
               <option value="ms" <%=test.branch=='ms' ? 'selected' : '' %>>Management</option>
-              <option value="math" <%=test.branch=='math' ? 'selected' : '' %>>Mathematics</option>
-              <option value="phy" <%=test.branch=='phy' ? 'selected' : '' %>>Physics</option>
+              <option value="math" <%=test.branch=='ma' ? 'selected' : '' %>>Mathematics</option>
+              <option value="phy" <%=test.branch=='ep' ? 'selected' : '' %>>Physics</option>
             </select>
             <!-- IMPORTANT: disabled select does not submit -->
             <input type="hidden" name="branch" value="<%= test.branch %>">

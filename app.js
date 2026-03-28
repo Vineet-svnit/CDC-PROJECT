@@ -301,13 +301,13 @@ app.post('/register', async (req, res) => {
 
         // Extract program from email pattern
         let program = '';
-        if (username.match(/^[ub]\d{2}[a-z]{2,5}\d{3}$/)) {
+        if (username.match(/^[ub]\d{2}[a-z]{2}\d{3}$/)) {
             program = 'btech';
-        } else if (username.match(/^[p]\d{2}[a-z]{2,5}\d{3}$/)) {
+        } else if (username.match(/^[p]\d{2}[a-z]{2}\d{3}$/)) {
             program = 'mtech';
-        } else if (username.match(/^[i]\d{2}[a-z]{2,5}\d{3}$/)) {
+        } else if (username.match(/^[i]\d{2}[a-z]{2}\d{3}$/)) {
             program = 'msc';
-        } else if (username.match(/^[b]\d{2}[m][g]\d{3}$/)) {
+        } else if (username.match(/^[m]\d{2}[b][a]\d{3}$/)) {
             program = 'mba';
         } else {
             req.flash('error', 'Invalid email format - unable to detect program');
@@ -656,17 +656,17 @@ app.get("/categories/:branch", isAdmin, async (req, res) => {
     switch (branch) {
         case 'lr': model = Question; break;
         case 'ai': model = AiDepartment; break;
-        case 'che': model = ChemicalDepartment; break;
-        case 'chm': model = ChemistryDepartment; break;
+        case 'ch': model = ChemicalDepartment; break;
+        case 'ic': model = ChemistryDepartment; break;
         case 'ce': model = CivilDepartment; break;
-        case 'cse': model = ComputerScienceDepartment; break;
+        case 'cs': model = ComputerScienceDepartment; break;
         case 'ee': model = ElectricalDepartment; break;
-        case 'ece': model = ElectronicsCommunicationDepartment; break;
-        case 'hss': model = HumanitiesSocialSciencesDepartment; break;
+        case 'ee': model = ElectronicsCommunicationDepartment; break;
+        case 'hs': model = HumanitiesSocialSciencesDepartment; break;
         case 'ms': model = ManagementStudiesDepartment; break;
-        case 'math': model = MathematicsDepartment; break;
+        case 'ma': model = MathematicsDepartment; break;
         case 'me': model = MechanicalDepartment; break;
-        case 'phy': model = PhysicsDepartment; break;
+        case 'ep': model = PhysicsDepartment; break;
         default: return res.status(400).json({ error: "Invalid branch" });
     }
     try {
@@ -932,17 +932,17 @@ app.post("/test/questions/new", isAdmin, async (req, res) => {
     switch (sourceModelBranch) {
         case 'lr': Model = Question; break;
         case 'ai': Model = AiDepartment; break;
-        case 'che': Model = ChemicalDepartment; break;
-        case 'chm': Model = ChemistryDepartment; break;
+        case 'ch': Model = ChemicalDepartment; break;
+        case 'ic': Model = ChemistryDepartment; break;
         case 'ce': Model = CivilDepartment; break;
-        case 'cse': Model = ComputerScienceDepartment; break;
+        case 'cs': Model = ComputerScienceDepartment; break;
         case 'ee': Model = ElectricalDepartment; break;
-        case 'ece': Model = ElectronicsCommunicationDepartment; break;
-        case 'hss': Model = HumanitiesSocialSciencesDepartment; break;
+        case 'ee': Model = ElectronicsCommunicationDepartment; break;
+        case 'hs': Model = HumanitiesSocialSciencesDepartment; break;
         case 'ms': Model = ManagementStudiesDepartment; break;
-        case 'math': Model = MathematicsDepartment; break;
+        case 'ma': Model = MathematicsDepartment; break;
         case 'me': Model = MechanicalDepartment; break;
-        case 'phy': Model = PhysicsDepartment; break;
+        case 'ep': Model = PhysicsDepartment; break;
         default: return res.status(400).send("Invalid branch");
     }
 
@@ -1071,11 +1071,11 @@ app.post("/upload", isAdmin, upload.single("file"), async (req, res) => {
                 existingQuestions = await AiDepartment.find();
                 break;
 
-            case 'che':
+            case 'ch':
                 existingQuestions = await ChemicalDepartment.find();
                 break;
 
-            case 'chm':
+            case 'ic':
                 existingQuestions = await ChemistryDepartment.find();
                 break;
 
@@ -1083,7 +1083,7 @@ app.post("/upload", isAdmin, upload.single("file"), async (req, res) => {
                 existingQuestions = await CivilDepartment.find();
                 break;
 
-            case 'cse':
+            case 'cs':
                 existingQuestions = await ComputerScienceDepartment.find();
                 break;
 
@@ -1091,11 +1091,11 @@ app.post("/upload", isAdmin, upload.single("file"), async (req, res) => {
                 existingQuestions = await ElectricalDepartment.find();
                 break;
 
-            case 'ece':
+            case 'ee':
                 existingQuestions = await ElectronicsCommunicationDepartment.find();
                 break;
 
-            case 'hss':
+            case 'hs':
                 existingQuestions = await HumanitiesSocialSciencesDepartment.find();
                 break;
 
@@ -1103,7 +1103,7 @@ app.post("/upload", isAdmin, upload.single("file"), async (req, res) => {
                 existingQuestions = await ManagementStudiesDepartment.find();
                 break;
 
-            case 'math':
+            case 'ma':
                 existingQuestions = await MathematicsDepartment.find();
                 break;
 
@@ -1111,7 +1111,7 @@ app.post("/upload", isAdmin, upload.single("file"), async (req, res) => {
                 existingQuestions = await MechanicalDepartment.find();
                 break;
 
-            case 'phy':
+            case 'ep':
                 existingQuestions = await PhysicsDepartment.find();
                 break;
 
@@ -1171,11 +1171,11 @@ app.post("/upload", isAdmin, upload.single("file"), async (req, res) => {
                     await AiDepartment.insertMany(questions);
                     break;
 
-                case 'che':
+                case 'ch':
                     await ChemicalDepartment.insertMany(questions);
                     break;
 
-                case 'chm':
+                case 'ic':
                     await ChemistryDepartment.insertMany(questions);
                     break;
 
@@ -1183,7 +1183,7 @@ app.post("/upload", isAdmin, upload.single("file"), async (req, res) => {
                     await CivilDepartment.insertMany(questions);
                     break;
 
-                case 'cse':
+                case 'cs':
                     await ComputerScienceDepartment.insertMany(questions);
                     break;
 
@@ -1191,11 +1191,11 @@ app.post("/upload", isAdmin, upload.single("file"), async (req, res) => {
                     await ElectricalDepartment.insertMany(questions);
                     break;
 
-                case 'ece':
+                case 'ee':
                     await ElectronicsCommunicationDepartment.insertMany(questions);
                     break;
 
-                case 'hss':
+                case 'hs':
                     await HumanitiesSocialSciencesDepartment.insertMany(questions);
                     break;
 
@@ -1203,7 +1203,7 @@ app.post("/upload", isAdmin, upload.single("file"), async (req, res) => {
                     await ManagementStudiesDepartment.insertMany(questions);
                     break;
 
-                case 'math':
+                case 'ma':
                     await MathematicsDepartment.insertMany(questions);
                     break;
 
@@ -1211,7 +1211,7 @@ app.post("/upload", isAdmin, upload.single("file"), async (req, res) => {
                     await MechanicalDepartment.insertMany(questions);
                     break;
 
-                case 'phy':
+                case 'ep':
                     await PhysicsDepartment.insertMany(questions);
                     break;
 
@@ -1407,17 +1407,17 @@ app.put("/test/:id", isAdmin, async (req, res) => {
         switch (sourceModelBranch) {
             case 'lr': Model = Question; break;
             case 'ai': Model = AiDepartment; break;
-            case 'che': Model = ChemicalDepartment; break;
-            case 'chm': Model = ChemistryDepartment; break;
+            case 'ch': Model = ChemicalDepartment; break;
+            case 'ic': Model = ChemistryDepartment; break;
             case 'ce': Model = CivilDepartment; break;
-            case 'cse': Model = ComputerScienceDepartment; break;
+            case 'cs': Model = ComputerScienceDepartment; break;
             case 'ee': Model = ElectricalDepartment; break;
-            case 'ece': Model = ElectronicsCommunicationDepartment; break;
-            case 'hss': Model = HumanitiesSocialSciencesDepartment; break;
+            case 'ee': Model = ElectronicsCommunicationDepartment; break;
+            case 'hs': Model = HumanitiesSocialSciencesDepartment; break;
             case 'ms': Model = ManagementStudiesDepartment; break;
-            case 'math': Model = MathematicsDepartment; break;
+            case 'ma': Model = MathematicsDepartment; break;
             case 'me': Model = MechanicalDepartment; break;
-            case 'phy': Model = PhysicsDepartment; break;
+            case 'ep': Model = PhysicsDepartment; break;
         }
 
         let allQuestions = [];
@@ -1439,17 +1439,17 @@ app.put("/test/:id", isAdmin, async (req, res) => {
             switch (sourceModelBranch) {
                 case 'lr': return Question.findByIdAndUpdate(_id, rest, { new: true });
                 case 'ai': return AiDepartment.findByIdAndUpdate(_id, rest, { new: true });
-                case 'che': return ChemicalDepartment.findByIdAndUpdate(_id, rest, { new: true });
-                case 'chm': return ChemistryDepartment.findByIdAndUpdate(_id, rest, { new: true });
+                case 'ch': return ChemicalDepartment.findByIdAndUpdate(_id, rest, { new: true });
+                case 'ic': return ChemistryDepartment.findByIdAndUpdate(_id, rest, { new: true });
                 case 'ce': return CivilDepartment.findByIdAndUpdate(_id, rest, { new: true });
-                case 'cse': return ComputerScienceDepartment.findByIdAndUpdate(_id, rest, { new: true });
+                case 'cs': return ComputerScienceDepartment.findByIdAndUpdate(_id, rest, { new: true });
                 case 'ee': return ElectricalDepartment.findByIdAndUpdate(_id, rest, { new: true });
-                case 'ece': return ElectronicsCommunicationDepartment.findByIdAndUpdate(_id, rest, { new: true });
-                case 'hss': return HumanitiesSocialSciencesDepartment.findByIdAndUpdate(_id, rest, { new: true });
+                case 'ee': return ElectronicsCommunicationDepartment.findByIdAndUpdate(_id, rest, { new: true });
+                case 'hs': return HumanitiesSocialSciencesDepartment.findByIdAndUpdate(_id, rest, { new: true });
                 case 'ms': return ManagementStudiesDepartment.findByIdAndUpdate(_id, rest, { new: true });
-                case 'math': return MathematicsDepartment.findByIdAndUpdate(_id, rest, { new: true });
+                case 'ma': return MathematicsDepartment.findByIdAndUpdate(_id, rest, { new: true });
                 case 'me': return MechanicalDepartment.findByIdAndUpdate(_id, rest, { new: true });
-                case 'phy': return PhysicsDepartment.findByIdAndUpdate(_id, rest, { new: true });
+                case 'ep': return PhysicsDepartment.findByIdAndUpdate(_id, rest, { new: true });
                 default: throw new Error("Invalid branch");
             }
         });
