@@ -1,21 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const branchToModel = {
-    lr: 'Question',
-    ai: 'AiDepartment',
-    che: 'ChemicalDepartment',
-    chm: 'ChemistryDepartment',
-    ce: 'CivilDepartment',
-    cse: 'ComputerScienceDepartment',
-    ee: 'ElectricalDepartment',
-    ece: 'ElectronicsCommunicationDepartment',
-    hss: 'HumanitiesSocialSciencesDepartment',
-    ms: 'ManagementStudiesDepartment',
-    math: 'MathematicsDepartment',
-    me: 'MechanicalDepartment',
-    phy: 'PhysicsDepartment'
-};
+
 
 const testSchema = new Schema({
     testName: {
@@ -61,8 +47,7 @@ const testSchema = new Schema({
     },
     branchModel: {
         type: String,
-        required: true,
-        enum: Object.values(branchToModel)
+        required: true
     },
     questions: [{
         type: Schema.Types.ObjectId,
@@ -70,7 +55,14 @@ const testSchema = new Schema({
     }],
     branch: {
         type: String,
-        enum: ['ai', 'ch', 'ic', 'ce', 'cs', 'ee', 'ee', 'hs', 'ms', 'ma', 'me', 'ep'],
+        enum: [
+            'b_ai', 'b_ch', 'b_ce', 'b_cse', 'b_ep', 'b_ee', 'b_ece', 'b_vlsi', 'b_ic', 'b_mnc', 'b_me',
+            'm_cad_cam', 'm_ch', 'm_comm_sys', 'm_cse', 'm_control_auto', 'm_ctm', 'm_ds', 'm_env', 'm_geo',
+            'm_is', 'm_inst_ctrl', 'm_manufacturing', 'm_me', 'm_peed', 'm_power_sys', 'm_struct', 'm_thermal', 
+            'm_transport', 'm_turbo', 'm_urban', 'm_vlsi', 'm_water',
+            'msc_math', 'msc_phy', 'msc_chem',
+            'mba_ba'
+        ],
         required: true
     },
     program: {

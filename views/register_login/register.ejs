@@ -56,51 +56,13 @@
         <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
         <script src="/js/script.js"></script>
         <script src="/js/register_login.js"></script>
+        <script src="/js/constants.js"></script>
         <script>
             // Dynamic branch dropdown based on program detection
             const programInput = document.getElementById('program');
             const branchSelect = document.getElementById('branch');
             const emailInput = document.getElementById('email');
             const usernameInput = document.getElementById('username');
-
-            const branchOptions = {
-                btech: [
-                    { value: 'ai', text: 'Artificial Intelligence' },
-                    { value: 'ch', text: 'Chemical Engineering' },
-                    { value: 'ic', text: 'Chemistry' },
-                    { value: 'ce', text: 'Civil Engineering' },
-                    { value: 'cs', text: 'Computer Science and Engineering' },
-                    { value: 'ee', text: 'Electrical Engineering' },
-                    { value: 'ee', text: 'Electronics Engineering' },
-                    { value: 'hs', text: 'Humanities and Social Sciences' },
-                    { value: 'ms', text: 'Management Studies' },
-                    { value: 'ma', text: 'Mathematics' },
-                    { value: 'me', text: 'Mechanical Engineering' },
-                    { value: 'ep', text: 'Physics' }
-                ],
-                mtech: [
-                    { value: 'ai', text: 'Artificial Intelligence' },
-                    { value: 'ch', text: 'Chemical Engineering' },
-                    { value: 'ic', text: 'Chemistry' },
-                    { value: 'ce', text: 'Civil Engineering' },
-                    { value: 'cs', text: 'Computer Science and Engineering' },
-                    { value: 'ee', text: 'Electrical Engineering' },
-                    { value: 'ee', text: 'Electronics Engineering' },
-                    { value: 'hs', text: 'Humanities and Social Sciences' },
-                    { value: 'ms', text: 'Management Studies' },
-                    { value: 'ma', text: 'Mathematics' },
-                    { value: 'me', text: 'Mechanical Engineering' },
-                    { value: 'ep', text: 'Physics' }
-                ],
-                msc: [
-                    { value: 'ep', text: 'Physics' },
-                    { value: 'ic', text: 'Chemistry' },
-                    { value: 'ma', text: 'Mathematics' }
-                ],
-                mba: [
-                    { value: '', text: 'No branch required' }
-                ]
-            };
 
             const programDisplayNames = {
                 btech: 'B.Tech',
@@ -129,7 +91,7 @@
                         // M.Sc pattern (i22ph010, etc.)
                         detectedProgram = 'msc';
                     } else if (username.match(/^[m]\d{2}[b][a]\d{3}$/)) {
-                        // MBA pattern (b21mg002, etc.)
+                        // MBA pattern (m21mg002, etc.)
                         detectedProgram = 'mba';
                     }
 
@@ -148,59 +110,68 @@
                 }
             });
 
-            // function updateBranchOptions(selectedProgram) {
-            //     branchSelect.innerHTML = '<option value="" disabled selected>Select branch</option>';
-
-            //     if (selectedProgram && branchOptions[selectedProgram]) {
-            //         branchOptions[selectedProgram].forEach(option => {
-            //             const opt = document.createElement('option');
-            //             opt.value = option.value;
-            //             opt.textContent = option.text;
-            //             branchSelect.appendChild(opt);
-            //         });
-            //         branchSelect.disabled = false;
-            //     } else {
-            //         branchSelect.disabled = true;
-            //     }
-            // }
-
             function updateBranchOptions(program, branchCode) {
-                branchSelect.innerHTML = '';
+                branchSelect.innerHTML = '<option value="" disabled selected>Select branch</option>';
 
-                if (!program || !branchOptions[program]) {
-                    resetBranch();
+                if (!program || !window.programOptions[program]) {
+                    branchSelect.disabled = true;
+                    document.getElementById('branchHidden').value = '';
                     return;
                 }
 
-                const options = branchOptions[program];
+                const options = window.programOptions[program];
+                let match = null;
 
-                const match = options.find(opt => opt.value === branchCode);
+                if (branchCode) {
+                    const codeMap = {
+                        'ai': 'ai', 'ch': 'ch', 'ce': 'ce', 'cs': 'cse', 'co': 'cse',
+                        'ep': 'ep', 'ph': 'phy', 'ee': 'ee', 'ec': 'ece', 'el': 'ece',
+                        'ic': 'ic', 'cy': 'chem', 'mn': 'mnc', 'ma': 'math', 'me': 'me',
+                        'vl': 'vlsi', 'ba': 'ba', 'mg': 'ba'
+                    };
+                    const mappedCode = codeMap[branchCode] || branchCode;
 
-                if (!match) {
-                    resetBranch("Invalid branch");
-                    return;
+                    let prefix = program === 'btech' ? 'b_' :
+                        program === 'mtech' ? 'm_' :
+                            program === 'msc' ? 'msc_' : 'mba_';
+
+                    // Specifically math for btech is called 'mnc' but for msc is 'math' so mapping helps
+                    if (program === 'btech' && mappedCode === 'math') match = options.find(opt => opt.value === 'b_mnc');
+                    else match = options.find(opt => opt.value === (prefix + mappedCode)) || options.find(opt => opt.value === mappedCode);
                 }
 
-                const opt = document.createElement('option');
-                opt.value = match.value;
-                opt.textContent = match.text;
-                opt.selected = true;
+                if (match) {
+                    const opt = document.createElement('option');
+                    opt.value = match.value;
+                    opt.textContent = match.text;
+                    opt.selected = true;
+                    branchSelect.appendChild(opt);
 
-                branchSelect.appendChild(opt);
-                branchSelect.value = match.value;
-
-                document.getElementById('branchHidden').value = match.value;
+                    branchSelect.disabled = true;
+                    document.getElementById('branchHidden').value = match.value;
+                } else {
+                    // Fallback to manual selection
+                    options.forEach(option => {
+                        const opt = document.createElement('option');
+                        opt.value = option.value;
+                        opt.textContent = option.text;
+                        branchSelect.appendChild(opt);
+                    });
+                    branchSelect.disabled = false;
+                    document.getElementById('branchHidden').value = '';
+                }
             }
+
             // Initially disable branch select
             branchSelect.disabled = true;
 
-            function resetBranch(msg = 'Select branch') {
-                branchSelect.innerHTML = `<option disabled selected>${msg}</option>`;
-                document.getElementById('branchHidden').value = ''; // 🔥 important
-            }
+            // Important: sync manual selection to hidden field
+            branchSelect.addEventListener('change', function () {
+                document.getElementById('branchHidden').value = this.value;
+            });
 
             document.querySelector('form').addEventListener('submit', function (e) {
-                if (!branchSelect.value) {
+                if (!document.getElementById('branchHidden').value) {
                     e.preventDefault();
                     alert("Invalid email or branch");
                 }

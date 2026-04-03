@@ -64,21 +64,7 @@ const {
 // Import template helpers
 const templateHelpers = require('./utils/templateHelpers.js');
 // const Question = require("./models/question.js");
-const {
-    Question,
-    AiDepartment,
-    ChemicalDepartment,
-    ChemistryDepartment,
-    CivilDepartment,
-    ComputerScienceDepartment,
-    ElectricalDepartment,
-    ElectronicsCommunicationDepartment,
-    HumanitiesSocialSciencesDepartment,
-    ManagementStudiesDepartment,
-    MathematicsDepartment,
-    MechanicalDepartment,
-    PhysicsDepartment
-} = require("./models/question.js");
+const { getQuestionModel } = require("./models/question.js");
 
 // const mongoURL = 'mongodb://127.0.0.1:27017/CDCproject';
 
@@ -652,23 +638,7 @@ app.get('/branchTests', isAdmin, async (req, res) => {
 
 app.get("/categories/:branch", isAdmin, async (req, res) => {
     const { branch } = req.params;
-    let model;
-    switch (branch) {
-        case 'lr': model = Question; break;
-        case 'ai': model = AiDepartment; break;
-        case 'ch': model = ChemicalDepartment; break;
-        case 'ic': model = ChemistryDepartment; break;
-        case 'ce': model = CivilDepartment; break;
-        case 'cs': model = ComputerScienceDepartment; break;
-        case 'ee': model = ElectricalDepartment; break;
-        case 'ee': model = ElectronicsCommunicationDepartment; break;
-        case 'hs': model = HumanitiesSocialSciencesDepartment; break;
-        case 'ms': model = ManagementStudiesDepartment; break;
-        case 'ma': model = MathematicsDepartment; break;
-        case 'me': model = MechanicalDepartment; break;
-        case 'ep': model = PhysicsDepartment; break;
-        default: return res.status(400).json({ error: "Invalid branch" });
-    }
+    let model = getQuestionModel(branch);
     try {
         // Get categories with their question counts
         const categoriesWithCounts = await model.aggregate([
@@ -928,23 +898,7 @@ app.post("/test/questions/new", isAdmin, async (req, res) => {
     // Get questions from 'lr' model if non-technical, otherwise from branch model
     const sourceModelBranch = technical ? branch : 'lr';
 
-    let Model;
-    switch (sourceModelBranch) {
-        case 'lr': Model = Question; break;
-        case 'ai': Model = AiDepartment; break;
-        case 'ch': Model = ChemicalDepartment; break;
-        case 'ic': Model = ChemistryDepartment; break;
-        case 'ce': Model = CivilDepartment; break;
-        case 'cs': Model = ComputerScienceDepartment; break;
-        case 'ee': Model = ElectricalDepartment; break;
-        case 'ee': Model = ElectronicsCommunicationDepartment; break;
-        case 'hs': Model = HumanitiesSocialSciencesDepartment; break;
-        case 'ms': Model = ManagementStudiesDepartment; break;
-        case 'ma': Model = MathematicsDepartment; break;
-        case 'me': Model = MechanicalDepartment; break;
-        case 'ep': Model = PhysicsDepartment; break;
-        default: return res.status(400).send("Invalid branch");
-    }
+    let Model = getQuestionModel(sourceModelBranch);
 
     if (!Model || categories.length === 0) {
         req.flash('error', 'Invalid branch or no categories selected!');
@@ -1061,63 +1015,11 @@ app.post("/upload", isAdmin, upload.single("file"), async (req, res) => {
         const errors = [];
         let existingQuestions = [];
 
-        // const existingQuestions = await Question.find();
-        switch (branch) {
-            case 'lr':
-                existingQuestions = await Question.find();
-                break;
-
-            case 'ai':
-                existingQuestions = await AiDepartment.find();
-                break;
-
-            case 'ch':
-                existingQuestions = await ChemicalDepartment.find();
-                break;
-
-            case 'ic':
-                existingQuestions = await ChemistryDepartment.find();
-                break;
-
-            case 'ce':
-                existingQuestions = await CivilDepartment.find();
-                break;
-
-            case 'cs':
-                existingQuestions = await ComputerScienceDepartment.find();
-                break;
-
-            case 'ee':
-                existingQuestions = await ElectricalDepartment.find();
-                break;
-
-            case 'ee':
-                existingQuestions = await ElectronicsCommunicationDepartment.find();
-                break;
-
-            case 'hs':
-                existingQuestions = await HumanitiesSocialSciencesDepartment.find();
-                break;
-
-            case 'ms':
-                existingQuestions = await ManagementStudiesDepartment.find();
-                break;
-
-            case 'ma':
-                existingQuestions = await MathematicsDepartment.find();
-                break;
-
-            case 'me':
-                existingQuestions = await MechanicalDepartment.find();
-                break;
-
-            case 'ep':
-                existingQuestions = await PhysicsDepartment.find();
-                break;
-
-            default:
-                existingQuestions = [];
-                break;
+        try {
+            const Model = getQuestionModel(branch);
+            existingQuestions = await Model.find();
+        } catch (e) {
+            existingQuestions = [];
         }
 
         rows.forEach((row, index) => {
@@ -1162,61 +1064,11 @@ app.post("/upload", isAdmin, upload.single("file"), async (req, res) => {
 
         // Insert only valid questions
         if (questions.length > 0) {
-            switch (branch) {
-                case 'lr':
-                    await Question.insertMany(questions);
-                    break;
-
-                case 'ai':
-                    await AiDepartment.insertMany(questions);
-                    break;
-
-                case 'ch':
-                    await ChemicalDepartment.insertMany(questions);
-                    break;
-
-                case 'ic':
-                    await ChemistryDepartment.insertMany(questions);
-                    break;
-
-                case 'ce':
-                    await CivilDepartment.insertMany(questions);
-                    break;
-
-                case 'cs':
-                    await ComputerScienceDepartment.insertMany(questions);
-                    break;
-
-                case 'ee':
-                    await ElectricalDepartment.insertMany(questions);
-                    break;
-
-                case 'ee':
-                    await ElectronicsCommunicationDepartment.insertMany(questions);
-                    break;
-
-                case 'hs':
-                    await HumanitiesSocialSciencesDepartment.insertMany(questions);
-                    break;
-
-                case 'ms':
-                    await ManagementStudiesDepartment.insertMany(questions);
-                    break;
-
-                case 'ma':
-                    await MathematicsDepartment.insertMany(questions);
-                    break;
-
-                case 'me':
-                    await MechanicalDepartment.insertMany(questions);
-                    break;
-
-                case 'ep':
-                    await PhysicsDepartment.insertMany(questions);
-                    break;
-
-                default:
-                    throw new Error("Invalid branch");
+            const Model = getQuestionModel(branch);
+            if(Model) {
+                await Model.insertMany(questions);
+            } else {
+                throw new Error("Invalid branch");
             }
         }
 
@@ -1403,22 +1255,7 @@ app.put("/test/:id", isAdmin, async (req, res) => {
 
     if (categoriesChanged && newCategories.length > 0) {
         // Resample questions
-        let Model;
-        switch (sourceModelBranch) {
-            case 'lr': Model = Question; break;
-            case 'ai': Model = AiDepartment; break;
-            case 'ch': Model = ChemicalDepartment; break;
-            case 'ic': Model = ChemistryDepartment; break;
-            case 'ce': Model = CivilDepartment; break;
-            case 'cs': Model = ComputerScienceDepartment; break;
-            case 'ee': Model = ElectricalDepartment; break;
-            case 'ee': Model = ElectronicsCommunicationDepartment; break;
-            case 'hs': Model = HumanitiesSocialSciencesDepartment; break;
-            case 'ms': Model = ManagementStudiesDepartment; break;
-            case 'ma': Model = MathematicsDepartment; break;
-            case 'me': Model = MechanicalDepartment; break;
-            case 'ep': Model = PhysicsDepartment; break;
-        }
+        let Model = getQuestionModel(sourceModelBranch);
 
         let allQuestions = [];
         totalNumberOfQues = 0;
@@ -1436,22 +1273,11 @@ app.put("/test/:id", isAdmin, async (req, res) => {
         // Update individual questions
         const updatedPromises = changedQuestions.map(q => {
             const { _id, ...rest } = q;
-            switch (sourceModelBranch) {
-                case 'lr': return Question.findByIdAndUpdate(_id, rest, { new: true });
-                case 'ai': return AiDepartment.findByIdAndUpdate(_id, rest, { new: true });
-                case 'ch': return ChemicalDepartment.findByIdAndUpdate(_id, rest, { new: true });
-                case 'ic': return ChemistryDepartment.findByIdAndUpdate(_id, rest, { new: true });
-                case 'ce': return CivilDepartment.findByIdAndUpdate(_id, rest, { new: true });
-                case 'cs': return ComputerScienceDepartment.findByIdAndUpdate(_id, rest, { new: true });
-                case 'ee': return ElectricalDepartment.findByIdAndUpdate(_id, rest, { new: true });
-                case 'ee': return ElectronicsCommunicationDepartment.findByIdAndUpdate(_id, rest, { new: true });
-                case 'hs': return HumanitiesSocialSciencesDepartment.findByIdAndUpdate(_id, rest, { new: true });
-                case 'ms': return ManagementStudiesDepartment.findByIdAndUpdate(_id, rest, { new: true });
-                case 'ma': return MathematicsDepartment.findByIdAndUpdate(_id, rest, { new: true });
-                case 'me': return MechanicalDepartment.findByIdAndUpdate(_id, rest, { new: true });
-                case 'ep': return PhysicsDepartment.findByIdAndUpdate(_id, rest, { new: true });
-                default: throw new Error("Invalid branch");
+            const Model = getQuestionModel(sourceModelBranch);
+            if(Model) {
+                return Model.findByIdAndUpdate(_id, rest, { new: true });
             }
+            throw new Error("Invalid branch");
         });
         await Promise.all(updatedPromises);
     }
@@ -1467,7 +1293,8 @@ app.put("/test/:id", isAdmin, async (req, res) => {
         program: finalProgram,
         year: admissionYear,
         branch: finalBranch,
-        isTechnical: finalIsTechnical
+        isTechnical: finalIsTechnical,
+        branchModel: (getQuestionModel(sourceModelBranch) || {modelName: 'Question'}).modelName
     }, { new: true }).populate("questions").exec();
 
     const questions = test.questions;

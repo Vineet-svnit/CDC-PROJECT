@@ -2,7 +2,8 @@ const dotenv = require("dotenv");
 dotenv.config();
 const mongoose = require('mongoose');
 const { connectDB } = require("../config/db.js")
-const {Question} = require('../models/question'); // Replace with your actual model path
+const { getQuestionModel } = require('../models/question');
+const Question = getQuestionModel('lr');
 
 const generateMockTests = async () => {
   try {

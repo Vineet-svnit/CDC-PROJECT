@@ -36,18 +36,19 @@ const questionSchema = new Schema({
     category: String
 });
 
-module.exports = {
-    Question:mongoose.model("Question", questionSchema),
-    AiDepartment: mongoose.model("AiDepartment", questionSchema),
-    ChemicalDepartment: mongoose.model("ChemicalDepartment", questionSchema),
-    ChemistryDepartment: mongoose.model("ChemistryDepartment", questionSchema),
-    CivilDepartment: mongoose.model("CivilDepartment", questionSchema),
-    ComputerScienceDepartment: mongoose.model("ComputerScienceDepartment", questionSchema),
-    ElectricalDepartment: mongoose.model("ElectricalDepartment", questionSchema),
-    ElectronicsCommunicationDepartment: mongoose.model("ElectronicsCommunicationDepartment", questionSchema),
-    HumanitiesSocialSciencesDepartment: mongoose.model("HumanitiesSocialSciencesDepartment", questionSchema),
-    ManagementStudiesDepartment: mongoose.model("ManagementStudiesDepartment", questionSchema),
-    MathematicsDepartment: mongoose.model("MathematicsDepartment", questionSchema),
-    MechanicalDepartment: mongoose.model("MechanicalDepartment", questionSchema),
-    PhysicsDepartment: mongoose.model("PhysicsDepartment", questionSchema)
+const models = {};
+
+const getQuestionModel = (branch) => {
+    // Determine the target collection based on branch identifier
+    // Default 'lr' logic is routed to questions collection as earlier default
+    const collectionName = branch === 'lr' ? 'questions' : `${branch}_questions`;
+
+    if (!models[collectionName]) {
+        // We supply the explicit collection name to mongoose.model as the 3rd argument OR mongoose will pluralize
+        models[collectionName] = mongoose.model(collectionName, questionSchema, collectionName);
+    }
+
+    return models[collectionName];
 };
+
+module.exports = { getQuestionModel, questionSchema };
