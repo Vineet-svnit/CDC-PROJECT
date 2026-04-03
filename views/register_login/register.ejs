@@ -13,202 +13,199 @@
 
 <body>
     <%- include("../includes/flash.ejs") %>
-    <div class="circle orange"></div>
-    <div class="circle blue"></div>
-    <div id="container">
-        <h1>Register Here</h1>
-        <form method="post" action="/register" class="needs-validation" novalidate>
-            <div class="form-floating mb-3">
-                <input type="email" class="form-control" name="email" placeholder="Enter Institute Email" id="email"
+        <div class="circle orange"></div>
+        <div class="circle blue"></div>
+        <div id="container">
+            <h1>Register Here</h1>
+            <form method="post" action="/register" class="needs-validation" novalidate>
+                <div class="form-floating mb-3">
+                    <input type="email" class="form-control" name="email" placeholder="Enter Institute Email" id="email"
+                        required>
+                    <label for="email">Institute email</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" name="username" placeholder="Username" id="username"
+                        readonly>
+                    <label for="username">Username</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" name="program" placeholder="Program" id="program" readonly>
+                    <label for="program">Program</label>
+                </div>
+                <div class="form-floating mb-3 password-wrapper">
+                    <input type="password" class="form-control" name="password" placeholder="Enter Password"
+                        id="password" required>
+                    <label for="password">Password</label><button id="btn" type="button"><i
+                            class="fa fa-eye-slash"></i></button>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" name="name" placeholder="Enter Full Name" id="name"
+                        required>
+                    <label for="name">Full name</label>
+                </div>
+                <select class="form-select form-select-lg mb-3" aria-label="Select branch" id="branch" disabled
                     required>
-                <label for="email">Institute email</label>
-            </div>
-            <div class="form-floating mb-3">
-                <input type="text" class="form-control" name="username" placeholder="Username" id="username" readonly>
-                <label for="username">Username</label>
-            </div>
-            <div class="form-floating mb-3">
-                <input type="text" class="form-control" name="program" placeholder="Program" id="program" readonly>
-                <label for="program">Program</label>
-            </div>
-            <div class="form-floating mb-3 password-wrapper">
-                <input type="password" class="form-control" name="password" placeholder="Enter Password" id="password"
-                    required>
-                <label for="password">Password</label><button id="btn" type="button"><i
-                        class="fa fa-eye-slash"></i></button>
-            </div>
-            <div class="form-floating mb-3">
-                <input type="text" class="form-control" name="name" placeholder="Enter Full Name" id="name" required>
-                <label for="name">Full name</label>
-            </div>
-            <div class="form-floating mb-3">
-                <input type="text" class="form-control" name="branch" placeholder="Branch" id="branch" readonly>
-                <label for="branch">Branch</label>
-            </div>
-            <button class="btn btn-dark mb-3" id="register">Register</button>
-            <p>Already have an account? &MediumSpace;<a href="/login">Log in</a>
-            </p>
-        </form>
-    </div>
-    <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/script.js"></script>
-    <script src="/js/register_login.js"></script>
-    <script>
-        // Dynamic branch dropdown based on program detection
-        const programInput = document.getElementById('program');
-        const branchSelect = document.getElementById('branch');
-        const emailInput = document.getElementById('email');
-        const usernameInput = document.getElementById('username');
+                    <option value="" disabled selected>Select branch</option>
+                </select>
+                <input type="hidden" name="branch" id="branchHidden">
+                <button class="btn btn-dark mb-3" id="register">Register</button>
+                <p>Already have an account? &MediumSpace;<a href="/login">Log in</a>
+                </p>
+            </form>
+        </div>
+        <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <script src="/js/script.js"></script>
+        <script src="/js/register_login.js"></script>
+        <script>
+            // Dynamic branch dropdown based on program detection
+            const programInput = document.getElementById('program');
+            const branchSelect = document.getElementById('branch');
+            const emailInput = document.getElementById('email');
+            const usernameInput = document.getElementById('username');
 
-        const branchOptions = {
-            btech: [
-                { value: 'ai', text: 'Artificial Intelligence' },
-                { value: 'che', text: 'Chemical Engineering' },
-                { value: 'chm', text: 'Chemistry' },
-                { value: 'ce', text: 'Civil Engineering' },
-                { value: 'cse', text: 'Computer Science and Engineering' },
-                { value: 'ee', text: 'Electrical Engineering' },
-                { value: 'ece', text: 'Electronics Engineering' },
-                { value: 'hss', text: 'Humanities and Social Sciences' },
-                { value: 'ms', text: 'Management Studies' },
-                { value: 'math', text: 'Mathematics' },
-                { value: 'me', text: 'Mechanical Engineering' },
-                { value: 'phy', text: 'Physics' }
-            ],
-            mtech: [
-                { value: 'ai', text: 'Artificial Intelligence' },
-                { value: 'che', text: 'Chemical Engineering' },
-                { value: 'chm', text: 'Chemistry' },
-                { value: 'ce', text: 'Civil Engineering' },
-                { value: 'cse', text: 'Computer Science and Engineering' },
-                { value: 'ee', text: 'Electrical Engineering' },
-                { value: 'ece', text: 'Electronics Engineering' },
-                { value: 'hss', text: 'Humanities and Social Sciences' },
-                { value: 'ms', text: 'Management Studies' },
-                { value: 'math', text: 'Mathematics' },
-                { value: 'me', text: 'Mechanical Engineering' },
-                { value: 'phy', text: 'Physics' }
-            ],
-            msc: [
-                { value: 'phy', text: 'Physics' },
-                { value: 'chm', text: 'Chemistry' },
-                { value: 'math', text: 'Mathematics' }
-            ],
-            mba: [
-                { value: '', text: 'Business Analytics' }
-            ]
-        };
+            const branchOptions = {
+                btech: [
+                    { value: 'ai', text: 'Artificial Intelligence' },
+                    { value: 'ch', text: 'Chemical Engineering' },
+                    { value: 'ic', text: 'Chemistry' },
+                    { value: 'ce', text: 'Civil Engineering' },
+                    { value: 'cs', text: 'Computer Science and Engineering' },
+                    { value: 'ee', text: 'Electrical Engineering' },
+                    { value: 'ee', text: 'Electronics Engineering' },
+                    { value: 'hs', text: 'Humanities and Social Sciences' },
+                    { value: 'ms', text: 'Management Studies' },
+                    { value: 'ma', text: 'Mathematics' },
+                    { value: 'me', text: 'Mechanical Engineering' },
+                    { value: 'ep', text: 'Physics' }
+                ],
+                mtech: [
+                    { value: 'ai', text: 'Artificial Intelligence' },
+                    { value: 'ch', text: 'Chemical Engineering' },
+                    { value: 'ic', text: 'Chemistry' },
+                    { value: 'ce', text: 'Civil Engineering' },
+                    { value: 'cs', text: 'Computer Science and Engineering' },
+                    { value: 'ee', text: 'Electrical Engineering' },
+                    { value: 'ee', text: 'Electronics Engineering' },
+                    { value: 'hs', text: 'Humanities and Social Sciences' },
+                    { value: 'ms', text: 'Management Studies' },
+                    { value: 'ma', text: 'Mathematics' },
+                    { value: 'me', text: 'Mechanical Engineering' },
+                    { value: 'ep', text: 'Physics' }
+                ],
+                msc: [
+                    { value: 'ep', text: 'Physics' },
+                    { value: 'ic', text: 'Chemistry' },
+                    { value: 'ma', text: 'Mathematics' }
+                ],
+                mba: [
+                    { value: '', text: 'No branch required' }
+                ]
+            };
 
-        const programDisplayNames = {
-            btech: 'B.Tech',
-            mtech: 'M.Tech',
-            msc: 'M.Sc',
-            mba: 'MBA'
-        };
+            const programDisplayNames = {
+                btech: 'B.Tech',
+                mtech: 'M.Tech',
+                msc: 'M.Sc',
+                mba: 'MBA'
+            };
 
-        // Auto-populate username from email and detect program
-        emailInput.addEventListener('input', function() {
-            const email = this.value.toLowerCase();
-            if (email.includes('@')) {
-                const username = email.split('@')[0];
-                usernameInput.value = username;
+            // Auto-populate username from email and detect program
+            emailInput.addEventListener('input', function () {
+                const email = this.value.toLowerCase();
+                if (email.includes('@')) {
+                    const username = email.split('@')[0];
+                    usernameInput.value = username;
 
-                let detectedProgram = '';
+                    let detectedProgram = '';
 
-                // Auto-detect program from email pattern
-                if (username.match(/^[ub]\d{2}[a-z]{2,5}\d{3}$/)) {
-                    // B.Tech pattern (u24cs001, b21me002, etc.)
-                    detectedProgram = 'btech';
-                } else if (username.match(/^[p]\d{2}[a-z]{2,5}\d{3}$/)) {
-                    // M.Tech pattern (p24co005, etc.)
-                    detectedProgram = 'mtech';
-                } else if (username.match(/^[i]\d{2}[a-z]{2,5}\d{3}$/)) {
-                    // M.Sc pattern (i22ph010, etc.)
-                    detectedProgram = 'msc';
-                } else if (username.match(/^[m]\d{2}[b][a]\d{3}$/)) {
-                    // MBA pattern (b21mg002, etc.)
-                    detectedProgram = 'mba';
-                }
+                    // Auto-detect program from email pattern
+                    if (username.match(/^[ub]\d{2}[a-z]{2}\d{3}$/)) {
+                        // B.Tech pattern (u24cs001, b21me002, etc.)
+                        detectedProgram = 'btech';
+                    } else if (username.match(/^[p]\d{2}[a-z]{2}\d{3}$/)) {
+                        // M.Tech pattern (p24co005, etc.)
+                        detectedProgram = 'mtech';
+                    } else if (username.match(/^[i]\d{2}[a-z]{2}\d{3}$/)) {
+                        // M.Sc pattern (i22ph010, etc.)
+                        detectedProgram = 'msc';
+                    } else if (username.match(/^[m]\d{2}[b][a]\d{3}$/)) {
+                        // MBA pattern (b21mg002, etc.)
+                        detectedProgram = 'mba';
+                    }
 
-                if (detectedProgram) {
-                    programInput.value = programDisplayNames[detectedProgram];
+                    if (detectedProgram) {
+                        programInput.value = programDisplayNames[detectedProgram];
+                        const branchCode = username.substring(3, 5);
+                        updateBranchOptions(detectedProgram, branchCode);
+                    } else {
+                        programInput.value = '';
+                        updateBranchOptions('', '');
+                    }
                 } else {
+                    usernameInput.value = '';
                     programInput.value = '';
+                    updateBranchOptions('', '');
+                }
+            });
+
+            // function updateBranchOptions(selectedProgram) {
+            //     branchSelect.innerHTML = '<option value="" disabled selected>Select branch</option>';
+
+            //     if (selectedProgram && branchOptions[selectedProgram]) {
+            //         branchOptions[selectedProgram].forEach(option => {
+            //             const opt = document.createElement('option');
+            //             opt.value = option.value;
+            //             opt.textContent = option.text;
+            //             branchSelect.appendChild(opt);
+            //         });
+            //         branchSelect.disabled = false;
+            //     } else {
+            //         branchSelect.disabled = true;
+            //     }
+            // }
+
+            function updateBranchOptions(program, branchCode) {
+                branchSelect.innerHTML = '';
+
+                if (!program || !branchOptions[program]) {
+                    resetBranch();
+                    return;
                 }
 
-                // Validate branch code strictly by comparing the substring
-                const branchCode = username.slice(3, 5); // Extract branch code from username
-                const remainingPart = username.slice(5); // Extract remaining part after branch code
-                let validBranch = '';
+                const options = branchOptions[program];
 
-                if (detectedProgram === 'btech' || detectedProgram === 'mtech') {
-                    const branchMapping = {
-                        ai: 'Artificial Intelligence',
-                        ch: 'Chemical Engineering',
-                        ic: 'Chemistry',
-                        ce: 'Civil Engineering',
-                        cs: 'Computer Science and Engineering',
-                        ee: 'Electrical Engineering',
-                        ec: 'Electronics Engineering',
-                        hs: 'Humanities and Social Sciences',
-                        ms: 'Management Studies',
-                        mc: 'Mathematics',
-                        me: 'Mechanical Engineering',
-                        ep: 'Physics'
-                    };
+                const match = options.find(opt => opt.value === branchCode);
 
-                    // Check if branch code exists and ensure no extra characters in the branch part
-                    if (branchMapping.hasOwnProperty(branchCode) && remainingPart.match(/^\d{3}$/)) {
-                        validBranch = branchMapping[branchCode];
-                    }
-                } else if (detectedProgram === 'msc') {
-                    const branchMapping = {
-                        ma: 'Mathematics',
-                        ph: 'Physics',
-                        cy: 'Chemistry'
-                    };
-
-                    // Check if branch code exists and ensure no extra characters in the branch part
-                    if (branchMapping.hasOwnProperty(branchCode) && remainingPart.match(/^\d{3}$/)) {
-                        validBranch = branchMapping[branchCode];
-                    }
-                } else if (detectedProgram === 'mba') {
-                    validBranch = branchCode === 'ba' && remainingPart.match(/^\d{3}$/) ? 'Business Analytics' : '';
+                if (!match) {
+                    resetBranch("Invalid branch");
+                    return;
                 }
 
-                // Ensure branch field displays the corresponding name on hitting @
-                const branchInput = document.getElementById('branch');
-                if (validBranch) {
-                    branchInput.value = validBranch; // Display the branch name in the field
-                } else {
-                    branchInput.value = 'Invalid branch'; // Display invalid branch if no match
-                }
-            } else {
-                usernameInput.value = '';
-                programInput.value = '';
-                document.getElementById('branch').value = '';
+                const opt = document.createElement('option');
+                opt.value = match.value;
+                opt.textContent = match.text;
+                opt.selected = true;
+
+                branchSelect.appendChild(opt);
+                branchSelect.value = match.value;
+
+                document.getElementById('branchHidden').value = match.value;
             }
-        });
+            // Initially disable branch select
+            branchSelect.disabled = true;
 
-        function updateBranchOptions(selectedProgram) {
-            branchSelect.innerHTML = '<option value="" disabled selected>Select branch</option>';
-
-            if (selectedProgram && branchOptions[selectedProgram]) {
-                branchOptions[selectedProgram].forEach(option => {
-                    const opt = document.createElement('option');
-                    opt.value = option.value;
-                    opt.textContent = option.text;
-                    branchSelect.appendChild(opt);
-                });
-                branchSelect.disabled = false;
-            } else {
-                branchSelect.disabled = true;
+            function resetBranch(msg = 'Select branch') {
+                branchSelect.innerHTML = `<option disabled selected>${msg}</option>`;
+                document.getElementById('branchHidden').value = ''; // 🔥 important
             }
-        }
 
-        // Initially disable branch select
-        branchSelect.disabled = true;
-    </script>
+            document.querySelector('form').addEventListener('submit', function (e) {
+                if (!branchSelect.value) {
+                    e.preventDefault();
+                    alert("Invalid email or branch");
+                }
+            });
+        </script>
 </body>
 
 </html>
