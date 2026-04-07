@@ -242,7 +242,17 @@ app.get('/logout', (req, res, next) => {
 app.get('/settings', isLoggedIn, async (req, res) => {
     try {
         const user = await User.findById(req.user._id);
-        res.render('user/settings', { user, page: 'settings' });
+        const { programOptions } = require('./public/js/constants');
+        
+        let fullBranchName = user.branch ? user.branch.toUpperCase() : 'N/A';
+        if (user.program && programOptions[user.program]) {
+            const branchObj = programOptions[user.program].find(b => b.value === user.branch);
+            if (branchObj) {
+                fullBranchName = branchObj.text;
+            }
+        }
+
+        res.render('user/settings', { user, page: 'settings', fullBranchName });
     } catch (err) {
         req.flash('error', 'Error loading settings');
         res.redirect('/');

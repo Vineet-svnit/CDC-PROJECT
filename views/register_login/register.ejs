@@ -89,9 +89,13 @@
                         detectedProgram = 'mtech';
                     } else if (username.match(/^[i]\d{2}[a-z]{2}\d{3}$/)) {
                         // M.Sc pattern (i22ph010, etc.)
-                        detectedProgram = 'msc';
+                        if (username.substring(3, 5) === 'ai') {
+                            detectedProgram = 'btech'; // Special dual-degree case
+                        } else {
+                            detectedProgram = 'msc';
+                        }
                     } else if (username.match(/^[m]\d{2}[b][a]\d{3}$/)) {
-                        // MBA pattern (m21mg002, etc.)
+                        // MBA pattern (m21ba002, etc.)
                         detectedProgram = 'mba';
                     }
 
@@ -123,21 +127,37 @@
                 let match = null;
 
                 if (branchCode) {
-                    const codeMap = {
-                        'ai': 'ai', 'ch': 'ch', 'ce': 'ce', 'cs': 'cse', 'co': 'cse',
-                        'ep': 'ep', 'ph': 'phy', 'ee': 'ee', 'ec': 'ece', 'el': 'ece',
-                        'ic': 'ic', 'cy': 'chem', 'mn': 'mnc', 'ma': 'math', 'me': 'me',
-                        'vl': 'vlsi', 'ba': 'ba', 'mg': 'ba'
-                    };
-                    const mappedCode = codeMap[branchCode] || branchCode;
+                    let mappedCode = branchCode;
+                    if (program === 'mtech') {
+                        const mtechMap = {
+                            'cc': 'cad_cam', 'ch': 'ch', 'ec': 'comm_sys', 'cs': 'cse',
+                            'ct': 'ctm', 'ca': 'control_auto', 'ds': 'ds', 'en': 'env',
+                            'gt': 'geo', 'is': 'is', 'mf': 'manufacturing', 'me': 'me',
+                            'el': 'peed', 'ps': 'power_sys', 'st': 'struct', 'td': 'thermal',
+                            'tp': 'transport', 'tm': 'turbo', 'up': 'urban', 'vl': 'vlsi', 'wr': 'water'
+                        };
+                        mappedCode = mtechMap[branchCode] || branchCode;
+                    } else if (program === 'msc') {
+                        const mscMap = {
+                            'ma': 'math', 'ph': 'phy', 'cy': 'chem'
+                        };
+                        mappedCode = mscMap[branchCode] || branchCode;
+                    } else if (program === 'btech') {
+                        const btechMap = {
+                            'ai': 'ai', 'ch': 'ch', 'ce': 'ce', 'cs': 'cse', 'co': 'cse',
+                            'ep': 'ep', 'ee': 'ee', 'ec': 'ece', 'vl': 'vlsi',
+                            'ev': 'vlsi', 'ic': 'ic', 'mn': 'mnc', 'ma': 'mnc', 'me': 'me'
+                        };
+                        mappedCode = btechMap[branchCode] || branchCode;
+                    } else if (program === 'mba') {
+                        mappedCode = 'ba';
+                    }
 
-                    let prefix = program === 'btech' ? 'b_' :
+                    const prefix = program === 'btech' ? 'b_' :
                         program === 'mtech' ? 'm_' :
                             program === 'msc' ? 'msc_' : 'mba_';
 
-                    // Specifically math for btech is called 'mnc' but for msc is 'math' so mapping helps
-                    if (program === 'btech' && mappedCode === 'math') match = options.find(opt => opt.value === 'b_mnc');
-                    else match = options.find(opt => opt.value === (prefix + mappedCode)) || options.find(opt => opt.value === mappedCode);
+                    match = options.find(opt => opt.value === (prefix + mappedCode)) || options.find(opt => opt.value === mappedCode);
                 }
 
                 if (match) {
@@ -150,14 +170,16 @@
                     branchSelect.disabled = true;
                     document.getElementById('branchHidden').value = match.value;
                 } else {
-                    // Fallback to manual selection
-                    options.forEach(option => {
-                        const opt = document.createElement('option');
-                        opt.value = option.value;
-                        opt.textContent = option.text;
-                        branchSelect.appendChild(opt);
-                    });
-                    branchSelect.disabled = false;
+                    // Fallback to manual selection - DISABLED: all branches must be auto-detected from email
+                    // options.forEach(option => {
+                    //     const opt = document.createElement('option');
+                    //     opt.value = option.value;
+                    //     opt.textContent = option.text;
+                    //     branchSelect.appendChild(opt);
+                    // });
+                    // branchSelect.disabled = false;
+                    // document.getElementById('branchHidden').value = '';
+                    branchSelect.disabled = true;
                     document.getElementById('branchHidden').value = '';
                 }
             }
