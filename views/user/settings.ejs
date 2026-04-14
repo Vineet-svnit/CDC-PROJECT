@@ -39,7 +39,7 @@
               <div class="row mb-3">
                 <div class="col-md-6">
                   <small class="text-muted d-block mb-1">Branch</small>
-                  <p class="mb-0 fw-500"><%= user.branch.toUpperCase() %></p>
+                  <p class="mb-0 fw-500"><%= typeof fullBranchName !== 'undefined' ? fullBranchName : user.branch.toUpperCase() %></p>
                 </div>
                 <div class="col-md-6">
                   <small class="text-muted d-block mb-1">Admission Year</small>

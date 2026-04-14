@@ -55,9 +55,9 @@ function updateDownloadBranches() {
   const selectedProgram = downloadForm.program.value;
   downloadForm.branch.innerHTML = '<option value="" disabled selected>Select branch</option>';
 
-  if (selectedProgram && branchOptions[selectedProgram]) {
+  if (selectedProgram && window.programOptions[selectedProgram]) {
 
-    branchOptions[selectedProgram].forEach(option => {
+    window.programOptions[selectedProgram].forEach(option => {
       const opt = document.createElement('option');
       opt.value = option.value;
       opt.textContent = option.text;
@@ -149,44 +149,7 @@ async function loadDashboardStats() {
 loadDashboardStats();
 
 // --- Leaderboard Logic ---
-const branchOptions = {
-  btech: [
-    { value: 'ai', text: 'Artificial Intelligence' },
-    { value: 'ch', text: 'Chemical' },
-    { value: 'ic', text: 'Chemistry' },
-    { value: 'ce', text: 'Civil Engineering' },
-    { value: 'cs', text: 'Computer Science and Engineering' },
-    { value: 'ee', text: 'Electrical Engineering' },
-    { value: 'ee', text: 'Electronics Engineering' },
-    { value: 'hs', text: 'Humanities and Social Sciences' },
-    { value: 'ms', text: 'Management Studies' },
-    { value: 'ma', text: 'Mathematics' },
-    { value: 'me', text: 'Mechanical Engineering' },
-    { value: 'ep', text: 'Physics' }
-  ],
-  mtech: [
-    { value: 'ai', text: 'Artificial Intelligence' },
-    { value: 'ch', text: 'Chemical' },
-    { value: 'ic', text: 'Chemistry' },
-    { value: 'ce', text: 'Civil Engineering' },
-    { value: 'cs', text: 'Computer Science and Engineering' },
-    { value: 'ee', text: 'Electrical Engineering' },
-    { value: 'ee', text: 'Electronics Engineering' },
-    { value: 'hs', text: 'Humanities and Social Sciences' },
-    { value: 'ms', text: 'Management Studies' },
-    { value: 'ma', text: 'Mathematics' },
-    { value: 'me', text: 'Mechanical Engineering' },
-    { value: 'ep', text: 'Physics' }
-  ],
-  msc: [
-    { value: 'ep', text: 'Physics' },
-    { value: 'ic', text: 'Chemistry' },
-    { value: 'ma', text: 'Mathematics' }
-  ],
-  mba: [
-    { value: '', text: 'No branch required' }
-  ]
-};
+
 
 const branchSelect = document.getElementById("branchSelect");
 const leaderboardProgram = document.getElementById("leaderboardProgram");
@@ -225,9 +188,9 @@ function updateLeaderboardBranches() {
   const selectedProgram = leaderboardProgram.value;
   branchSelect.innerHTML = '<option value="" disabled selected>Select branch</option>';
 
-  if (selectedProgram && branchOptions[selectedProgram]) {
+  if (selectedProgram && window.programOptions[selectedProgram]) {
 
-    branchOptions[selectedProgram].forEach(option => {
+    window.programOptions[selectedProgram].forEach(option => {
       const opt = document.createElement('option');
       opt.value = option.value;
       opt.textContent = option.text;
@@ -422,9 +385,9 @@ if (statsProgram && statsBranch) {
     const selectedProgram = this.value;
     statsBranch.innerHTML = '<option value="" disabled selected>Select branch</option>';
 
-    if (selectedProgram && branchOptions[selectedProgram]) {
+    if (selectedProgram && window.programOptions[selectedProgram]) {
 
-      branchOptions[selectedProgram].forEach(option => {
+      window.programOptions[selectedProgram].forEach(option => {
         const opt = document.createElement('option');
         opt.value = option.value;
         opt.textContent = option.text;
@@ -517,6 +480,4 @@ if (generateBtn) {
       generateBtn.innerHTML = originalHtml;
     }
   });
-}
-
-fetchLeaderboard();
+}

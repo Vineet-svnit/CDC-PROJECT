@@ -370,22 +370,30 @@
             <form action="/upload" method="POST" enctype="multipart/form-data" class="row g-3 px-2">
               <div class="col-12">
                 <label for="branch" class="form-label">Select Branch</label>
-                <select class="form-select" id="branch" name="branch" required>
+                <select class="form-select" id="upload_branch" name="branch" required>
                   <option value="" disabled selected>Select branch</option>
-                  <!-- <option value="lr">Logical Reasoning and Aptitude</option> -->
-                  <option value="ai">Artificial Intelligence</option>
-                  <option value="che">Chemical</option>
-                  <option value="chm">Chemistry</option>
-                  <option value="ce">Civil Engineering</option>
-                  <option value="cse">Computer Science and Engineering</option>
-                  <option value="ee">Electrical Engineering</option>
-                  <option value="ece">Electronics Engineering</option>
-                  <option value="hss">Humanities and Social Sciences</option>
-                  <option value="ms">Management Studies</option>
-                  <option value="math">Mathematics</option>
-                  <option value="me">Mechanical Engineering</option>
-                  <option value="phy">Physics</option>
+                  <option value="lr">Logical Reasoning / Common</option>
                 </select>
+                <script>
+                   document.addEventListener("DOMContentLoaded", () => {
+                       const uploadBranch = document.getElementById("upload_branch");
+                       if (uploadBranch && window.programOptions) {
+                           for (const prog in window.programOptions) {
+                               window.programOptions[prog].forEach(opt => {
+                                   if (opt.value !== '') {
+                                       const option = document.createElement("option");
+                                       // Don't show duplicates of the same branch when they overlap (since this is just collection selection)
+                                       if(!Array.from(uploadBranch.options).find(ex => ex.value === opt.value)) {
+                                            option.value = opt.value;
+                                            option.text = opt.text + " (" + prog.toUpperCase() + ")";
+                                            uploadBranch.appendChild(option);
+                                       }
+                                   }
+                               });
+                           }
+                       }
+                   });
+                </script>
               </div>
               <div class="col-12">
                 <label for="file" class="form-label">Upload Excel File</label>
@@ -403,6 +411,7 @@
     </div>
   </div>
 
+  <script src="/js/constants.js"></script>
   <script src="/js/dashboard.js"></script>
   <script>
     // show only top 5 test items initially, toggle to show all

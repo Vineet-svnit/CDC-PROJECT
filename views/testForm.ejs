@@ -97,58 +97,20 @@
         </div>
     </div>
 
-    <script>
+        <script src="/js/constants.js"></script>
+        <script>
         // Dynamic branch dropdown based on program selection
         const programSelect = document.getElementById('program');
         const branchSelect = document.getElementById('branch');
-
-        const branchOptions = {
-            btech: [
-                { value: 'ai', text: 'Artificial Intelligence' },
-                { value: 'ch', text: 'Chemical' },
-                { value: 'ic', text: 'Chemistry' },
-                { value: 'ce', text: 'Civil Engineering' },
-                { value: 'cs', text: 'Computer Science and Engineering' },
-                { value: 'ee', text: 'Electrical Engineering' },
-                { value: 'ee', text: 'Electronics Engineering' },
-                { value: 'hs', text: 'Humanities and Social Sciences' },
-                { value: 'ms', text: 'Management Studies' },
-                { value: 'ma', text: 'Mathematics' },
-                { value: 'me', text: 'Mechanical Engineering' },
-                { value: 'ep', text: 'Physics' }
-            ],
-            mtech: [
-                { value: 'ai', text: 'Artificial Intelligence' },
-                { value: 'ch', text: 'Chemical' },
-                { value: 'ic', text: 'Chemistry' },
-                { value: 'ce', text: 'Civil Engineering' },
-                { value: 'cs', text: 'Computer Science and Engineering' },
-                { value: 'ee', text: 'Electrical Engineering' },
-                { value: 'ee', text: 'Electronics Engineering' },
-                { value: 'hs', text: 'Humanities and Social Sciences' },
-                { value: 'ms', text: 'Management Studies' },
-                { value: 'ma', text: 'Mathematics' },
-                { value: 'me', text: 'Mechanical Engineering' },
-                { value: 'ep', text: 'Physics' }
-            ],
-            msc: [
-                { value: 'ep', text: 'Physics' },
-                { value: 'ic', text: 'Chemistry' },
-                { value: 'ma', text: 'Mathematics' }
-            ],
-            mba: [
-                { value: '', text: 'No branch required' }
-            ]
-        };
 
         if (programSelect && branchSelect) {
             programSelect.addEventListener('change', function () {
                 const selectedProgram = this.value;
                 branchSelect.innerHTML = '<option value="" disabled selected>Select branch</option>';
 
-                if (selectedProgram && branchOptions[selectedProgram]) {
+                if (selectedProgram && window.programOptions[selectedProgram]) {
 
-                    branchOptions[selectedProgram].forEach(option => {
+                    window.programOptions[selectedProgram].forEach(option => {
                         const opt = document.createElement('option');
                         opt.value = option.value;
                         opt.textContent = option.text;
