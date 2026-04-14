@@ -6,17 +6,30 @@ const generateOTP = () => {
 };
 
 // Gmail transporter
+// const transporter = nodemailer.createTransport({
+//     service: "gmail",
+//     auth: {
+//         user: process.env.GMAIL_USER,
+//         pass: process.env.GMAIL_APP_PASSWORD
+//     }
+// });
+
 const transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
     auth: {
         user: process.env.GMAIL_USER,
         pass: process.env.GMAIL_APP_PASSWORD
-    }
+    },
+    debug: true,   // 👈 IMPORTANT
+    logger: true   // 👈 IMPORTANT
 });
 
 // Send OTP
 const sendOTPEmail = async (email, otp, name) => {
     try {
+        console.log("Before sendMail");
         const info = await transporter.sendMail({
             from: `"CDC Registration" <${process.env.GMAIL_USER}>`,
             to: email,
@@ -28,6 +41,8 @@ const sendOTPEmail = async (email, otp, name) => {
                 <p>Valid for 3 minutes</p>
             `
         });
+
+        console.log("After sendMail");
 
         return { success: true, data: info };
 
