@@ -43,7 +43,8 @@ const Announcement = require("./models/announcement.js");
 const OtpVerification = require('./models/otpVerification.js');
 
 // Import OTP service - Using Postmark
-const { generateOTP, sendOTPEmail } = require('./utils/postmarkService.js');
+// const { generateOTP, sendOTPEmail } = require('./utils/postmarkService.js');
+const { generateOTP, sendOTPEmail } = require('./utils/smtp_client.js');
 
 // Import time utilities
 const {
