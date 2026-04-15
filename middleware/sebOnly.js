@@ -101,7 +101,8 @@ async function sebOnly(req, res, next) {
 
   // hard-coded base URLs (exactly as browser shows)
   const BASE_URL = isProd
-    ? "https://cdc-project-w2zb.onrender.com/"
+    ? "https://cdc-svnit.onrender.com/"
+    // ? "https://cdc-project-w2zb.onrender.com/"
     : "http://localhost:5000/";
 
   // strip query + fragment, keep path
