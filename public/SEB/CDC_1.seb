@@ -5,7 +5,7 @@
     <key>originatorVersion</key>
     <string>SEB_Win_2.1.1</string>
     <key>startURL</key>
-    <string>https://cdc-exam.svnit.ac.in/</string>
+    <string>https://cdc-svnit.onrender.com/</string>
     <key>startResource</key>
     <string />
     <key>sebServerURL</key>
@@ -213,7 +213,7 @@
     <key>sendBrowserExamKey</key>
     <true />
     <key>quitURL</key>
-    <string>https://cdc-exam.svnit.ac.in/randomquit</string>
+    <string>https://cdc-svnit.onrender.com/randomquit</string>
     <key>quitURLConfirm</key>
     <true />
     <key>restartExamURL</key>
