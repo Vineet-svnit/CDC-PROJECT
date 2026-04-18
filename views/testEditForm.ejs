@@ -69,23 +69,85 @@
               <input type="hidden" name="isTechnical" value="<%= test.isTechnical %>">
               <% } %>
           </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <label class="form-label">Program</label>
+            <select class="form-select" id="editProgram" name="program" required <%=disableSelect %>>
+              <option value="" disabled>Select program</option>
+              <option value="btech" <%=test.program==='btech' ? 'selected' : '' %>>B.Tech</option>
+              <option value="mtech" <%=test.program==='mtech' ? 'selected' : '' %>>M.Tech</option>
+              <option value="mba"   <%=test.program==='mba'   ? 'selected' : '' %>>MBA</option>
+              <option value="msc"   <%=test.program==='msc'   ? 'selected' : '' %>>M.Sc</option>
+            </select>
+            <% if(started) { %>
+              <input type="hidden" name="program" value="<%= test.program %>">
+            <% } %>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Admission Year</label>
+            <input type="number" class="form-control" id="editYear" name="year"
+              value="<%= test.year %>" min="2000" max="2100" required <%=readOnlyEdit %>>
+          </div>
+        </div>
+
+        <div class="row g-3 mb-4">
           <div class="col-md-6">
             <label class="form-label">Branch</label>
-            <select class="form-select" <%=disableSelect %>>
-              <option value="ai" <%=test.branch=='ai' ? 'selected' : '' %>>Artificial Intelligence</option>
-              <option value="cse" <%=test.branch=='cs' ? 'selected' : '' %>>Computer Science</option>
-              <option value="me" <%=test.branch=='me' ? 'selected' : '' %>>Mechanical</option>
-              <option value="che" <%=test.branch=='ch' ? 'selected' : '' %>>Chemical</option>
-              <option value="chm" <%=test.branch=='ic' ? 'selected' : '' %>>Chemistry</option>
-              <option value="ce" <%=test.branch=='ce' ? 'selected' : '' %>>Civil</option>
-              <option value="ee" <%=test.branch=='ee' ? 'selected' : '' %>>Electrical</option>
-              <option value="ece" <%=test.branch=='ee' ? 'selected' : '' %>>Electronics</option>
-              <option value="hss" <%=test.branch=='hs' ? 'selected' : '' %>>Humanities</option>
-              <option value="ms" <%=test.branch=='ms' ? 'selected' : '' %>>Management</option>
-              <option value="math" <%=test.branch=='ma' ? 'selected' : '' %>>Mathematics</option>
-              <option value="phy" <%=test.branch=='ep' ? 'selected' : '' %>>Physics</option>
+            <select class="form-select" id="editBranch" name="branch" required <%=disableSelect %>>
+              <option value="" disabled <%=!test.branch ? 'selected' : '' %>>Select branch</option>
+
+              <optgroup label="B.Tech">
+                <option value="b_ai"   <%=test.branch==='b_ai'   ? 'selected' : '' %>>Artificial Intelligence</option>
+                <option value="b_ch"   <%=test.branch==='b_ch'   ? 'selected' : '' %>>Chemical Engineering</option>
+                <option value="b_ce"   <%=test.branch==='b_ce'   ? 'selected' : '' %>>Civil Engineering</option>
+                <option value="b_cse"  <%=test.branch==='b_cse'  ? 'selected' : '' %>>Computer Science and Engineering</option>
+                <option value="b_ep"   <%=test.branch==='b_ep'   ? 'selected' : '' %>>Engineering Physics</option>
+                <option value="b_ee"   <%=test.branch==='b_ee'   ? 'selected' : '' %>>Electrical Engineering</option>
+                <option value="b_ece"  <%=test.branch==='b_ece'  ? 'selected' : '' %>>Electronics Engineering</option>
+                <option value="b_vlsi" <%=test.branch==='b_vlsi' ? 'selected' : '' %>>Electronics & VLSI Engineering</option>
+                <option value="b_ic"   <%=test.branch==='b_ic'   ? 'selected' : '' %>>Industrial Chemistry</option>
+                <option value="b_mnc"  <%=test.branch==='b_mnc'  ? 'selected' : '' %>>Mathematics & Computing</option>
+                <option value="b_me"   <%=test.branch==='b_me'   ? 'selected' : '' %>>Mechanical Engineering</option>
+              </optgroup>
+
+              <optgroup label="M.Tech">
+                <option value="m_cad_cam"      <%=test.branch==='m_cad_cam'      ? 'selected' : '' %>>CAD - CAM</option>
+                <option value="m_ch"           <%=test.branch==='m_ch'           ? 'selected' : '' %>>Chemical Engineering</option>
+                <option value="m_comm_sys"     <%=test.branch==='m_comm_sys'     ? 'selected' : '' %>>Communication Systems</option>
+                <option value="m_cse"          <%=test.branch==='m_cse'          ? 'selected' : '' %>>Computer Science and Engineering</option>
+                <option value="m_control_auto" <%=test.branch==='m_control_auto' ? 'selected' : '' %>>Control & Automation</option>
+                <option value="m_ctm"          <%=test.branch==='m_ctm'          ? 'selected' : '' %>>Construction Technology and Management</option>
+                <option value="m_ds"           <%=test.branch==='m_ds'           ? 'selected' : '' %>>Data Science</option>
+                <option value="m_env"          <%=test.branch==='m_env'          ? 'selected' : '' %>>Environmental Engineering</option>
+                <option value="m_geo"          <%=test.branch==='m_geo'          ? 'selected' : '' %>>Geo Technical Engineering</option>
+                <option value="m_is"           <%=test.branch==='m_is'           ? 'selected' : '' %>>Information Security</option>
+                <option value="m_inst_ctrl"    <%=test.branch==='m_inst_ctrl'    ? 'selected' : '' %>>Instrumentation & Control</option>
+                <option value="m_manufacturing"<%=test.branch==='m_manufacturing'? 'selected' : '' %>>Manufacturing Engineering</option>
+                <option value="m_me"           <%=test.branch==='m_me'           ? 'selected' : '' %>>Mechanical Engineering</option>
+                <option value="m_peed"         <%=test.branch==='m_peed'         ? 'selected' : '' %>>Power Electronics & Electrical Drives</option>
+                <option value="m_power_sys"    <%=test.branch==='m_power_sys'    ? 'selected' : '' %>>Power System</option>
+                <option value="m_struct"       <%=test.branch==='m_struct'       ? 'selected' : '' %>>Structural Engineering</option>
+                <option value="m_thermal"      <%=test.branch==='m_thermal'      ? 'selected' : '' %>>Thermal System Design</option>
+                <option value="m_transport"    <%=test.branch==='m_transport'    ? 'selected' : '' %>>Transportation Engineering and Planning</option>
+                <option value="m_turbo"        <%=test.branch==='m_turbo'        ? 'selected' : '' %>>Turbo Machines</option>
+                <option value="m_urban"        <%=test.branch==='m_urban'        ? 'selected' : '' %>>Urban Planning</option>
+                <option value="m_vlsi"         <%=test.branch==='m_vlsi'         ? 'selected' : '' %>>VLSI & Embedded Systems</option>
+                <option value="m_water"        <%=test.branch==='m_water'        ? 'selected' : '' %>>Water Resources Engineering</option>
+              </optgroup>
+
+              <optgroup label="M.Sc">
+                <option value="msc_math" <%=test.branch==='msc_math' ? 'selected' : '' %>>Department of Mathematics</option>
+                <option value="msc_phy"  <%=test.branch==='msc_phy'  ? 'selected' : '' %>>Department of Physics</option>
+                <option value="msc_chem" <%=test.branch==='msc_chem' ? 'selected' : '' %>>Department of Chemistry</option>
+              </optgroup>
+
+              <optgroup label="MBA">
+                <option value="mba_ba" <%=test.branch==='mba_ba' ? 'selected' : '' %>>Business Analytics</option>
+              </optgroup>
             </select>
-            <!-- IMPORTANT: disabled select does not submit -->
+            <!-- disabled select does not submit, so mirror via hidden input -->
             <input type="hidden" name="branch" value="<%= test.branch %>">
           </div>
         </div>

@@ -1292,7 +1292,7 @@ app.put("/test/:id", isAdmin, async (req, res) => {
         });
         await Promise.all(updatedPromises);
     }
-
+ 
     const test = await Test.findByIdAndUpdate(id, {
         testName,
         duration,
