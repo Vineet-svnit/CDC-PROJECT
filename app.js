@@ -1521,63 +1521,64 @@ app.get("/stats", isAdmin, async (req, res) => {
 
 app.get("/admin/qualification-stats", isAdmin, async (req, res) => {
     try {
-        const { program, year, branch, type } = req.query;
+        const { program, year, branch, testId, isTechnical } = req.query;
+        const query = {};
+        const testMatch = {};
 
-        if (!program || !year || !branch || !type) {
-            return res.status(400).json({ success: false, error: "Missing required parameters" });
+        if (program) query.program = program;
+        if (year) query.year = parseInt(year);
+        if (branch) query.branch = branch;
+        if (testId) {
+            query['submissions.test_id'] = testId;
+            testMatch._id = testId;
+        } else if (isTechnical !== undefined) {
+            // Only apply isTechnical filter if no specific test is chosen
+            testMatch.isTechnical = isTechnical === 'true';
         }
 
-        // academic year is admission academic year (e.g., 2024)
-        const query = {
-            program: program,
-            branch: branch,
-            year: parseInt(year)
-        };
 
-        const users = await User.find(query).populate('submissions.test_id');
+        if (Object.keys(query).length === 0 && Object.keys(testMatch).length === 0) {
+            return res.status(400).json({ success: false, error: "At least one filter is required." });
+        }
+
+        const users = await User.find(query).populate({
+            path: 'submissions.test_id',
+            match: Object.keys(testMatch).length > 0 ? testMatch : undefined
+        });
 
         let qualifiedCount = 0;
         let notQualifiedCount = 0;
 
         users.forEach(user => {
             user.submissions.forEach(sub => {
-                if (!sub.test_id) return;
-
-                const isTechRequested = type === 'technical';
-                const test = sub.test_id;
-
-                // Robustly get Test ID and fields (handle populated or unpopulated)
-                const testId = test._id ? test._id.toString() : test.toString();
-                const testIsTechnical = test.isTechnical;
-                const testBranch = test.branch;
-                const testProgram = test.program;
-                const testYear = test.year;
-
-                // Match criteria strictly
-                const matchesCriteria = (testIsTechnical === isTechRequested) &&
-                    (testBranch === branch) &&
-                    (testProgram === program) &&
-                    (testYear !== undefined && parseInt(testYear) === parseInt(year));
-
-                if (matchesCriteria) {
-                    if (sub.isQualified) {
-                        qualifiedCount++;
+                if (sub.test_id) { // Ensure submission is populated
+                    if (testId) {
+                        // If a test is specified, only count that one
+                        if (sub.test_id._id.toString() === testId) {
+                            if (sub.isQualified) qualifiedCount++;
+                            else notQualifiedCount++;
+                        }
                     } else {
-                        notQualifiedCount++;
+                        // If no test is specified, count all submissions that match the criteria (e.g. isTechnical)
+                        if (sub.isQualified) qualifiedCount++;
+                        else notQualifiedCount++;
                     }
                 }
             });
         });
 
+        const totalSubmissions = qualifiedCount + notQualifiedCount;
+
         res.json({
             success: true,
             qualified: qualifiedCount,
             notQualified: notQualifiedCount,
-            total: qualifiedCount + notQualifiedCount
+            total: totalSubmissions
         });
-    } catch (err) {
-        console.error("Error fetching qualification stats:", err);
-        res.status(500).json({ success: false, error: err.message });
+
+    } catch (error) {
+        console.error("Error fetching qualification stats:", error);
+        res.status(500).json({ success: false, error: "Server error" });
     }
 });
 
