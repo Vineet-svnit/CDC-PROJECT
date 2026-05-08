@@ -372,36 +372,104 @@ if (testSelect) testSelect.addEventListener("change", populateLeaderboard);
 // Initial setup
 updateDownloadBranches();
 updateLeaderboardBranches();
-// Remove fetchLeaderboard() from here - it should only run when filters are selected
+
+// --- Branch Performance Analysis Logic ---
 const statsProgram = document.getElementById('stats_program');
 const statsBranch = document.getElementById('stats_branch');
 const statsYear = document.getElementById('stats_year');
+const statsTestSelect = document.getElementById('stats_testSelect');
 const generateBtn = document.getElementById('generateStatsBtn');
 const resultArea = document.getElementById('statsResultArea');
 const noDataArea = document.getElementById('statsNoData');
 
-if (statsProgram && statsBranch) {
-  statsProgram.addEventListener('change', function () {
-    const selectedProgram = this.value;
-    statsBranch.innerHTML = '<option value="" disabled selected>Select branch</option>';
+function updateStatsBranches() {
+  if (!statsProgram || !statsBranch) return;
+  const selectedProgram = statsProgram.value;
+  statsBranch.innerHTML = '<option value="" disabled selected>Select branch</option>';
+  statsTestSelect.innerHTML = '<option value="">Select Test</option>';
+  statsTestSelect.disabled = true;
 
-    if (selectedProgram && window.programOptions[selectedProgram]) {
 
-      window.programOptions[selectedProgram].forEach(option => {
-        const opt = document.createElement('option');
-        opt.value = option.value;
-        opt.textContent = option.text;
-        statsBranch.appendChild(opt);
-      });
-      statsBranch.disabled = false;
-      if (selectedProgram === 'mba') {
-        statsBranch.value = '';
-      }
-    } else {
-      statsBranch.disabled = true;
+  if (selectedProgram && window.programOptions[selectedProgram]) {
+    window.programOptions[selectedProgram].forEach(option => {
+      const opt = document.createElement('option');
+      opt.value = option.value;
+      opt.textContent = option.text;
+      statsBranch.appendChild(opt);
+    });
+    statsBranch.disabled = false;
+    if (selectedProgram === 'mba') {
+      statsBranch.value = '';
     }
+  } else {
+    statsBranch.disabled = true;
+  }
+}
+
+async function populateStatsTests() {
+  if (!statsBranch || !statsTestSelect || !statsProgram || !statsYear) return;
+
+  const selectedBranch = statsBranch.value;
+  const selectedProgram = statsProgram.value;
+  const selectedYear = statsYear.value;
+  const testTypeEl = document.querySelector('input[name="statsTestType"]:checked');
+
+  if (!selectedBranch || !selectedProgram || !selectedYear || !testTypeEl) {
+    statsTestSelect.innerHTML = "<option value=''>Select Test</option>";
+    statsTestSelect.disabled = true;
+    return;
+  }
+
+  const testType = testTypeEl.value;
+  const isTech = testType === 'technical';
+
+  try {
+    const response = await axios.get('/branchTests', {
+      params: {
+        branch_name: selectedBranch,
+        program: selectedProgram,
+        year: selectedYear,
+        isTechnical: isTech
+      }
+    });
+
+    const allTests = response.data;
+    statsTestSelect.innerHTML = "<option value=''>Select Test</option>";
+    statsTestSelect.disabled = allTests.length === 0;
+
+
+    allTests.forEach((test) => {
+      const opt = document.createElement("option");
+      opt.value = test._id;
+      opt.textContent = test.testName;
+      statsTestSelect.appendChild(opt);
+    });
+  } catch (err) {
+    console.error('Error fetching tests for stats:', err);
+    statsTestSelect.disabled = true;
+  }
+}
+
+
+if (statsProgram) {
+  statsProgram.addEventListener('change', () => {
+    updateStatsBranches();
+    populateStatsTests();
   });
 }
+
+if (statsBranch) {
+  statsBranch.addEventListener('change', populateStatsTests);
+}
+
+if (statsYear) {
+  statsYear.addEventListener('change', populateStatsTests);
+}
+
+const statsTestTypeRadios = document.querySelectorAll('input[name="statsTestType"]');
+statsTestTypeRadios.forEach(radio => {
+  radio.addEventListener('change', populateStatsTests);
+});
 
 let qualChart = null;
 
@@ -410,21 +478,15 @@ if (generateBtn) {
     const program = statsProgram.value;
     const branch = statsBranch.value;
     const year = statsYear.value;
-    const typeEl = document.querySelector('input[name="statsTestType"]:checked');
-    if (!typeEl) return;
-    const type = typeEl.value;
-
-    if (!program || !year || !branch) {
-      alert('Please select Program, Year and Branch');
-      return;
-    }
+    const testId = statsTestSelect.value;
+    const isTechnical = document.querySelector('input[name="statsTestType"]:checked').value === 'technical';
 
     generateBtn.disabled = true;
     const originalHtml = generateBtn.innerHTML;
     generateBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Generating...';
 
     try {
-      const url = `/admin/qualification-stats?program=${program}&year=${year}&branch=${branch}&type=${type}`;
+      const url = `/admin/qualification-stats?program=${program}&year=${year}&branch=${branch}&testId=${testId}&isTechnical=${isTechnical}`;
       const res = await fetch(url);
       const data = await res.json();
 
@@ -480,4 +542,4 @@ if (generateBtn) {
       generateBtn.innerHTML = originalHtml;
     }
   });
-}
+}
