@@ -52,7 +52,23 @@
                 <p>Already have an account? &MediumSpace;<a href="/login">Log in</a>
                 </p>
             </form>
+            <div class="mt-4 text-center" style="width: 100%; display: flex; justify-content: center;">
+                <a href="/randomquit" id="exitExamBtn" class="btn btn-danger" style="display: none; width: auto;">
+                    <i class="fas fa-door-open me-2"></i>Exit Exam Mode
+                </a>
+            </div>
         </div>
+        <script>
+            (function () {
+                const btn = document.getElementById("exitExamBtn");
+                if (!btn) return;
+                const ua = navigator.userAgent || "";
+                const isSEB = ua.includes("SEB") || ua.includes("SafeExamBrowser");
+                if (isSEB) {
+                    btn.style.display = "inline-block";
+                }
+            })();
+        </script>
         <script src="/bootstrap/js/bootstrap.bundle.min.js"></script>
         <script src="/js/script.js"></script>
         <script src="/js/register_login.js"></script>
