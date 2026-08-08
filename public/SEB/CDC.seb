@@ -201,7 +201,7 @@
     <key>allowUploads</key>
     <false />
     <key>examKeySalt</key>
-    <data>utkUoEUUKOqeby+WTgZMWolMHsP1iFfKsjXXO+OJAaw=</data>
+    <data>wkdlfVUjGZkDSIAaugY/GPlrE4X4dmCQp7IOBar/FrI=</data>
     <key>examSessionClearCookiesOnEnd</key>
     <false />
     <key>examSessionClearCookiesOnStart</key>
@@ -1539,7 +1539,7 @@
     <key>allowedDisplayBuiltin</key>
     <true />
     <key>allowedDisplayBuiltinEnforce</key>
-    <true />
+    <false />
     <key>allowedDisplaysIgnoreFailure</key>
     <false />
     <key>enableChromeNotifications</key>
