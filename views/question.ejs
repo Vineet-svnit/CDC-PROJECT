@@ -19,6 +19,13 @@
 
 <body style="background-color: #f5f7fa; overflow-x: hidden;">
 
+    <!-- Submission Loading Overlay -->
+    <div id="submissionOverlay" class="submission-overlay">
+        <div class="submission-spinner"></div>
+        <div class="submission-overlay-text">Submitting your test...</div>
+        <div class="submission-overlay-subtext">Please wait while we calculate your score</div>
+    </div>
+
     <!-- Instruction Overlay (shown during buffer period) -->
     <div id="instructionOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 9999; overflow-y: auto;">
         <div class="container py-5">
@@ -302,12 +309,22 @@
         })
 
         document.querySelector("#submit").addEventListener("click", async (e) => {
-            // await axios.post(`/submission/${testId}`, { submissions, questions });
-            await axios.post(`/submission/${testId}`, { submissions });
-            legalSubmission = true;
-            localStorage.clear();
-            window.location.href = `/submission/${testId}`;
+            // Show loading overlay immediately
+            document.getElementById('submissionOverlay').classList.add('active');
 
+            try {
+                // await axios.post(`/submission/${testId}`, { submissions, questions });
+                await axios.post(`/submission/${testId}`, { submissions });
+                legalSubmission = true;
+                localStorage.clear();
+                window.location.href = `/submission/${testId}`;
+                // Overlay stays visible until the browser navigates away
+            } catch (err) {
+                // Hide overlay on error so user can retry
+                document.getElementById('submissionOverlay').classList.remove('active');
+                console.error('Submission failed:', err);
+                alert('Submission failed. Please try again.');
+            }
         });
 
         // document.addEventListener("visibilitychange", async () => {
