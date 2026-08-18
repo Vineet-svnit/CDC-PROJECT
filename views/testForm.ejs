@@ -125,14 +125,26 @@
 
         let availableCategories = [];
         const branchEl = document.getElementById('branch');
-        if (branchEl) branchEl.addEventListener('change', async function () {
-            const branch = this.value;
-            const res = await fetch(`/categories/${branch}`);
+        const typeTechEl = document.getElementById('typeTech');
+        const typeNonTechEl = document.getElementById('typeNonTech');
+
+        async function fetchCategories() {
+            const branch = branchEl.value;
+            const isTechnical = typeTechEl.checked;
+            
+            if (!branch) return;
+            
+            const fetchBranch = isTechnical ? branch : 'lr';
+            const res = await fetch(`/categories/${fetchBranch}`);
             availableCategories = await res.json();
             document.getElementById('categories-section').style.display = 'block';
             document.getElementById('categories-container').innerHTML = '';
             addCategoryRow();
-        });
+        }
+
+        if (branchEl) branchEl.addEventListener('change', fetchCategories);
+        if (typeTechEl) typeTechEl.addEventListener('change', fetchCategories);
+        if (typeNonTechEl) typeNonTechEl.addEventListener('change', fetchCategories);
         const addBtn = document.getElementById('add-category-btn');
         if (addBtn) addBtn.addEventListener('click', addCategoryRow);
 

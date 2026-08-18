@@ -306,3 +306,75 @@ body {
         padding: 1rem;
     }
 }
+
+/* ===== Submission Loading Overlay ===== */
+.submission-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 28px;
+    animation: overlayFadeIn 0.35s ease-out forwards;
+}
+
+.submission-overlay.active {
+    display: flex;
+}
+
+@keyframes overlayFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Spinner ring */
+.submission-spinner {
+    width: 64px;
+    height: 64px;
+    border: 5px solid #e2e8f0;
+    border-top-color: #27496d;
+    border-radius: 50%;
+    animation: spinRing 0.9s linear infinite;
+}
+
+@keyframes spinRing {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Text beneath spinner */
+.submission-overlay-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #27496d;
+    letter-spacing: 0.3px;
+    animation: textPulse 1.8s ease-in-out infinite;
+}
+
+.submission-overlay-subtext {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: #64748b;
+    margin-top: -16px;
+}
+
+@keyframes textPulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.45;
+    }
+}
